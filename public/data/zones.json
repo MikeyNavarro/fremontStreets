@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "schemaVersion": 1,
+    "source": "Fremont Police Department police zone map reference supplied by the project specification",
+    "sourceUrl": "https://www.fremontpolice.gov/about-us/about-fremont-police/police-zone-map",
+    "checkedAt": "2026-10-18",
+    "boundaryVersion": null,
+    "verificationStatus": "unverified",
+    "proposedChangeDate": "2026-10-06",
+    "adoptionStatus": "Not confirmed. No inference of adoption has been made from the proposed change date.",
+    "accessResult": "After adding required network destinations, the official police page and municipal website returned upstream Akamai HTTP 403 access denied. ArcGIS catalog access remained blocked by the egress proxy. No official polygon or adoption record was retrieved.",
+    "labelProvenance": "Zone labels are supplied by the user's master addendum; their current official status has not been independently verified.",
+    "limitations": "No official or provisional patrol boundaries are shipped. Central Fremont road coverage must not be interpreted as the Zone 1 boundary."
+  },
+  "zones": [
+    {"id":"zone1","name":"Zone 1 — Central Fremont","status":"unavailable","reason":"Official adopted polygon and boundary version have not been verified. Central Fremont road data does not establish a patrol boundary.","geometry":null,"boundaryVersion":null},
+    {"id":"zone2","name":"Zone 2 — North Fremont","status":"unavailable","reason":"Official adopted polygon and boundary version have not been verified; road coverage for this study area is not complete.","geometry":null,"boundaryVersion":null},
+    {"id":"zone3","name":"Zone 3 — South Fremont","status":"unavailable","reason":"Official adopted polygon and boundary version have not been verified; road coverage for this study area is not complete.","geometry":null,"boundaryVersion":null}
+  ]
+}
