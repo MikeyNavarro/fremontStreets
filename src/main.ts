@@ -1,3 +1,4 @@
+import {LearningSystem} from './training/learning';
 import './style.css';
 import {StreetExplorer} from './training/explorer';
 import {DrivingShell} from './ui/shell';
@@ -42,6 +43,8 @@ async function boot() {
   let paused = false;
   let mode: 'free' | 'navigation' | 'quiz' | 'study' = 'free';
   let training: StudyMode | null = null;
+  let learning:LearningSystem|null=null;
+  let answersHidden=false;
   let route: Route | null = null;
   let challenge: {destination:string;targetNode:string;status:'active'|'complete';guided:boolean;index:number} | null = null;
   let guidance = true;
@@ -87,7 +90,8 @@ async function boot() {
   function say(message:string) { $('status').textContent=message;ui.toast(message); recentMessageUntil=performance.now()+6000; }
   function persist() { if(!persistProgress(localStorage,progress)) $('progress-area').textContent='Progress storage unavailable · this session only'; renderProgress();if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress); }
   function routeCoords(r:Route|null) { return r ? r.nodeIds.map(id=>graph.nodes.get(id)!.position) : []; }
-  function showRoute() { const c=guidance?routeCoords(route):[]; overhead.setRoute(c);driver?.setRoute(c); }
+  function protectAnswers(hidden=learning?.hiddenAnswers??false){answersHidden=hidden||mode==='quiz'&&!quizAnswered&&!!quizStreet;app.classList.toggle('answer-protected',answersHidden);overhead.setAssistanceHidden(answersHidden);explorer.setHidden(answersHidden);if(answersHidden){$('status').textContent='Recall practice · assistance hidden';$('toast').hidden=true;}showRoute();}
+  function showRoute() { const c=guidance&&!answersHidden?routeCoords(route):[]; overhead.setRoute(c);driver?.setRoute(c); }
   function currentEdge() { return graph.edges.get(game.vehicle.edgeId)!; }
   function areaHasRoads() { return game.zoneId==='all'||Boolean(study.coverage.zones[game.zoneId]?.available); }
   function renderArea(focusBoundary = true) {
@@ -102,14 +106,14 @@ async function boot() {
   }
   function selectArea(id:string) {
     if(editorActive||id!=='all'&&!study.zone(id)?.geometry)return;
-    training?.leave();persist();keys.clear();pendingTurn=undefined;route=null;game.activeRoute=null;challenge=null;game.zoneId=id;rememberPracticeZone(localStorage,id);
+    learning?.cancel();training?.leave();persist();keys.clear();pendingTurn=undefined;route=null;game.activeRoute=null;challenge=null;game.zoneId=id;rememberPracticeZone(localStorage,id);
     const edgeId=areaHasRoads()?departure.edgeId:null;
     game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);
     showRoute();$('save-route').setAttribute('disabled','');mode='free';setMode('free');renderArea();renderProgress();persist();
     say(edgeId?`${study.zone(id)?.name??'All Fremont'} practice starts at police headquarters on ${currentEdge().name}. Drive to the selected area; other progress is preserved.`:`${study.zone(id)?.name??'Study area'} boundary displayed. No source-road segments are loaded here; navigation and quizzes are unavailable.`);
   }
 
-  function setMode(next:typeof mode) {if(next!=='study')training?.leave();$('study-panel').hidden=next!=='study';$('mode-study').classList.toggle('active',next==='study');if(editorActive||next!=='free'&&!areaHasRoads())return;if(next!=='navigation'&&challenge?.status==='active'){challenge=null;route=null;game.activeRoute=null;showRoute();$('save-route').setAttribute('disabled','');}mode=next;for(const m of ['free','navigation','quiz'])$(`mode-${m}`).classList.toggle('active',m===mode);$('quiz').hidden=mode!=='quiz';$('overhead-view').classList.toggle('quiz-hidden',mode==='quiz');if(mode==='quiz')newQuiz();ui.updateSession(mode,game.zoneId,profile);renderMission();}
+  function setMode(next:typeof mode) {if(next!=='study')training?.leave();$('study-panel').hidden=next!=='study';$('mode-study').classList.toggle('active',next==='study');if(editorActive||next!=='free'&&!areaHasRoads())return;if(next!=='navigation'&&challenge?.status==='active'){challenge=null;route=null;game.activeRoute=null;showRoute();$('save-route').setAttribute('disabled','');}mode=next;for(const m of ['free','navigation','quiz'])$(`mode-${m}`).classList.toggle('active',m===mode);$('quiz').hidden=mode!=='quiz';$('overhead-view').classList.toggle('quiz-hidden',mode==='quiz');if(mode==='quiz')newQuiz();else protectAnswers();ui.updateSession(mode,game.zoneId,profile);renderMission();}
   function renderMission() {
     if(mode==='free')$('mission').innerHTML='<strong>Take the scenic route.</strong>Follow real Fremont streets at your own pace. Turn choices stay queued, so there’s no split-second timing.';
     if(mode==='navigation')$('mission').innerHTML=challenge?.status==='active'?`<strong>Find ${esc(challenge.destination)}</strong><span id="challenge-guide">${guidance?'Follow the highlighted road route.':'Guidance off. Use your street knowledge.'}</span><br><span id="route-remaining"></span>`:`<strong>${challenge?.status==='complete'?'Destination reached. Well driven!':'Find your way across town.'}</strong>Drive a connected route to a real street intersection.<button id="challenge-start" data-testid="challenge-start" class="primary">${challenge?.status==='complete'?'Try another challenge':'Start navigation challenge'}</button>`;
@@ -132,12 +136,13 @@ async function boot() {
     quizStreet=currentEdge().name;
     const collection=study.names(game.zoneId);
     if(!study.contains(game.vehicle.position,game.zoneId)||!collection.includes(quizStreet)){quizStreet='';quizChoices=[];$('quiz').innerHTML='<p class="muted">You are outside this study area or near an uncertain border. Drive onto a clearly classified named street in the selected zone to practice.</p>';return;}
+    if(!verification.entries.some(e=>recognitionEligible(e,game.vehicle.edgeId))){$('quiz').innerHTML='<p>This segment is not independently corroborated for scored recognition. Use the learning dashboard to study an eligible section.</p>';return;}
     if(!quizStreet){$('quiz').innerHTML='<p class="muted">Drive onto a named street to practice.</p>';return;}
-    quizAnswered=false;$('overhead-view').classList.add('quiz-hidden');
+    quizAnswered=false;protectAnswers();$('overhead-view').classList.add('quiz-hidden');
     quizChoices=[quizStreet,...collection.filter(n=>n!==quizStreet).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
     $('quiz').innerHTML=`<p class="muted">Identify the street where this question started. Map labels are hidden until you answer.</p>${quizChoices.map(n=>`<button data-answer="${esc(n)}">${esc(n)}</button>`).join('')}`;
     for(const button of $('quiz').querySelectorAll<HTMLButtonElement>('button'))button.addEventListener('click',()=>{
-      if(quizAnswered)return;quizAnswered=true;$('overhead-view').classList.remove('quiz-hidden');const correct=button.dataset.answer===quizStreet;progress=recordQuiz(progress,game.zoneId,correct);if(game.zoneId!=='all')progress=recordQuiz(progress,'all',correct);persist();say(correct?`Correct! This is ${quizStreet}.`:`This is ${quizStreet}. Keep practicing.`);$('quiz').innerHTML=`<p class="muted">${correct?'Correct.':'Keep learning.'} You are on <strong>${esc(quizStreet)}</strong>.</p><button id="quiz-next">Next question</button>`;$('quiz-next').addEventListener('click',newQuiz);
+      if(quizAnswered)return;quizAnswered=true;protectAnswers();$('overhead-view').classList.remove('quiz-hidden');const correct=button.dataset.answer===quizStreet;progress=recordQuiz(progress,game.zoneId,correct);if(game.zoneId!=='all')progress=recordQuiz(progress,'all',correct);persist();say(correct?`Correct! This is ${quizStreet}.`:`This is ${quizStreet}. Keep practicing.`);$('quiz').innerHTML=`<p class="muted">${correct?'Correct.':'Keep learning.'} You are on <strong>${esc(quizStreet)}</strong>.</p><button id="quiz-next">Next question</button>`;$('quiz-next').addEventListener('click',newQuiz);
     });
   }
   function renderProgress() {
@@ -160,14 +165,14 @@ async function boot() {
     $('view-note').textContent=camera==='driver'?'Schematic 3D · surfaces / interior approximate · bridge heights & traffic controls unverified':'Real source road centerlines · no external map calls during gameplay';
     requestAnimationFrame(()=>{overhead.resize();driver?.resize();showRoute();renderFrame();});
   }
-  function reset(){if(editorActive)return;training?.cancel();keys.clear();pendingTurn=undefined;game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();say('Back at police headquarters. Your saved progress is preserved.');}
+  function reset(){if(editorActive)return;learning?.cancel();training?.cancel();keys.clear();pendingTurn=undefined;game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();say('Back at police headquarters. Your saved progress is preserved.');}
 
   $('zone-select').onchange=()=>selectArea(($('zone-select') as HTMLSelectElement).value);
   $('follow-car').onclick=()=>{if(!editorActive)overhead.centerOnVehicle(game.vehicle.position);};
   $('camera-overhead').onclick=()=>switchCamera('overhead');$('camera-driver').onclick=()=>switchCamera('driver');
   $('pause').onclick=()=>{if(editorActive)return;paused=!paused;$('pause').classList.toggle('active',paused);$('pause').textContent=paused?'Resume':'Pause';keys.clear();};
   $('reset-drive').onclick=reset;
-  for(const m of ['free','navigation','quiz'] as const)$(`mode-${m}`).onclick=()=>{setMode(m);if(m==='free')ui.close();else ui.open('navigation');};
+  for(const m of ['free','navigation','quiz'] as const)$(`mode-${m}`).onclick=()=>{learning?.cancel();setMode(m);if(m==='free')ui.close();else ui.open('navigation');};
   for(const t of ['left','right','straight','uturn'] as const)$(`turn-${t}`).onclick=()=>queue(t);
   $('profile').onchange=()=>profile=($('profile') as HTMLSelectElement).value as AccelerationProfile;
   $('max-speed').onchange=()=>{maxSpeed=Math.max(10,Math.min(100,Number(($('max-speed') as HTMLInputElement).value)||100));($('max-speed') as HTMLInputElement).value=String(maxSpeed);};
@@ -175,13 +180,13 @@ async function boot() {
   $('guidance').onchange=()=>{guidance=($('guidance') as HTMLInputElement).checked;if(challenge?.status==='active'&&guidance)challenge.guided=true;showRoute();renderMission();training?.guidanceChanged();};
   $('save-route').onclick=()=>{if(!route)return;progress=savePracticeRoute(progress,game.zoneId,{id:crypto.randomUUID(),name:challenge?.destination??'Fremont practice route',edgeIds:route.edgeIds,destinationNode:route.nodeIds.at(-1)!,savedAt:new Date().toISOString()});persist();say('Practice route saved in this browser.');};
   for(const id of ['throttle','brake']){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(id);});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(id));}
-  document.addEventListener('keydown',e=>{if(editorActive||ui.isOpen)return;if(e.key==='Escape'){e.preventDefault();ui.open('menu');return;}if((e.target as HTMLElement)?.closest('input,select,textarea,[contenteditable=true]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
+  document.addEventListener('keydown',e=>{if(editorActive||ui.isOpen)return;if(e.key==='Escape'){e.preventDefault();learning?.cancel();ui.open('menu');return;}if(learning?.blocking&&e.key.toLowerCase()!=='c')return;if((e.target as HTMLElement)?.closest('input,select,textarea,[contenteditable=true]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
   document.addEventListener('focusin',e=>{if((e.target as HTMLElement)?.matches('input,select,textarea'))keys.clear();});
   document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();persist();}});
   window.addEventListener('beforeunload',persist);
-  Object.defineProperty(window,'__FREMONT_GAME__',{get:()=>({vehicle:structuredClone(game.vehicle),camera:game.camera,route:route?structuredClone(route):null,progress:structuredClone(progress),get graph(){return {nodes:[...graph.nodes.values()],edges:[...graph.edges.values()]};},paused,challenge:challenge?structuredClone(challenge):null,mode,profile,decision:nextDecision(graph,game.vehicle),zoneId:game.zoneId,get zoneDocument(){return structuredClone(editorDocument);},get zoneCoverage(){return structuredClone(study.coverage.zones);},get overlay(){return overhead.getZoneDiagnostics();},quiz:{street:quizStreet,choices:[...quizChoices]},editorActive,study:training?.snapshot()??null,maxSpeed,presentation:{panel:ui.panel,map:overhead.presentation(),driver:driver?.presentation()??null},departure:{edgeId:departure.edgeId,distance:departure.distance,position:departure.position}})});
-  ui.configure({resize:()=>requestAnimationFrame(()=>{overhead.resize();driver?.resize();}),suspend:()=>keys.clear(),panel:()=>{if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress);}});
+  Object.defineProperty(window,'__FREMONT_GAME__',{get:()=>({vehicle:structuredClone(game.vehicle),camera:game.camera,route:route?structuredClone(route):null,progress:structuredClone(progress),get graph(){return {nodes:[...graph.nodes.values()],edges:[...graph.edges.values()]};},paused,challenge:challenge?structuredClone(challenge):null,mode,profile,decision:nextDecision(graph,game.vehicle),zoneId:game.zoneId,get zoneDocument(){return structuredClone(editorDocument);},get zoneCoverage(){return structuredClone(study.coverage.zones);},get overlay(){return overhead.getZoneDiagnostics();},quiz:{street:quizStreet,choices:[...quizChoices]},editorActive,study:training?.snapshot()??null,maxSpeed,learning:learning?.snapshot()??null,presentation:{panel:ui.panel,map:overhead.presentation(),driver:driver?.presentation()??null},departure:{edgeId:departure.edgeId,distance:departure.distance,position:departure.position}})});
+  ui.configure({resize:()=>requestAnimationFrame(()=>{overhead.resize();driver?.resize();}),suspend:()=>keys.clear(),panel:()=>{if(ui.panel==='learning')learning?.render();if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress);}});
   $('map-orientation').onchange=()=>overhead.setHeadingUp(($('map-orientation') as HTMLSelectElement).value==='heading');
   $('map-zoom').oninput=()=>{const zoom=Number(($('map-zoom') as HTMLInputElement).value);$('map-zoom-value').textContent=zoom.toFixed(1);overhead.setZoom(zoom);};
   $('map-follow').onchange=()=>{overhead.setFollowVehicle(false);($('map-follow') as HTMLInputElement).checked=false;};
@@ -194,17 +199,19 @@ async function boot() {
     accumulator+=Math.min((now-last)/1000,.1);last=now;
     while(accumulator>=1/60){
       accumulator-=1/60;
-      if(!paused&&!editorActive&&!ui.isOpen&&areaHasRoads()){
+      if(!paused&&!editorActive&&!ui.isOpen&&!learning?.blocking&&areaHasRoads()){
         game.vehicle=stepVehicle(graph,game.vehicle,{throttle:keys.has('arrowup')||keys.has('w')||keys.has('throttle'),brake:keys.has('arrowdown')||keys.has('s')||keys.has('brake'),turn:pendingTurn},1/60,{profile,maxSpeedMph:maxSpeed,cornerAssist:assist});pendingTurn=undefined;
         if(mode==='study')training?.tick(game.vehicle);
+        learning?.tick(game.vehicle);
         if(game.vehicle.events.length){progress=study.record(progress,game.vehicle);if(challenge?.status==='active'){
           if(game.vehicle.events.some(e=>e.type==='node'&&e.id===challenge!.targetNode)){challenge.status='complete';progress=recordChallenge(progress,game.zoneId,challenge.guided);if(game.zoneId!=='all')progress=recordChallenge(progress,'all',challenge.guided);persist();renderMission();say('Destination reached! Navigation challenge completed.');}
         }}
       }
     }
     renderFrame();
-    if(now-lastHud>120){lastHud=now;ui.updateSession(mode,game.zoneId,profile);$('hud-guidance').textContent=guidance?'GUIDANCE ON':'NO GPS · STREET NAMES ONLY';const activeMission=training?.missionState;const destination=activeMission?activeMission.goal.kind==='headquarters'?'Police Headquarters':studyNetwork.entries.find(entry=>entry.id===activeMission.targetId)?.originalLabel:challenge?.destination;$('hud-destination').textContent=destination?`DESTINATION · ${destination}`:'Free drive · make yourself familiar';const edge=currentEdge();$('speed').textContent=String(Math.round(mph(game.vehicle.speed)));$('speed-limit').textContent=edge.speedLimitMph===null?'?':String(Math.round(edge.speedLimitMph));$('street-name').textContent=mode==='quiz'&&!quizAnswered?'Street-name practice':edge.name||'Unnamed mapped road';
+    if(now-lastHud>120){lastHud=now;ui.updateSession(mode,game.zoneId,profile);$('hud-guidance').textContent=guidance?'GUIDANCE ON':'NO GPS · STREET NAMES ONLY';const activeMission=training?.missionState;const destination=activeMission?activeMission.goal.kind==='headquarters'?'Police Headquarters':studyNetwork.entries.find(entry=>entry.id===activeMission.targetId)?.originalLabel:challenge?.destination;$('hud-destination').textContent=destination?`DESTINATION · ${destination}`:'Free drive · make yourself familiar';const edge=currentEdge();$('speed').textContent=String(Math.round(mph(game.vehicle.speed)));$('speed-limit').textContent=edge.speedLimitMph===null?'?':String(Math.round(edge.speedLimitMph));$('street-name').textContent=answersHidden||mode==='quiz'&&!quizAnswered?'Street-name practice':edge.name||'Unnamed mapped road';
       const decision=nextDecision(graph,game.vehicle);const choices=decision?.choices??outgoingChoices(graph,game.vehicle);const next=choices.filter(c=>c.kind!=='uturn');const distance=decision?.distance??Math.max(0,edge.length-game.vehicle.distance);const plannedIndex=guidance&&route?route.edgeIds.indexOf(decision?.incomingEdgeId??''):-1;const plannedEdge=plannedIndex>=0?graph.edges.get(route!.edgeIds[plannedIndex+1]):null;const planned=choices.find(choice=>choice.edgeId===plannedEdge?.id);$('turn-prompt').textContent=game.vehicle.pendingTurn?`${game.vehicle.pendingTurn.toUpperCase()} queued · junction in ${Math.round(distance)} m`:planned&&plannedEdge?`In ${Math.round(distance)} m · ${planned.kind==='uturn'?'turn around':planned.kind==='straight'?'continue straight':`turn ${planned.kind}`} onto ${plannedEdge.name||'the mapped connecting road'}`:next.length>1?`Junction in ${Math.round(distance)} m · ${next.map(c=>`${c.kind}: ${c.name||'unnamed road'}`).join(' · ')}`:'Hold W / ↑ to drive · queue a turn with A / D';
+      if(answersHidden){$('hud-destination').textContent='Recall practice';$('turn-prompt').textContent='Answer the map question to resume driving';}
       const unsupportedEnd=Boolean(decision&&!choices.length&&distance<200);$('turn-prompt').dataset.roadStatus=unsupportedEnd?'blocked':'open';if(unsupportedEnd)$('turn-prompt').textContent=distance<1?'No supported continuation here. Reset at HQ to begin another drive; progress is kept.':`Supported road coverage ends in ${Math.round(distance)} m. Choose another connected road before the gap.`;
       overhead.setTurns(next.map(c=>{const e=graph.edges.get(c.edgeId)!;return {coordinates:[graph.nodes.get(e.from)!.position,graph.nodes.get(e.to)!.position],selected:c.kind===game.vehicle.pendingTurn};}));driver?.setTurns(next.map(c=>{const e=graph.edges.get(c.edgeId)!;return {coordinates:[graph.nodes.get(e.from)!.position,graph.nodes.get(e.to)!.position],selected:c.kind===game.vehicle.pendingTurn};}));
       if(challenge?.status==='active'){
@@ -220,8 +227,13 @@ async function boot() {
     requestAnimationFrame(frame);
   }
   training=new StudyMode({container:$('study-panel'),network:studyNetwork,graph,overhead,storage:localStorage,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,setGuidance:(enabled)=>{guidance=enabled;($('guidance') as HTMLInputElement).checked=enabled;showRoute();},onMessage:say,onStart:(vehicle,nextRoute)=>{keys.clear();pendingTurn=undefined;paused=false;$('pause').classList.remove('active');$('pause').textContent='Pause';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;progress=study.record(progress,game.vehicle);$('save-route').toggleAttribute('disabled',!nextRoute);showRoute();if(nextRoute)ui.close();},onRoute:(nextRoute)=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
-  const openStudy=(zone1=false)=>{if(editorActive)return;selectArea(zone1?'zone1':'all');($('zone-select') as HTMLSelectElement).value=game.zoneId;setMode('study');training!.enter(zone1);$('mission').innerHTML='<strong>Your roads. Your navigation.</strong>Preview the listed roads, then start from headquarters. Any supported legal route can count.';};
+  const openStudy=(zone1=false)=>{if(editorActive)return;learning?.cancel();selectArea(zone1?'zone1':'all');($('zone-select') as HTMLSelectElement).value=game.zoneId;setMode('study');training!.enter(zone1);$('mission').innerHTML='<strong>Your roads. Your navigation.</strong>Preview the listed roads, then start from headquarters. Any supported legal route can count.';};
   $('mode-study').onclick=()=>{if(mode!=='study')openStudy();ui.open('study');};$('mode-zone1-main').onclick=()=>{openStudy(true);ui.open('study');};
+  learning=new LearningSystem({dashboard:$('learning-dashboard'),viewport:$('driving-viewport'),network:studyNetwork,evidence:verification,graph,overhead,explorer,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,clearInputs:()=>{keys.clear();pendingTurn=undefined;},close:()=>ui.close(),open:()=>ui.open('learning'),map:()=>switchCamera('overhead'),message:say,
+    policy:hidden=>protectAnswers(hidden),prepare:()=>{training?.leave();mode='free';quizAnswered=true;$('quiz').hidden=true;$('overhead-view').classList.remove('quiz-hidden');challenge=null;route=null;protectAnswers(false);},
+    startDrive:(vehicle,nextRoute,guided)=>{training?.leave();mode='free';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;guidance=guided;($('guidance') as HTMLInputElement).checked=guided;keys.clear();pendingTurn=undefined;paused=false;$('pause').textContent='Pause';showRoute();},setRoute:nextRoute=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
+  app.addEventListener('click',event=>{const button=(event.target as HTMLElement).closest('[data-open-panel]');if(button&&learning?.hiddenAnswers)learning.cancel();},true);
+  await learning.initialize();
   ($('zone-select') as HTMLSelectElement).value=game.zoneId;
   renderMission();renderProgress();renderArea(false);
   if(import.meta.env.DEV&&new URLSearchParams(location.search).get('zoneEditor')==='1'){

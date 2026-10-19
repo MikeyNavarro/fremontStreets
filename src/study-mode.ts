@@ -64,7 +64,7 @@ export class StudyMode {
     const available=readyStudyEntries(this.options.network);
     const ready=available.filter(entry=>this.group!=='zone1'||entry.zone1Location);
     const option=(entry:StudyEntry)=>`<option value="${entry.id}">${esc(entry.originalLabel)}${entry.status==='ready'?'':' · needs verification'}</option>`;
-    this.options.container.innerHTML=`<h3>My Street List — 38 Entries</h3><p class="muted">${available.length} mapped training targets; ${this.options.network.entries.length-available.length} need verification. Blue: east–west study group. Orange: north–south. These are memory categories, not exact bearings.</p>
+    this.options.container.innerHTML=`<h3>My Street List — 38 Entries</h3><p class="notice">Source-graph practice · unscored for mastery. Use the Street-learning Dashboard for independently corroborated recognition tasks.</p><p class="muted">${available.length} mapped training targets; ${this.options.network.entries.length-available.length} need verification. Blue: east–west study group. Orange: north–south. These are memory categories, not exact bearings.</p>
       <label class="study-field">Study group<select id="study-group" data-testid="study-group"><option value="all">All 38 entries</option><option value="ew">East–West — 21 Entries</option><option value="ns">North–South — 17 Entries</option><option value="zone1">Zone 1 portions of my list</option></select></label>
       <label class="study-field">Target road<select id="study-target" data-testid="study-target">${list.map(option).join('')}</select></label>
       <p id="study-target-note" class="muted"></p><button id="study-preview" data-testid="study-preview">Preview target on map</button>
@@ -188,8 +188,8 @@ export class StudyMode {
     for(const button of this.el('study-quiz').querySelectorAll<HTMLButtonElement>('button'))button.onclick=()=>{
       if(!this.quiz||this.quiz.answered)return;this.quiz.answered=true;
       const correct=button.dataset.studyAnswer===answer;
-      if(correct){const record=this.progress.entries[answer]??emptyStudyRecord();this.progress.entries[answer]={...record,identified:record.identified+1};const previous=this.progress.intersections[junction.id]??{completed:0,identified:0};this.progress.intersections[junction.id]={...previous,identified:previous.identified+1};this.persist();this.renderProgress();}
-      this.el('study-quiz').innerHTML=`<p class="muted">${correct?'Correct.':'Keep practicing.'} The source junction connects ${esc(junction.entryIds.map(id=>this.entry(id).originalLabel).join(' and '))}. This question asserts node connectivity, not every possible traffic movement.</p>`;
+
+      this.el('study-quiz').innerHTML=`<p class="muted">${correct?'Matches the OSM record.':'Review the OSM record.'} Unscored: the source junction lists ${esc(junction.entryIds.map(id=>this.entry(id).originalLabel).join(' and '))}. This question asserts node connectivity, not every possible traffic movement.</p>`;
     };
     this.options.overhead.focusPosition(junction.position,'Source-backed study junction');
   }

@@ -98,7 +98,7 @@ export class OverheadView {
       map.on('dragstart',()=>this.camera?.explore());
       map.on('rotatestart',event=>{if(event.originalEvent)this.camera?.explore();});
       map.on('pitchstart',event=>{if(event.originalEvent)this.camera?.explore();});
-      map.on('click',event=>{if(this.assistanceHidden||!this.onRoadClick)return;const hit=map.queryRenderedFeatures([[event.point.x-5,event.point.y-5],[event.point.x+5,event.point.y+5]],{layers:['roads']})[0];if(hit)this.onRoadClick(String(hit.properties.wayId),event.lngLat.toArray() as LonLat);});
+      map.on('click',event=>{if(!this.onRoadClick)return;const hit=map.queryRenderedFeatures([[event.point.x-5,event.point.y-5],[event.point.x+5,event.point.y+5]],{layers:['roads']})[0];if(hit)this.onRoadClick(String(hit.properties.wayId),event.lngLat.toArray() as LonLat);});
       this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
       // Keep the useful street-learning scale when driving. Fitting the entire
       // extract here would hide local street labels; zoom-out remains available.
