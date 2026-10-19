@@ -3,7 +3,8 @@
 Captured from the production build served under `/fremontStreets/` using
 Chromium. Desktop captures are 1920×1080; the laptop capture is 1280×800.
 They show the actual game with its bundled source-backed roads and browser-local
-state. Initial and refined captures were inspected during implementation.
+state. Initial and refined captures were inspected during implementation. The driver
+capture includes an active navigation route after the final cockpit layering fix.
 
 | Screen | Capture |
 |---|---|

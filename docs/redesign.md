@@ -114,6 +114,9 @@ were captured and inspected. Refinements included:
 - Increasing menu type sizes, reducing panel transparency and preventing stale
   map notifications from showing through newly opened panels.
 - Fixing focus escaping at the end of a dialog's tab sequence.
+- Correcting transparent route/turn ribbons drawing across the cockpit, found
+  during public-site inspection. The foreground interior now renders after
+  world ribbons; the driver screenshot includes an active navigation route.
 
 Eight representative final screenshots are captured by the UI browser suite
 and published in [the screenshot gallery](screenshots/README.md).
@@ -126,11 +129,14 @@ and published in [the screenshot gallery](screenshots/README.md).
   assertions; later refinements are covered by the final complete suites.
 - `npm run test:e2e`: **10 passed** in 4.9 minutes. The development-only
   editor passed again after its final dark form/status refinement (one targeted
-  browser check).
+  browser check). A repeated complete run with `CI=1` also passed all ten.
 - `npm run test:production`: **17 passed** in 8.5 minutes, covering the existing
   static/gameplay scenarios plus seven new UI checks. No failed/skipped cases.
   After simplifying the bulk rendering, **nine affected browser checks passed**
   again, including the seven UI cases, both cameras and actual no-GPS driving.
+  After the final cockpit layering correction, **four affected checks passed**
+  in 2.3 minutes: both rendered cameras, an active-route driver capture and
+  working settings, reduced motion/held throttle, and real no-GPS completion.
 
 The existing tests still exercise real driving controls and challenge completion.
 They were adapted to open the relevant menu/dialog instead of assuming permanent
@@ -155,11 +161,11 @@ Chromium/SwiftShader with reduced motion:
 
 | View | Balanced | Efficient |
 |---|---:|---:|
-| Driver | 6.3 FPS | 8.3 FPS |
-| Overhead | 10.6 FPS | 13.5 FPS |
+| Driver | 5.8 FPS | 8.4 FPS |
+| Overhead | 10.3 FPS | 12.4 FPS |
 
 Each observation uses a one-second warmup followed by two seconds during actual
-driving. The warmed sampling check passed separately after the nine affected
+driving. The current sample was collected during the four final affected
 checks. These are
 short software-rendering samples, not a representative GPU benchmark or a
 claimed 60 FPS result. [The earlier sample](redesign-performance-before.json)

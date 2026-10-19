@@ -116,8 +116,10 @@ export class DriverView {
     const hub=new THREE.Mesh(new THREE.BoxGeometry(.1,.055,.04),material);hub.position.set(-.43,-.49,-.89);this.camera.add(hub);
     this.dashboardCanvas=document.createElement('canvas');this.dashboardCanvas.width=512;this.dashboardCanvas.height=192;this.dashboardTexture=new THREE.CanvasTexture(this.dashboardCanvas);this.dashboardTexture.colorSpace=THREE.SRGBColorSpace;
     const screen=new THREE.Mesh(new THREE.PlaneGeometry(.38,.1425),new THREE.MeshBasicMaterial({map:this.dashboardTexture,toneMapped:false}));screen.position.set(.02,-.47,-.9);this.camera.add(screen);
-    // A foreground cockpit must not be hidden by the flat world pass.
-    this.camera.children.forEach((part,index)=>{if(part instanceof THREE.Mesh){part.renderOrder=20+index;part.material.depthTest=false;part.material.depthWrite=false;}});this.camera.children[2].renderOrder=19;
+    // Keep the cockpit in the transparent queue after world ribbons. Three.js
+    // renders transparent world meshes after opaque meshes regardless of renderOrder.
+    // Fully opaque foreground materials still blend at opacity 1.
+    this.camera.children.forEach((part,index)=>{if(part instanceof THREE.Mesh){part.renderOrder=20+index;part.material.transparent=true;part.material.opacity=1;part.material.depthTest=false;part.material.depthWrite=false;}});this.camera.children[2].renderOrder=19;
     this.scene.add(this.camera);this.drawInstruments(0);
   }
   private drawInstruments(speed:number){const ctx=this.dashboardCanvas?.getContext('2d');if(!ctx||!this.dashboardTexture)return;ctx.fillStyle='#07151c';ctx.fillRect(0,0,512,192);ctx.fillStyle='#e7f4f5';ctx.font='500 100px system-ui';ctx.textAlign='center';ctx.fillText(String(speed),190,130);ctx.font='20px system-ui';ctx.fillStyle='#8babb9';ctx.fillText('MPH',310,126);ctx.fillStyle='#71e5c7';ctx.fillRect(65,160,382*Math.min(speed/100,1),3);ctx.font='15px system-ui';ctx.fillText('FREMONT STREETS',255,32);this.dashboardTexture.needsUpdate=true;}
