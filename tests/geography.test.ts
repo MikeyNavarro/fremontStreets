@@ -70,16 +70,26 @@ test('only-turn restrictions remain restrictive when their sole target is filter
   assert.equal(data.restrictions[0].toWay, '11');
 });
 
-test('patrol geometry is withheld without adopted official polygons and dates', async () => {
+test('patrol study geometry retains historical City GIS provenance without claiming current adoption', async () => {
   const data = JSON.parse(await readFile(new URL('../public/data/zones.json', import.meta.url), 'utf8'));
-  assert.equal(data.metadata.verificationStatus, 'unverified');
-  assert.equal(data.metadata.boundaryVersion, null);
+  assert.equal(data.metadata.accuracy, 'approximate');
+  assert.equal(data.metadata.geometrySource, 'official-gis');
+  assert.equal(data.metadata.sourceItemId, '6e6db16bb5da46daa24e063b1507268e');
+  assert.equal(data.metadata.sourceDataLastEditDate, '2020-12-10T01:27:59.899Z');
+  assert.match(data.metadata.adoptionStatus, /has not been confirmed/);
+  assert.equal(data.metadata.digitizedAt, null, 'georeferenced source coordinates were imported directly');
+  assert.equal(data.metadata.calibration.uncertaintyMeters, 75);
+  assert.match(data.metadata.calibration.uncertaintyInterpretation, /not a measured GIS positional accuracy/);
   assert.equal(data.zones.length, 3);
   for (const zone of data.zones) {
-    assert.equal(zone.status, 'unavailable');
-    assert.equal(zone.geometry, null);
+    assert.equal(zone.status, 'partial');
+    assert.equal(zone.geometry.type, 'Polygon');
+    assert.ok(zone.geometry.coordinates[0].length > 1000, 'real source polygon vertices retained');
+    assert.equal(zone.sourceAttributes.ZONE, Number(zone.id.slice(-1)));
+    assert.equal(zone.boundaryVersion, data.metadata.boundaryVersion);
     assert.ok(zone.reason.length > 20);
   }
+  assert.match(data.zones[2].reason, /coverage is partial/);
 });
 
 test('bounded query includes source restriction relations and recursively retains source geometry', () => {

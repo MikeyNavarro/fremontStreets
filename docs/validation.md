@@ -1,57 +1,46 @@
-# First playable slice: validation and scope
+# Patrol-zone update: validation and scope
 
-The initial README was committed and pushed to GitHub `main` as `2076b5efb97ff3eb4a983ae2de6dca0356e6a71a`; the fetched remote tree contained `README.md`. The application work is in the working checkout and has not been committed or pushed as part of that README-only publication request.
+The playable game was preserved in commit `70223c0` before patrol development and pushed to GitHub `main`. The patrol implementation is separate from that baseline. No force-push or unrelated repository changes were used.
 
-## Executed checks
+## Current capabilities
 
-- `npm ci --no-audit --no-fund` completed using the frozen lockfile and workspace npm cache.
-- `npm run build` passed strict TypeScript checks and generated the production bundle. Vite reports a size advisory for MapLibre and Three.js library chunks; this is not a build failure.
-- `npm test`: **31 passed, 0 failed, 0 skipped**. Tests include acceleration, braking, caps, projection, source topology, bridge crossings, one-way/access, restrictions, buffered turns, canonical route/controller choices, camera invariance, navigation completion, progress serialization, and geographic imports.
-- `npm run test:e2e`: **6 passed, 0 failed, 0 skipped** in the final complete Chromium run (2.1 minutes). Scenarios verify actual rendered roads and zone availability; keyboard driving through multiple intersections and braking; both rendered cameras and exact paused-state invariance; persisted progress and saved-route replay/cancellation; completing a real navigation challenge through driving controls; and quiz accuracy. The targeted navigation test also passed separately. No vehicle state mutation or teleportation was used to complete the challenge.
-- Production browser smoke verification rendered MapLibre roads and Three.js, preserved the exact paused vehicle on camera switch, and observed no page errors or external service requests. Desktop and 390-pixel mobile layouts were inspected.
-- The documented `npm run data:import -- --output /tmp/fremont-roads-roundtrip.json` completed against Overpass. Source nodes, ways and restrictions matched the bundled snapshot on repeat import.
+All Fremont and Zones 1, 2 and 3 can be selected. A zone selection starts a new practice drive on an existing safe interior source road and preserves every area's learning record. The map centers on the colored boundary; accelerating or choosing **Follow car** resumes vehicle following. Boundaries do not block driving or split the physical graph.
 
-## Required behavior and evidence
+Navigation prefers in-zone source segments and selects safely interior destinations, but can cross boundaries when the continuous graph requires it. Questions use the selected zone's source street collection and withhold questions when the vehicle is outside it or near an uncertain border. Exploration is recorded by actual geographic location; citywide totals aggregate zone practice. Challenges, quizzes, recent streets, saved routes and independent zone progress persist in browser storage.
 
-| Behavior | Evidence / scope |
-| --- | --- |
-| Game starts | Vite startup, served HTML and local road JSON, actual Chromium application checks |
-| Real Fremont roads | Bundled timestamped OSM IDs/tags/geometry; geographic tests validate source-derived graph segments |
-| Multiple real intersections | Keyboard browser drive crosses at least two; a two-minute core drive crosses 27 unique source intersections |
-| QUICK acceleration | Automated unconstrained measurement reaches 30 mph at about 2.5 seconds and 45 mph at about 4.5 seconds |
-| Overhead view | Actual MapLibre canvas, roads and real street labels verified |
-| Driver view | Actual Three.js WebGL canvas verified; flat schematic road widths and scenery are approximate |
-| Camera invariant | Exact paused vehicle, speed, heading, active route and progress equality in browser and core tests |
-| Navigation challenge | Exact source-node arrival completes a real connected route; browser controls reach the target |
-| Learning areas | All Fremont uses the loaded partial graph; three patrol-zone options are visibly unavailable |
-| Official boundaries | No polygon, effective date or adoption record could be verified; null geometries and provenance records retained |
-| Progress | Exploration, challenges, quizzes, recent streets and saved routes stored separately in local storage; independent zone records tested in core |
-| Build and tests | Production build and the executed automated checks above |
-| Geographic uncertainty | Interface, README, source metadata and geography documentation explicitly distinguish missing information |
+The developer editor works only in Vite development with `?zoneEditor=1`; gameplay pauses. It displays all boundaries, offers zone selection, draggable vertices and precision longitude/latitude controls, previews classified streets and uncertain segments, validates edits, supports undo/discard/original reversion, and imports/exports versioned approximate GeoJSON with provenance. Map handles are spaced for readability; all original vertices remain editable in the selector. Editor history has no reference to the road graph. Production builds do not enable the editor.
 
-## Supported coverage and limitations
+## Source and coverage
 
-The requested study extract is central Fremont, bounded by −122.004/37.534 and −121.963/37.568, with whole returned ways extending into the surrounding buffer. It includes Downtown-area roads such as Fremont Boulevard, Mowry Avenue, Walnut Avenue and Paseo Padre Parkway. It is neither full-city coverage nor a verified Zone 1 polygon.
+Actual City of Fremont GIS Division `Police_Zones` polygons match the supplied screenshot. Their source data dates to December 2020, with catalog metadata from February 2021. They are labeled **approximate study boundaries**, not verified current adopted or surveyed patrol boundaries. The proposed October 6, 2026 changes remain unconfirmed. No manual screenshot coordinates or guessed rectangles were used. Original rings and holes are retained.
 
-The source snapshot (2026-10-18T23:12:16Z) contains 3,063 ways, 9,998 nodes, 537 nonempty source names, 42 supported node-via restrictions and 50 unsupported restriction records. Conservative graph handling omits 85 ways implicated by unsupported restrictions; the playable graph has 535 unique names. See `public/data/roads.json` for provenance, query, checksum and limitations. Nothing is inferred from lines simply crossing in space.
+The 75 m uncertain-border review band is classification policy, not a measured GIS accuracy or guarantee of current patrol adoption. Source URLs, screenshot reference, import date, source version, hashes and calibration method are in `public/data/zones.json` and `docs/patrol-sources.md`.
 
-Police and municipal websites returned upstream access denial; ArcGIS discovery could not supply verified official polygons or an adoption record. The proposed October 6, 2026 boundary changes are not assumed adopted. All three patrol zones remain unavailable. The guarded zone importer prepares reviewed official data; activating boundary overlays, zone-filtered gameplay and per-zone UI requires integration and tests against those verified polygons before removing the unavailable state.
+| Area | Playable source segments | Named streets | Coverage |
+| --- | ---: | ---: | --- |
+| Zone 1 — Central Fremont | 11,275 | 588 | Partial |
+| Zone 2 — North Fremont | 1,849 | 185 | Partial |
+| Zone 3 — South Fremont | 6,632 | 273 | Partial |
 
-Traffic signals, detailed lanes, terrain, bridge heights and missing/complex legal restrictions are unverified. The 3D view is flat and schematic; physical movement still follows source-node connectivity and cannot jump between disconnected crossing roads. Speed limits are displayed only from supported source values. Corner assist and the absence of traffic waiting are simulation simplifications.
+Cross-zone streets may appear in several collections. These counts are not complete inventories or completion percentages. The original central Fremont extract and authorized northern Irvington/Zone 3 append leave much of the city and each zone uncovered.
 
-At forks with multiple branches in one direction, left/right selects a canonical branch. Navigation avoids alternatives that these directional controls cannot explicitly choose; the underlying physical road graph is unchanged. Explicit branch selection is a future improvement.
+The merged OSM source has 5,839 ways, 19,523 nodes and 37,792 playable directed edges. A canonical-hash regression confirms every original node, way and restriction is unchanged, and all 18,854 original directed edges retain their exact properties. Source topology, one-way/access and supported restrictions remain authoritative; source lines are never snapped together merely because they cross.
 
-Browser storage is local to this origin, browser and device; there is no account synchronization. Only named streets in the playable extract can appear in questions. Routes may leave the requested box via retained source ways. There is no misleading dataset-completion percentage.
+## Executed verification
 
-## Fixed during validation
+- `npm run build` passes strict TypeScript checking and generates the production bundle. MapLibre and Three.js retain a library-size advisory; this is not a build failure.
+- `npm test`: **60 passed, 0 failed, 0 skipped** after the final source import.
+- `npm run test:e2e`: **10 passed, 0 failed, 0 skipped** in the final complete Chromium run (3.7 minutes). This includes the original full navigation/driving/camera/storage regressions and all three actual zones plus developer editing.
+- Actual browser controls verified correct source polygons/colors; all three zones’ questions, safe navigation targets, saved routes and preserved progress; normal editing disabled; and developer dragging, precise edits, invalid rejection, undo/discard/revert, GeoJSON import/export and unchanged road connectivity.
+- All three zones' actual navigation routes were driven through buffered directional controls in the automated core tests, using real source geometry and exact destination-node arrival.
+- Historical GIS network reimport reproduced the source geometry. The bounded road append was repeated against the original baseline with the same added geometry and rules. Repeating the same normalized append is byte-identical, with zero additions.
+- Original QUICK acceleration, braking, speed caps, road following, camera invariance and storage tests remain part of the regression suite.
+- A production-browser smoke check verified all three nonempty zone collections and actual selected map overlays, exact paused vehicle preservation when switching to the driver camera, zero page errors, and zero external gameplay requests. Even with `?zoneEditor=1`, the production build showed no editor and reported editing disabled.
 
-MapLibre 6 required an explicit bundled ESM worker URL for Vite. Navigation initially allowed shape-node reversals and ambiguous same-direction forks that the controls could not select. Routing now uses the same canonical directional choices as driving, with regressions for the reported Sundale Drive/Fremont Boulevard fork. Upcoming-intersection lookahead gives advance instructions across intermediate road-shape nodes.
+## Remaining limitations and next priorities
 
-## Highest-priority next work
+Current legal patrol adoption is unverified. Road coverage is partial; terrain, bridge heights, lanes, traffic signals and missing/complex restrictions remain unverified. The driver's-seat scene is flat and schematic. Corner assist and the absence of traffic waiting are simulation simplifications, not statements of traffic law.
 
-1. Obtain and review adopted official patrol polygons and effective dates, then integrate/test boundary overlays, in-zone destinations/questions, and per-zone UI before enabling the zone options.
-2. Expand versioned road coverage across Fremont and implement more complex via-way/conditional restrictions without weakening conservative access rules.
-3. Add destination selection, convenient route recovery and more street-learning question formats.
-4. Improve the schematic driver scene with source-backed elevations and landmarks, keeping visual approximations explicit.
+At forks with several branches in the same direction, left/right selects a canonical branch. Navigation uses transitions selectable through those controls. Explicit branch selection and route recovery remain improvements. Browser progress is local to the origin/device and has no account synchronization.
 
-Reusable installation and startup instructions are saved in the environment configuration draft. Saving that draft does not publish a snapshot or verify restoration into a new task. Review/save environment settings and publish through the product when ready.
+Next priorities are confirming current official patrol adoption, expanding bounded source coverage across all three study areas, improving destination selection and recovery, and incorporating verified traffic controls and elevations. Reusable installation/startup instructions are saved in the environment draft; publication and restoration into a new task are separate and are not claimed by these checks.

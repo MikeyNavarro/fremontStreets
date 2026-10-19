@@ -43,7 +43,16 @@ async function state(page: Page, includeGraph = false): Promise<Snapshot> {
   return page.evaluate(withGraph => {
     const app = window as unknown as { __FREMONT_GAME__: Snapshot };
     const snapshot = app.__FREMONT_GAME__;
-    return structuredClone({ ...snapshot, graph: withGraph ? snapshot.graph : { nodes: [], edges: [] } });
+    return structuredClone({
+      vehicle: snapshot.vehicle,
+      camera: snapshot.camera,
+      paused: snapshot.paused,
+      route: snapshot.route,
+      progress: snapshot.progress,
+      graph: withGraph ? snapshot.graph : { nodes: [], edges: [] },
+      challenge: snapshot.challenge,
+      decision: snapshot.decision,
+    });
   }, includeGraph);
 }
 
@@ -52,7 +61,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
 });
 
-test('starts with actual Fremont road coverage and honest zone availability', async ({ page }) => {
+test('starts with actual Fremont roads and selectable patrol study areas', async ({ page }) => {
   const snapshot = await state(page, true);
   expect(snapshot.graph.nodes.length).toBeGreaterThan(100);
   expect(snapshot.graph.edges.length).toBeGreaterThan(100);
@@ -65,7 +74,7 @@ test('starts with actual Fremont road coverage and honest zone availability', as
   await expect(page.getByTestId('zone-select')).toHaveValue('all');
   await expect(page.getByTestId('zone-select').locator('option')).toHaveCount(4);
   for (const zone of ['zone1', 'zone2', 'zone3']) {
-    await expect(page.getByTestId('zone-select').locator(`option[value="${zone}"]`)).toBeDisabled();
+    await expect(page.getByTestId('zone-select').locator(`option[value="${zone}"]`)).toBeEnabled();
   }
   await expect(page.getByTestId('overhead-view')).toBeVisible();
   await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready', 'true');

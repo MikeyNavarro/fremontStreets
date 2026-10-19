@@ -1,4 +1,6 @@
 import './style.css';
+import { PatrolStudy } from './patrol';
+import { APPROXIMATE_ZONE_NOTICE, type ZoneDocument } from './core/zones';
 import { buildGraph, isValidRoute, createVehicle, stepVehicle, outgoingChoices, nextDecision, routeFromVehicle, legalOutgoing, nearestNode, createProgress, getZoneProgress, recordExploration, recordQuiz, recordChallenge, savePracticeRoute, loadProgress, persistProgress, setCamera, createGameState } from './core';
 import type { RoadData, RoadGraph, VehicleState, Turn, Route, AccelerationProfile } from './core';
 import { OverheadView } from './views/overhead';
@@ -15,10 +17,13 @@ async function boot() {
   const [roadsResponse, zonesResponse] = await Promise.all([fetch('/data/roads.json'), fetch('/data/zones.json')]);
   if (!roadsResponse.ok) throw new Error('The real Fremont road dataset is missing. Run the documented geographic import before playing.');
   const data = await roadsResponse.json() as RoadData;
-  const zones = zonesResponse.ok ? await zonesResponse.json() : {zones:[]};
+  const zones = (zonesResponse.ok ? await zonesResponse.json() : {metadata:{sourceUrl:'',boundaryVersion:null},zones:[]}) as ZoneDocument;
   const graph = buildGraph(data);
   if (!graph.edges.size) throw new Error('The geographic dataset contains no usable driving roads.');
-  const names = [...new Set([...graph.edges.values()].map(e=>e.name).filter(Boolean))].sort();
+  const study = new PatrolStudy(graph,zones);
+  const names = study.names('all');
+  let editorActive = false;
+  let editorDocument = zones;
   const startNode = nearestNode(graph, [-121.9845, 37.5489])!;
   const firstEdge = (graph.outgoing.get(startNode) ?? []).map(id => graph.edges.get(id)!).find(e=>e.name) ?? graph.edges.values().next().value!;
   let game = createGameState(createVehicle(graph, firstEdge.id));
@@ -45,13 +50,13 @@ async function boot() {
     <header class="topbar"><div class="brand"><div class="brand-icon" aria-hidden="true">⌁</div><div><h1>FREMONT STREETS</h1><div class="subtitle">LEARN THE CITY. KNOW YOUR WAY.</div></div></div><div class="header-note">Fremont, California <span style="margin:0 12px;color:#5d7968">/</span> <strong>Street-learning simulator</strong></div></header>
     <main class="layout">
       <aside class="left">
-        <section class="panel"><div class="eyebrow">Your practice area</div><h2>Explore Fremont</h2><select id="zone-select" data-testid="zone-select" class="zone-select" aria-label="Learning area"><option value="all">All Fremont · partial coverage</option>${['zone1','zone2','zone3'].map((id,i)=>{const zone=zones.zones?.find((z:any)=>z.id===id);return `<option value="${id}" disabled>${esc(zone?.name??['Zone 1 — Central Fremont','Zone 2 — North Fremont','Zone 3 — South Fremont'][i])} · unavailable</option>`}).join('')}</select><div class="coverage-pill" data-testid="coverage">${names.length} real named streets · bounded extract</div><p class="muted">Citywide learning mode uses the loaded roads. This is <strong>partial Fremont coverage</strong>; roads stay connected across study areas.</p><details class="source-details"><summary>Why are patrol zones unavailable?</summary><p>Official adopted boundaries have not been verified. Proposed October 6, 2026 changes are not treated as adopted. No guessed patrol polygons are displayed. <a href="https://www.fremontpolice.gov/about-us/about-fremont-police/police-zone-map" target="_blank" rel="noopener">Official reference ↗</a></p></details></section>
+        <section class="panel"><div class="eyebrow">Your practice area</div><h2>Explore Fremont</h2><select id="zone-select" data-testid="zone-select" class="zone-select" aria-label="Learning area"><option value="all">All Fremont · partial coverage</option>${zones.zones.map(zone=>`<option value="${esc(zone.id)}" ${!zone.geometry||!study.coverage.validation.valid?'disabled':''}>${esc(zone.name)} · ${study.coverage.zones[zone.id]?.available?'partial roads':'boundary only'}</option>`).join('')}</select><div id="coverage" class="coverage-pill" data-testid="coverage">${names.length} real named streets · bounded extract</div><p id="zone-coverage-description" class="muted">Partial Fremont coverage. Selecting an area starts a new practice drive on an existing road; progress is preserved. Boundaries never act as walls.</p><div class="zone-notice" data-testid="zone-notice">${APPROXIMATE_ZONE_NOTICE}</div><details class="source-details"><summary>Boundary source, version & limitations</summary><p>Historical City of Fremont GIS geometry matches the supplied police-map screenshot. Current 2026 adoption is unverified.</p><p>Version: ${esc(zones.metadata.boundaryVersion)}<br>Imported: ${esc(zones.metadata.importedAt)}<br>Screenshot: ${esc(zones.metadata.screenshotReference)}<br>Calibration: ${esc(zones.metadata.calibration?.method)}<br>Uncertain-border review band: ${esc(zones.metadata.calibration?.uncertaintyMeters)} m (study policy, not measured accuracy).</p><p><a href="https://www.fremontpolice.gov/about-us/about-fremont-police/police-zone-map" target="_blank" rel="noopener">Police map reference ↗</a></p><p>${esc(Array.isArray(zones.metadata.limitations)?zones.metadata.limitations.join(' '):zones.metadata.limitations??'Partial road coverage.')}</p></details></section>
         <section class="panel"><div class="eyebrow">A little farther each day</div><h2>Choose your drive</h2><div class="mode-grid"><button id="mode-free" class="active"><span class="mode-icon">↝</span>Free Drive</button><button id="mode-navigation"><span class="mode-icon">⚑</span>Navigation challenge</button><button id="mode-quiz"><span class="mode-icon">?</span>Street-name practice</button></div><div id="mission" class="mission"></div><div id="quiz" class="quiz-box" hidden></div></section>
         <section class="panel"><div class="eyebrow">Your collection</div><h2>Practice routes</h2><p class="muted">Save a navigation route and come back to it. Stored in this browser.</p><button id="save-route" disabled style="font-size:11px;width:100%">+ Save current route</button><div id="saved-routes" class="saved-list"></div></section>
       </aside>
       <section class="center"><div class="view-toolbar"><div class="segmented" aria-label="Camera view"><button id="camera-overhead" class="active" aria-pressed="true">↗ Overhead map</button><button id="camera-driver" data-testid="camera-toggle" aria-pressed="false">◉ Driver’s seat</button></div><div class="live-status"><span class="dot"></span><span id="drive-view-label">Real roads. One shared simulation.</span></div></div>
         <div class="viewport" aria-label="Driving simulation"><div id="overhead-view" class="view" data-testid="overhead-view"></div><div id="driver-view" class="view" data-testid="driver-view" hidden></div><div class="street-banner"><div class="street-card"><small id="street-label">YOU ARE DRIVING ON</small><strong id="street-name">Loading…</strong></div><div class="speed-limit" title="Source road speed limit; ? means unknown"><small>LIMIT<br>MPH</small><strong id="speed-limit">?</strong></div></div><div class="driving-hud"><div class="speedometer"><strong id="speed" data-testid="speed">0</strong><span>MPH</span></div><div class="turn-prompt" id="turn-prompt">Hold ↑ or W to drive</div></div><div id="view-note" class="view-note">Real source road centerlines · road widths are approximate · no live traffic</div></div>
-        <div class="drivebar"><button id="pause" data-testid="pause-toggle">Ⅱ Pause</button><button id="reset-drive">↺ Reset drive</button><span class="keyhint"><kbd class="key">W ↑</kbd> throttle &nbsp;<kbd class="key">S ↓</kbd> brake &nbsp;<kbd class="key">A ←</kbd> <kbd class="key">D →</kbd> queue turn</span></div><div id="status" class="status-line" role="status">Choose a turn early. Your selection waits until a matching legal intersection.</div><div class="touch-controls" aria-label="Driving controls"><button id="turn-left">↰ Left</button><button id="turn-straight">↑ Straight</button><button id="turn-right">↱ Right</button><button id="turn-uturn">↶ Turn around</button><button id="throttle">Hold to accelerate</button><button id="brake">Hold to brake</button></div>
+        <div class="drivebar"><button id="pause" data-testid="pause-toggle">Ⅱ Pause</button><button id="reset-drive">↺ Reset drive</button><span class="keyhint"><kbd class="key">W ↑</kbd> throttle &nbsp;<kbd class="key">S ↓</kbd> brake &nbsp;<kbd class="key">A ←</kbd> <kbd class="key">D →</kbd> queue turn</span></div><button id="follow-car" style="font-size:11px;margin-bottom:9px">Follow car / resume driving view</button><div id="zone-editor-host"></div><div id="status" class="status-line" role="status">Choose a turn early. Your selection waits until a matching legal intersection.</div><div class="touch-controls" aria-label="Driving controls"><button id="turn-left">↰ Left</button><button id="turn-straight">↑ Straight</button><button id="turn-right">↱ Right</button><button id="turn-uturn">↶ Turn around</button><button id="throttle">Hold to accelerate</button><button id="brake">Hold to brake</button></div>
       </section>
       <aside class="right"><section class="panel"><div class="eyebrow">Exploration ≠ mastery</div><h2>Your learning log</h2><div class="muted" id="progress-area">All Fremont · loaded roads only</div><div class="metrics"><div class="metric"><strong id="metric-streets">0</strong><span>named streets encountered</span></div><div class="metric"><strong id="metric-intersections">0</strong><span>intersections practiced</span></div><div class="metric"><strong id="metric-challenges">0</strong><span>navigation completions</span></div><div class="metric"><strong id="metric-accuracy">—</strong><span>street-name quiz accuracy</span></div><div class="metric"><strong id="metric-unguided">0</strong><span>routes without guidance</span></div><div class="metric"><strong id="metric-saved">0</strong><span>saved practice routes</span></div></div><div class="divider"></div><h3>Recently practiced</h3><div id="recent-streets"></div><p class="muted">No completion percentage: this extract does not cover every Fremont street.</p></section>
       <section class="panel"><div class="eyebrow">Make it your drive</div><h2>Driving settings</h2><div class="settings"><label class="setting-row">Acceleration<select id="profile" aria-label="Acceleration profile"><option>NORMAL</option><option selected>QUICK</option><option>SPORT</option></select></label><label class="setting-row">Vehicle cap (mph)<input id="max-speed" aria-label="Vehicle speed cap" type="number" min="10" max="55" value="55"></label><label class="checkbox"><input type="checkbox" id="assist" checked>Cornering assist · eases speed through turns</label><label class="checkbox"><input type="checkbox" id="guidance" checked>Route guidance</label></div><p class="muted">QUICK: 0–30 in ≈2.5 s. Vehicle capability is not a road speed limit. Unknown source limits show “?”.</p></section>
@@ -68,7 +73,28 @@ async function boot() {
   function routeCoords(r:Route|null) { return r ? r.nodeIds.map(id=>graph.nodes.get(id)!.position) : []; }
   function showRoute() { const c=guidance?routeCoords(route):[]; overhead.setRoute(c);driver?.setRoute(c); }
   function currentEdge() { return graph.edges.get(game.vehicle.edgeId)!; }
-  function setMode(next:typeof mode) {if(next!=='navigation'&&challenge?.status==='active'){challenge=null;route=null;game.activeRoute=null;showRoute();$('save-route').setAttribute('disabled','');}mode=next;for(const m of ['free','navigation','quiz'])$(`mode-${m}`).classList.toggle('active',m===mode);$('quiz').hidden=mode!=='quiz';$('overhead-view').classList.toggle('quiz-hidden',mode==='quiz');if(mode==='quiz')newQuiz();renderMission();}
+  function areaHasRoads() { return game.zoneId==='all'||Boolean(study.coverage.zones[game.zoneId]?.available); }
+  function renderArea() {
+    const id=game.zoneId, zone=study.zone(id), coverage=study.coverage.zones[id];
+    $('coverage').textContent=id==='all'?`${names.length} real named streets · bounded extract`:`${coverage?.segmentIds.length??0} playable segments · ${coverage?.streetNames.length??0} named streets`;
+    $('zone-coverage-description').textContent=id==='all'?'Partial city coverage. Selecting a zone starts a new practice drive on an existing road; progress is preserved.':coverage?.available?'Partial road coverage only. The colored polygon is an approximate study area. You can drive across its boundary.':'Boundary study only: the existing road extract has no usable streets in this zone. Driving and questions require a source-backed road import; no streets have been created.';
+    $('progress-area').textContent=zone?`${zone.name} · ${coverage?.available?'partial roads':'no current road coverage'}`:'All Fremont · loaded roads only';
+    overhead.setBoundaries(study.boundaries(),id==='all'?undefined:id,id==='all');
+    if(zone?.geometry){overhead.setFollowVehicle(false);overhead.focusBoundary(zone.geometry);}else overhead.setFollowVehicle(true);
+    $('mode-navigation').toggleAttribute('disabled',!areaHasRoads());$('mode-quiz').toggleAttribute('disabled',!areaHasRoads());
+    for(const control of ['throttle','brake','turn-left','turn-right','turn-straight','turn-uturn'])$(control).toggleAttribute('disabled',!areaHasRoads());
+  }
+  function selectArea(id:string) {
+    if(editorActive||id!=='all'&&!study.zone(id)?.geometry)return;
+    persist();keys.clear();pendingTurn=undefined;route=null;game.activeRoute=null;challenge=null;game.zoneId=id;
+    const edgeId=study.startEdge(id,firstEdge.id);
+    if(edgeId){game.vehicle=createVehicle(graph,edgeId);progress=study.record(progress,game.vehicle);}
+    else game.vehicle={...game.vehicle,speed:0,pendingTurn:null,events:[]};
+    showRoute();$('save-route').setAttribute('disabled','');mode='free';setMode('free');renderArea();renderProgress();persist();
+    say(edgeId?`${study.zone(id)?.name??'All Fremont'} practice started on ${currentEdge().name||'a mapped road'}. Your other area progress is preserved.`:`${study.zone(id)?.name??'Study area'} boundary displayed. No source-road segments are loaded here; navigation and quizzes are unavailable.`);
+  }
+
+  function setMode(next:typeof mode) {if(editorActive||next!=='free'&&!areaHasRoads())return;if(next!=='navigation'&&challenge?.status==='active'){challenge=null;route=null;game.activeRoute=null;showRoute();$('save-route').setAttribute('disabled','');}mode=next;for(const m of ['free','navigation','quiz'])$(`mode-${m}`).classList.toggle('active',m===mode);$('quiz').hidden=mode!=='quiz';$('overhead-view').classList.toggle('quiz-hidden',mode==='quiz');if(mode==='quiz')newQuiz();renderMission();}
   function renderMission() {
     if(mode==='free')$('mission').innerHTML='<strong>Take the scenic route.</strong>Follow real Fremont streets at your own pace. Turn choices stay queued, so there’s no split-second timing.';
     if(mode==='navigation')$('mission').innerHTML=challenge?.status==='active'?`<strong>Find ${esc(challenge.destination)}</strong><span id="challenge-guide">${guidance?'Follow the highlighted road route.':'Guidance off. Use your street knowledge.'}</span><br><span id="route-remaining"></span>`:`<strong>${challenge?.status==='complete'?'Destination reached. Well driven!':'Find your way across town.'}</strong>Drive a connected route to a real street intersection.<button id="challenge-start" data-testid="challenge-start" class="primary">${challenge?.status==='complete'?'Try another challenge':'Start navigation challenge'}</button>`;
@@ -76,17 +102,17 @@ async function boot() {
   }
   function chooseRoute():Route|null {
     const edge=currentEdge();
-    const candidates=[...graph.nodes.values()].filter(n=>Math.hypot(n.x-game.vehicle.metric.x,n.y-game.vehicle.metric.y)>250&&Math.hypot(n.x-game.vehicle.metric.x,n.y-game.vehicle.metric.y)<950&&(graph.outgoing.get(n.id)?.length??0)>2).sort((a,b)=>Math.abs(Math.hypot(a.x-game.vehicle.metric.x,a.y-game.vehicle.metric.y)-550)-Math.abs(Math.hypot(b.x-game.vehicle.metric.x,b.y-game.vehicle.metric.y)-550));
+    const candidates=[...graph.nodes.values()].filter(n=>study.safeDestination(game.zoneId,n.id)&&Math.hypot(n.x-game.vehicle.metric.x,n.y-game.vehicle.metric.y)>250&&Math.hypot(n.x-game.vehicle.metric.x,n.y-game.vehicle.metric.y)<950&&(graph.outgoing.get(n.id)?.length??0)>2).sort((a,b)=>Math.abs(Math.hypot(a.x-game.vehicle.metric.x,a.y-game.vehicle.metric.y)-550)-Math.abs(Math.hypot(b.x-game.vehicle.metric.x,b.y-game.vehicle.metric.y)-550));
     for(const n of candidates.slice(0,60)) {
-      const found=routeFromVehicle(graph,game.vehicle,n.id);
+      const found=routeFromVehicle(graph,game.vehicle,n.id,study.preferredEdges(game.zoneId));
       if(found&&found.edgeIds.length>3&&legalOutgoing(graph,edge).some(e=>e.id===found.edgeIds[0]))return {nodeIds:[edge.from,...found.nodeIds],edgeIds:[edge.id,...found.edgeIds],distance:edge.length-game.vehicle.distance+found.distance};
     }
     return null;
   }
-  function startChallenge(saved?:Route) {
+  function startChallenge(saved?:Route) {if(editorActive||!areaHasRoads())return;
     const r=saved??chooseRoute();
     if(!r) {say('No valid navigation route from here in the loaded extract. Reset your drive and try again.');return;}
-    if(saved){game.vehicle=createVehicle(graph,r.edgeIds[0]);progress=recordExploration(progress,game.zoneId,game.vehicle.events);}
+    if(saved){game.vehicle=createVehicle(graph,r.edgeIds[0]);progress=study.record(progress,game.vehicle);}
     route=r;game.activeRoute=r;
     const last=graph.edges.get(r.edgeIds.at(-1)!)!;
     const other=(graph.outgoing.get(last.to)??[]).map(id=>graph.edges.get(id)!.name).find(name=>name&&name!==last.name);
@@ -95,12 +121,14 @@ async function boot() {
   }
   function newQuiz() {
     quizStreet=currentEdge().name;
+    const collection=study.names(game.zoneId);
+    if(!study.contains(game.vehicle.position,game.zoneId)||!collection.includes(quizStreet)){quizStreet='';quizChoices=[];$('quiz').innerHTML='<p class="muted">You are outside this study area or near an uncertain border. Drive onto a clearly classified named street in the selected zone to practice.</p>';return;}
     if(!quizStreet){$('quiz').innerHTML='<p class="muted">Drive onto a named street to practice.</p>';return;}
     quizAnswered=false;$('overhead-view').classList.add('quiz-hidden');
-    quizChoices=[quizStreet,...names.filter(n=>n!==quizStreet).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
-    $('quiz').innerHTML=`<p class="muted">Which street are you driving on? Map labels are hidden during this question.</p>${quizChoices.map(n=>`<button data-answer="${esc(n)}">${esc(n)}</button>`).join('')}`;
+    quizChoices=[quizStreet,...collection.filter(n=>n!==quizStreet).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+    $('quiz').innerHTML=`<p class="muted">Identify the street where this question started. Map labels are hidden until you answer.</p>${quizChoices.map(n=>`<button data-answer="${esc(n)}">${esc(n)}</button>`).join('')}`;
     for(const button of $('quiz').querySelectorAll<HTMLButtonElement>('button'))button.addEventListener('click',()=>{
-      if(quizAnswered)return;quizAnswered=true;$('overhead-view').classList.remove('quiz-hidden');const correct=button.dataset.answer===quizStreet;progress=recordQuiz(progress,game.zoneId,correct);persist();say(correct?`Correct! This is ${quizStreet}.`:`This is ${quizStreet}. Keep practicing.`);$('quiz').innerHTML=`<p class="muted">${correct?'Correct.':'Keep learning.'} You are on <strong>${esc(quizStreet)}</strong>.</p><button id="quiz-next">Next question</button>`;$('quiz-next').addEventListener('click',newQuiz);
+      if(quizAnswered)return;quizAnswered=true;$('overhead-view').classList.remove('quiz-hidden');const correct=button.dataset.answer===quizStreet;progress=recordQuiz(progress,game.zoneId,correct);if(game.zoneId!=='all')progress=recordQuiz(progress,'all',correct);persist();say(correct?`Correct! This is ${quizStreet}.`:`This is ${quizStreet}. Keep practicing.`);$('quiz').innerHTML=`<p class="muted">${correct?'Correct.':'Keep learning.'} You are on <strong>${esc(quizStreet)}</strong>.</p><button id="quiz-next">Next question</button>`;$('quiz-next').addEventListener('click',newQuiz);
     });
   }
   function renderProgress() {
@@ -111,7 +139,7 @@ async function boot() {
     $('saved-routes').innerHTML=p.savedRoutes.length?p.savedRoutes.map((saved:any,i:number)=>`<div class="saved-item"><span>${esc(saved.name)}</span><button data-saved="${i}">Drive</button></div>`).join(''):'<span class="empty">No saved routes yet.</span>';
     for(const b of $('saved-routes').querySelectorAll<HTMLButtonElement>('button'))b.onclick=()=>{const saved=p.savedRoutes[Number(b.dataset.saved)];const edgeIds=saved.edgeIds.filter(id=>graph.edges.has(id));if(edgeIds.length!==saved.edgeIds.length||!isValidRoute(graph,edgeIds)){say('This saved route is from a different data version. Please create a new route.');return;}startChallenge({edgeIds,nodeIds:[graph.edges.get(edgeIds[0])!.from,...edgeIds.map(id=>graph.edges.get(id)!.to)],distance:edgeIds.reduce((sum,id)=>sum+graph.edges.get(id)!.length,0)});};
   }
-  function queue(turn:Turn){pendingTurn=turn;say(`${{left:'Left',right:'Right',straight:'Straight',uturn:'Turn around'}[turn]} queued — applied at the next legal matching junction.`);}
+  function queue(turn:Turn){if(editorActive||!areaHasRoads())return;pendingTurn=turn;say(`${{left:'Left',right:'Right',straight:'Straight',uturn:'Turn around'}[turn]} queued — applied at the next legal matching junction.`);}
   function switchCamera(camera:'overhead'|'driver') {
     const previous=game;
     game=setCamera(game,camera);
@@ -123,9 +151,11 @@ async function boot() {
     $('view-note').textContent=camera==='driver'?'Flat schematic 3D · widths / center guide approximate · bridge heights & traffic controls unverified':'Real source road centerlines · no external map calls during gameplay';
     requestAnimationFrame(()=>{overhead.resize();driver?.resize();showRoute();renderFrame();});
   }
-  function reset(){game.vehicle=createVehicle(graph,firstEdge.id);progress=recordExploration(progress,game.zoneId,game.vehicle.events);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();say('Drive reset. Your saved progress is preserved.');}
+  function reset(){if(editorActive)return;const start=study.startEdge(game.zoneId,firstEdge.id);if(!start){say('No source roads are loaded for this area. Select another area to drive.');return;}game.vehicle=createVehicle(graph,start);progress=study.record(progress,game.vehicle);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();say('Drive reset. Your saved progress is preserved.');}
+  $('zone-select').onchange=()=>selectArea(($('zone-select') as HTMLSelectElement).value);
+  $('follow-car').onclick=()=>{if(!editorActive&&areaHasRoads())overhead.setFollowVehicle(true);};
   $('camera-overhead').onclick=()=>switchCamera('overhead');$('camera-driver').onclick=()=>switchCamera('driver');
-  $('pause').onclick=()=>{paused=!paused;$('pause').classList.toggle('active',paused);$('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';keys.clear();};
+  $('pause').onclick=()=>{if(editorActive)return;paused=!paused;$('pause').classList.toggle('active',paused);$('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';keys.clear();};
   $('reset-drive').onclick=reset;
   for(const m of ['free','navigation','quiz'] as const)$(`mode-${m}`).onclick=()=>setMode(m);
   for(const t of ['left','right','straight','uturn'] as const)$(`turn-${t}`).onclick=()=>queue(t);
@@ -135,22 +165,23 @@ async function boot() {
   $('guidance').onchange=()=>{guidance=($('guidance') as HTMLInputElement).checked;if(challenge?.status==='active'&&guidance)challenge.guided=true;showRoute();renderMission();};
   $('save-route').onclick=()=>{if(!route)return;progress=savePracticeRoute(progress,game.zoneId,{id:crypto.randomUUID(),name:challenge?.destination??'Fremont practice route',edgeIds:route.edgeIds,destinationNode:route.nodeIds.at(-1)!,savedAt:new Date().toISOString()});persist();say('Practice route saved in this browser.');};
   for(const id of ['throttle','brake']){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(id);});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(id));}
-  document.addEventListener('keydown',e=>{if((e.target as HTMLElement)?.matches('input,select,textarea'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
+  document.addEventListener('keydown',e=>{if(editorActive)return;if((e.target as HTMLElement)?.matches('input,select,textarea'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
   document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();persist();}});
   window.addEventListener('beforeunload',persist);
-  Object.defineProperty(window,'__FREMONT_GAME__',{get:()=>({vehicle:structuredClone(game.vehicle),camera:game.camera,route:route?structuredClone(route):null,progress:structuredClone(progress),graph:{nodes:[...graph.nodes.values()],edges:[...graph.edges.values()]},paused,challenge:challenge?structuredClone(challenge):null,mode,profile,decision:nextDecision(graph,game.vehicle)})});
-  progress=recordExploration(progress,game.zoneId,game.vehicle.events);
+  Object.defineProperty(window,'__FREMONT_GAME__',{get:()=>({vehicle:structuredClone(game.vehicle),camera:game.camera,route:route?structuredClone(route):null,progress:structuredClone(progress),graph:{nodes:[...graph.nodes.values()],edges:[...graph.edges.values()]},paused,challenge:challenge?structuredClone(challenge):null,mode,profile,decision:nextDecision(graph,game.vehicle),zoneId:game.zoneId,zoneDocument:structuredClone(editorDocument),zoneCoverage:structuredClone(study.coverage.zones),overlay:overhead.getZoneDiagnostics(),quiz:{street:quizStreet,choices:[...quizChoices]},editorActive})});
+  progress=study.record(progress,game.vehicle);
   let last=performance.now(),accumulator=0,lastHud=0;
   function renderFrame(){const snapshot={position:game.vehicle.position,heading:game.vehicle.heading,speed:game.vehicle.speed};if(game.camera==='overhead')overhead.update(snapshot);else driver?.update(snapshot);}
   function frame(now:number){
     accumulator+=Math.min((now-last)/1000,.1);last=now;
     while(accumulator>=1/60){
       accumulator-=1/60;
-      if(!paused){
+      if(!paused&&!editorActive&&areaHasRoads()){
+        if(keys.has('arrowup')||keys.has('w')||keys.has('throttle'))overhead.setFollowVehicle(true);
         game.vehicle=stepVehicle(graph,game.vehicle,{throttle:keys.has('arrowup')||keys.has('w')||keys.has('throttle'),brake:keys.has('arrowdown')||keys.has('s')||keys.has('brake'),turn:pendingTurn},1/60,{profile,maxSpeedMph:maxSpeed,cornerAssist:assist});pendingTurn=undefined;
-        if(game.vehicle.events.length){progress=recordExploration(progress,game.zoneId,game.vehicle.events);if(challenge?.status==='active'){
-          if(game.vehicle.events.some(e=>e.type==='node'&&e.id===challenge!.targetNode)){challenge.status='complete';progress=recordChallenge(progress,game.zoneId,challenge.guided);persist();renderMission();say('Destination reached! Navigation challenge completed.');}
+        if(game.vehicle.events.length){progress=study.record(progress,game.vehicle);if(challenge?.status==='active'){
+          if(game.vehicle.events.some(e=>e.type==='node'&&e.id===challenge!.targetNode)){challenge.status='complete';progress=recordChallenge(progress,game.zoneId,challenge.guided);if(game.zoneId!=='all')progress=recordChallenge(progress,'all',challenge.guided);persist();renderMission();say('Destination reached! Navigation challenge completed.');}
         }}
       }
     }
@@ -166,6 +197,14 @@ async function boot() {
     if(now-lastPersist>2000){lastPersist=now;persist();}
     requestAnimationFrame(frame);
   }
-  renderMission();renderProgress();requestAnimationFrame(frame);
+  renderMission();renderProgress();renderArea();
+  if(import.meta.env.DEV&&new URLSearchParams(location.search).get('zoneEditor')==='1'){
+    const {mountZoneEditor}=await import('./editor');
+    editorActive=true;paused=true;keys.clear();switchCamera('overhead');
+    $('pause').textContent='Editor active · paused';
+    for(const id of ['pause','zone-select','reset-drive','camera-driver','mode-free','mode-navigation','mode-quiz','throttle','brake','turn-left','turn-right','turn-straight','turn-uturn','follow-car'])$(id).setAttribute('disabled','');
+    mountZoneEditor({container:$('zone-editor-host'),overhead,baseline:zones,graph,onPreview:doc=>{editorDocument=doc;}});
+  }
+  requestAnimationFrame(frame);
 }
 boot().catch(error=>{app.innerHTML=`<div class="loading"><h1>FREMONT STREETS</h1><p>${esc(error.message)}</p><p>Check geographic import instructions in README.md.</p></div>`;console.error(error);});

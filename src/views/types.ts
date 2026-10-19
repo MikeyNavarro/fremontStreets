@@ -1,10 +1,12 @@
-import type { FeatureCollection, LineString, MultiLineString } from 'geojson';
+import type { FeatureCollection, LineString, MultiLineString, Polygon, MultiPolygon } from 'geojson';
 import { PROJECTION_ORIGIN, project as projectMetric } from '../core/projection';
 
 export { PROJECTION_ORIGIN } from '../core/projection';
 
 export type LonLat = [number, number];
 export type RoadCollection = FeatureCollection<LineString | MultiLineString>;
+export type BoundaryGeometry = Polygon | MultiPolygon;
+export type BoundaryCollection = FeatureCollection<BoundaryGeometry>;
 
 /** Both renderers consume this snapshot; neither owns or advances the simulation. */
 export interface VehicleSnapshot {
