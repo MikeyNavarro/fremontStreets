@@ -40,8 +40,8 @@ interface Snapshot {
   };
 }
 
-async function state(page: Page, includeGraph = false): Promise<Snapshot> {
-  return page.evaluate(withGraph => {
+async function state(page: Page, includeCurrentEdges = false): Promise<Snapshot> {
+  return page.evaluate(withCurrentEdges => {
     const app = window as unknown as { __FREMONT_GAME__: Snapshot };
     const snapshot = app.__FREMONT_GAME__;
     return structuredClone({
@@ -50,11 +50,12 @@ async function state(page: Page, includeGraph = false): Promise<Snapshot> {
       paused: snapshot.paused,
       route: snapshot.route,
       progress: snapshot.progress,
-      graph: withGraph ? snapshot.graph : { nodes: [], edges: [] },
+      // These assertions inspect only the driven transition, never the full graph.
+      graph: {nodes:[],edges:withCurrentEdges?snapshot.graph.edges.filter(edge=>edge.id===snapshot.vehicle.edgeId||edge.id===snapshot.vehicle.previousEdgeId).map(({id,from,to,name,heading})=>({id,from,to,name,heading})):[]},
       challenge: snapshot.challenge,
       decision: snapshot.decision,
     });
-  }, includeGraph);
+  }, includeCurrentEdges);
 }
 
 test.beforeEach(async ({ page }) => {

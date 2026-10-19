@@ -1,24 +1,24 @@
-import {intersectionEligible,navigationEligible,recognitionEligible,type VerificationRegistry} from './verification';
+import {intersectionEligible,navigationEligible,recognitionEligible,routeEvidenceEligible,type VerificationRegistry} from './verification';
 export type Category='recognition'|'intersection'|'navigation';
-export type TaskKind='identify'|'locate'|'location'|'intersection'|'navigate'|'checkpoint';
+export type TaskKind='identify'|'locate'|'location'|'intersection'|'navigate'|'checkpoint'|'direction';
 export interface Attempt { id:string;entryId:string;questionId:string;sessionId:string;geoVersion:string;at:string;category:Category;kind:TaskKind;outcome:'correct'|'incorrect'|'withdrawn'|'abandoned';assisted:boolean;hints:number;eligible:boolean }
-export interface TrainingTask { id:string;entryId:string;category:Category;kind:TaskKind;edgeId:string;geoVersion:string;junctionId?:string;eligible:boolean }
-export interface Exam {id:string;geoVersion:string;sessionId:string;tasks:TrainingTask[];attemptIds:string[];status:'active'|'complete'|'withdrawn';createdAt:string}
+export interface TrainingTask { id:string;entryId:string;category:Category;kind:TaskKind;edgeId:string;geoVersion:string;junctionId?:string;eligible:boolean;routeEdgeIds?:string[];referenceEntryId?:string;referenceEdgeId?:string }
+export interface Exam {id:string;geoVersion:string;sessionId:string;tasks:TrainingTask[];attemptIds:string[];status:'active'|'complete'|'withdrawn';createdAt:string;pending?:{taskId:string;hints:number;vehicle?:import('../core').VehicleState;mission?:import('./missions').LearningMission}}
 export interface LearningState {schema:1;attempts:Attempt[];exam:Exam|null;sessionId:string;legacy:Record<string,string>}
 export const EMPTY_LEARNING=():LearningState=>({schema:1,attempts:[],exam:null,sessionId:'',legacy:{}});
 const DAY=86_400_000;
 export function taskEligible(task:TrainingTask,registry:VerificationRegistry):boolean {
  if(task.geoVersion!==registry.version)return false;
  const entry=registry.entries.find(e=>e.id===task.entryId);
- if(task.category==='recognition')return recognitionEligible(entry,task.edgeId);
- if(task.category==='navigation')return navigationEligible(entry)&&recognitionEligible(entry,task.edgeId);
+ if(task.category==='recognition')return recognitionEligible(entry,task.edgeId)&&(task.kind!=='direction'||recognitionEligible(registry.entries.find(e=>e.id===task.referenceEntryId),task.referenceEdgeId));
+ if(task.category==='navigation')return navigationEligible(entry)&&recognitionEligible(entry,task.edgeId)&&task.routeEdgeIds?.at(-1)===task.edgeId&&routeEvidenceEligible(task.routeEdgeIds,registry);
  return recognitionEligible(entry,task.edgeId)&&intersectionEligible(registry.junctions.find(j=>j.id===task.junctionId&&j.entryIds.includes(task.entryId)));
 }
 export function streetProgress(id:string,state:LearningState,registry:VerificationRegistry,now=Date.now()){
  const history=state.attempts.filter(a=>a.entryId===id);
  const attempts=history.filter(a=>a.geoVersion===registry.version&&a.eligible&&(a.outcome==='correct'||a.outcome==='incorrect')).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)||a.id.localeCompare(b.id));
  const unaided=attempts.filter(a=>!a.assisted&&a.hints===0),correct=unaided.filter(a=>a.outcome==='correct');
- const recognized=new Set(correct.filter(a=>a.category==='recognition').map(a=>a.questionId)).size>=2;
+ const recognized=new Set(correct.filter(a=>a.category==='recognition'&&['identify','locate','location'].includes(a.kind)).map(a=>a.questionId)).size>=2;
  const nav=correct.filter(a=>a.category==='navigation'),intersection=correct.some(a=>a.category==='intersection');
  const evidence=registry.entries.find(e=>e.id===id),hasIntersection=registry.junctions.some(j=>j.entryIds.includes(id)&&intersectionEligible(j));
  const blocked=!navigationEligible(evidence)||!hasIntersection;
@@ -58,7 +58,7 @@ export function addAttempt(state:LearningState,attempt:Attempt):LearningState {
 }
 export function validateBackup(value:unknown,ids:Set<string>):LearningState {
  const v=value as any;if(!v||v.schema!==1||v.format!=='fremont-streets-learning'||!Array.isArray(v.attempts)||v.attempts.length>100000)throw new Error('Unsupported progress backup.');
- const seen=new Set<string>();for(const a of v.attempts){if(!a||!ids.has(a.entryId)||typeof a.id!=='string'||!a.id||seen.has(a.id)||typeof a.questionId!=='string'||typeof a.sessionId!=='string'||!a.sessionId||typeof a.geoVersion!=='string'||!Number.isFinite(Date.parse(a.at))||!['recognition','intersection','navigation'].includes(a.category)||!['identify','locate','location','intersection','navigate','checkpoint'].includes(a.kind)||!['correct','incorrect','withdrawn','abandoned'].includes(a.outcome)||typeof a.assisted!=='boolean'||typeof a.eligible!=='boolean'||!Number.isInteger(a.hints)||a.hints<0)throw new Error('Invalid attempt history; nothing imported.');seen.add(a.id);}
+ const seen=new Set<string>();for(const a of v.attempts){if(!a||!ids.has(a.entryId)||typeof a.id!=='string'||!a.id||seen.has(a.id)||typeof a.questionId!=='string'||typeof a.sessionId!=='string'||!a.sessionId||typeof a.geoVersion!=='string'||!Number.isFinite(Date.parse(a.at))||!['recognition','intersection','navigation'].includes(a.category)||!['identify','locate','location','intersection','navigate','checkpoint','direction'].includes(a.kind)||!['correct','incorrect','withdrawn','abandoned'].includes(a.outcome)||typeof a.assisted!=='boolean'||typeof a.eligible!=='boolean'||!Number.isInteger(a.hints)||a.hints<0)throw new Error('Invalid attempt history; nothing imported.');seen.add(a.id);}
  // Exams are validated separately; arbitrary imported routes/tasks never resume automatically.
  return {schema:1,attempts:v.attempts,exam:null,sessionId:'',legacy:v.legacy&&typeof v.legacy==='object'?Object.fromEntries(Object.entries(v.legacy).filter(([k,x])=>k.startsWith('fremont-')&&typeof x==='string')) as Record<string,string>:{}};
 }

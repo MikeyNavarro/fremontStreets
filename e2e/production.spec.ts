@@ -86,7 +86,7 @@ test('production artifact contains all runtime assets and only serves the Pages 
     const directory = file.parentPath.replaceAll('\\', '/').replace(/^dist\/?/, '');
     return `${directory ? `${directory}/` : ''}${file.name}`;
   });
-  expect(names).toEqual(expect.arrayContaining(['index.html', 'favicon.svg', '.nojekyll', 'data/roads.json', 'data/zones.json', 'data/study-network.json']));
+  expect(names).toEqual(expect.arrayContaining(['index.html', 'favicon.svg', '.nojekyll', 'data/roads.json', 'data/zones.json', 'data/study-network.json', 'data/verification.json']));
   expect(names.some(name => /^assets\/maplibre-gl-worker-.*\.mjs$/.test(name))).toBe(true);
   const html = await readFile('dist/index.html', 'utf8');
   const references = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(match => match[1]);

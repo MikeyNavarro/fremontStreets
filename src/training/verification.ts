@@ -11,14 +11,15 @@ export interface VerificationRegistry {
   sources: Record<string, { url: string; sha256: string; retrievedAt: string; version: string; limitations: string }>;
   policy: { geometryToleranceMetres: number; sampleSpacingMetres: number; note: string };
   entries: EntryEvidence[]; junctions: JunctionEvidence[];
+  /** Explicit, versioned evidence for a specific incoming > outgoing movement. */
+  movements?: Record<string, Fact>;
 }
 export function recognitionEligible(entry: EntryEvidence | undefined, edgeId?: string): boolean {
   return !!entry && entry.identity.status === 'Verified' && entry.geometry.status !== 'Conflicted'
     && entry.segments.some(segment => !edgeId || segment.edgeId === edgeId);
 }
 export function intersectionEligible(junction: JunctionEvidence | undefined): boolean {
-  return !!junction && Object.values(junction).filter((v):v is Fact => !!v && typeof v === 'object' && 'status' in v)
-    .every(fact => fact.status === 'Verified');
+  return !!junction && (['identity','geometry','topology','maneuvers'] as const).every(dimension=>junction[dimension]?.status==='Verified');
 }
 /** No inference of permission from a missing restriction or a City line crossing. */
 export function navigationEligible(entry: EntryEvidence | undefined): boolean {
@@ -26,4 +27,8 @@ export function navigationEligible(entry: EntryEvidence | undefined): boolean {
 }
 export function fact(status: EvidenceStatus, scope: string, reason: string, evidence: string[] = []): Fact {
   return { status, scope, reason, evidence };
+}
+
+export function routeEvidenceEligible(edgeIds:string[]|undefined,registry:VerificationRegistry):boolean {
+ return !!edgeIds&&edgeIds.length>=2&&edgeIds.slice(1).every((id,i)=>registry.movements?.[edgeIds[i]+'>'+id]?.status==='Verified');
 }

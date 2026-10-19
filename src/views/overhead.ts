@@ -32,6 +32,7 @@ export class OverheadView {
   private labelsVisible=true;
   private assistanceHidden=false;
   private selection=emptyLines();
+  onAmbiguousClick:(()=>void)|null=null;
   onRoadClick:((wayId:string,position:LonLat)=>void)|null=null;
   private vertexMarkers: Marker[] = [];
   private stopVertexEditing: (() => void) | null = null;
@@ -70,6 +71,7 @@ export class OverheadView {
             'study-zones': { type: 'geojson', data: this.boundaries },
             'classified-roads': { type: 'geojson', data: this.classifiedRoads },
             'inspection': {type:'geojson',data:this.selection},
+            'qa-nodes':{type:'geojson',data:{type:'FeatureCollection',features:[]}},
             'study-targets': { type: 'geojson', data: this.studyRoads },
             'study-intersections': { type: 'geojson', data: this.studyJunctions },
           },
@@ -87,6 +89,7 @@ export class OverheadView {
             { id:'route-glow',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#60dfc4','line-width':18,'line-opacity':.12} },
             { id: 'route-border', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#173d41', 'line-width': 9, 'line-opacity': 0.85 } },
             { id: 'route', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#74e0c4', 'line-width': 5, 'line-opacity': 0.95 } },
+            {id:'qa-nodes',type:'circle',source:'qa-nodes',paint:{'circle-radius':4,'circle-color':'#f7b76a','circle-stroke-color':'#10212c','circle-stroke-width':1}},
             {id:'inspection-lines',type:'line',source:'inspection',paint:{'line-color':'#f4dc9d','line-width':7,'line-opacity':.95}},
             { id: 'turns', type: 'line', source: 'turns', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['case', ['boolean', ['get', 'selected'], false], '#e6bb80', '#668b98'], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 8, 4], 'line-opacity': 0.95 } },
           ],
@@ -98,8 +101,13 @@ export class OverheadView {
       map.on('dragstart',()=>this.camera?.explore());
       map.on('rotatestart',event=>{if(event.originalEvent)this.camera?.explore();});
       map.on('pitchstart',event=>{if(event.originalEvent)this.camera?.explore();});
-      map.on('click',event=>{if(!this.onRoadClick)return;const hit=map.queryRenderedFeatures([[event.point.x-5,event.point.y-5],[event.point.x+5,event.point.y+5]],{layers:['roads']})[0];if(hit)this.onRoadClick(String(hit.properties.wayId),event.lngLat.toArray() as LonLat);});
-      this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+      map.on('click',event=>{if(!this.onRoadClick)return;
+        const hits=map.queryRenderedFeatures([[event.point.x-6,event.point.y-6],[event.point.x+6,event.point.y+6]],{layers:['roads']}).map(hit=>{let distance=Infinity;const lines=hit.geometry.type==='LineString'?[hit.geometry.coordinates]:hit.geometry.type==='MultiLineString'?hit.geometry.coordinates:[];for(const line of lines)for(let i=1;i<line.length;i++){const a=map.project(line[i-1] as LonLat),b=map.project(line[i] as LonLat),dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((event.point.x-a.x)*dx+(event.point.y-a.y)*dy)/(dx*dx+dy*dy||1)));distance=Math.min(distance,Math.hypot(event.point.x-a.x-t*dx,event.point.y-a.y-t*dy));}return {hit,distance};}).sort((a,b)=>a.distance-b.distance);
+        if(!hits.length)return;
+        if(hits.some(other=>other.hit.properties.name!==hits[0].hit.properties.name&&other.distance-hits[0].distance<1.5)){this.onAmbiguousClick?.();return;}
+        this.onRoadClick(String(hits[0].hit.properties.wayId),event.lngLat.toArray() as LonLat);
+      });
+      this.map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'bottom-right');
       // Keep the useful street-learning scale when driving. Fitting the entire
       // extract here would hide local street labels; zoom-out remains available.
       const car = document.createElement('div');
@@ -187,6 +195,7 @@ export class OverheadView {
   setLabelsVisible(visible:boolean):void {this.labelsVisible=visible;this.lastLabelRefresh=0;this.refreshLabels();}
   setAssistanceHidden(hidden:boolean):void {this.assistanceHidden=hidden;this.container.classList.toggle('assistance-hidden',hidden);this.lastLabelRefresh=0;this.refreshLabels();}
   setInspection(lines:FeatureCollection<LineString>):void {this.selection=lines;this.syncSource('inspection',lines);}
+  setQANodes(nodes:Array<{id:string;position:LonLat}>):void{this.syncSource('qa-nodes',{type:'FeatureCollection',features:nodes.map(n=>({type:'Feature',properties:{nodeId:n.id,status:'Unresolved'},geometry:{type:'Point',coordinates:n.position}}))});}
   focusRoad(coordinates:LonLat[]):void {if(!this.map||!coordinates.length)return;this.camera?.explore();const bounds=new maplibregl.LngLatBounds();coordinates.forEach(p=>bounds.extend(p));this.map.fitBounds(bounds,{padding:100,maxZoom:17,duration:this.reducedMotion?0:250});}
 
   setStation(position: LonLat): void {
@@ -209,6 +218,7 @@ export class OverheadView {
     this.container.dataset.studyIntersectionCount=String(this.studyJunctions.features.length);
   }
 
+  markPosition(position:LonLat,label:string):void {this.destinationMarker?.remove();if(!this.map)return;const element=document.createElement('div');element.className='learning-reference-marker';element.textContent=label;this.destinationMarker=new maplibregl.Marker({element,anchor:'bottom'}).setLngLat(position).addTo(this.map);}
   focusPosition(position: LonLat, label?: string): void {
     if(!this.map)return;this.camera?.focus({center:position});
     this.destinationMarker?.remove();this.destinationMarker=null;

@@ -25,7 +25,8 @@ labels, visibility controls and source-ID inspection are available.
 
 Phases 2–3: a native training dashboard extends the existing shell. Zone 1
 recommendations, all 38 selectable entries, sourced Study Mode, highlighted-road
-recognition, map-location selection and current-location recall are implemented.
+recognition, map-location selection, current-location recall, and direction
+comparisons between specific corroborated points are implemented.
 A single assistance policy hides map labels, HUD road names, route instructions,
 search, tooltips/markers and announcements while recall is active. Driving
 pauses for an answer. Hints are recorded and excluded from unaided evidence.
@@ -39,7 +40,9 @@ Phase 4: HQ-start navigation and no-GPS missions accept any corroborated target
 segment reachable through the supported graph. Return practice uses the same
 physical HQ road segment and a 25 m tolerance. Wrong turns recalculate connected
 routes without teleporting. Missions are pinned to geographic evidence versions.
-Actual practice completions are recorded separately from eligible mastery evidence.
+Two-stop patrols preserve the actual vehicle between legs, and the first checkpoint
+pauses until the player continues. Actual practice completions are recorded
+separately from eligible mastery evidence.
 
 Phase 5: mastery calculations and the exam eligibility/scoring engine are in
 place. The requested 20-task composition and 85% overall / 75% per-category
@@ -52,13 +55,14 @@ are software validation, not real-world verification.
 
 ## Validation at this checkpoint
 
-88 Node tests passed, including existing geography, real driving, acceleration,
+92 Node tests passed, including existing geography, real driving, acceleration,
 camera and graph tests plus new evidence, mastery, review and exam-rule tests.
-TypeScript and the Vite production build passed. Five focused browser cases
+TypeScript and the Vite production build passed. Seven focused browser cases
 passed: manual exploration lifecycle; search/inspection; two unaided recognition
 answers plus an assisted answer, reload and backup import/export; evidence-gap
 handling with an outside-Zone-1 manual selection; and a no-GPS mission completed
-using real driving controls. Full existing regressions and deployment verification
+using real driving controls; a source-point direction and actual map-click task;
+and a two-stop patrol driven through both legs without teleporting. Full existing regressions and deployment verification
 remain separate final gates.
 
 ## Operating the learning system
@@ -83,3 +87,30 @@ records. The 232 unsupported OSM restriction records, unmatched geometry, bounde
 coverage, approximate historical patrol boundaries and approximate public-road
 HQ access remain disclosed. The old connection quiz is an unscored source-record
 inspection; its historic counters are preserved but not promoted to mastery.
+
+## Deployment and final validation ledger
+
+The Stevenson baseline at 59e5485 deployed through successful GitHub Actions run
+39212252884. Its CI executed 77 Node, 10 development-browser and 18 production-
+browser tests. Public browser verification confirmed HTTP 200, all six restored
+Stevenson ways and three repaired shared-node continuations, 166,282 graph edges,
+real driving, an active source route, both renderers, unchanged camera state,
+QUICK/100 mph, 38 entries, and zero failed requests. That baseline is independently
+published; publication of the newer learning release requires its own workflow.
+
+During development, one broad dev-server run was interrupted by a source-edit
+reload; its navigation assertion reported a destroyed execution context. It is
+not counted as a passing regression run. Final suites run against frozen source
+and the built Pages artifact. No assertion timeout was increased to hide this.
+The job-level budget is 35 minutes because the prior complete CI took about 19
+minutes and seven new learning cases now execute in both dev and production.
+
+Additional fixes: road selection measures distance to actual rendered/source
+segments instead of choosing the first hit or nearest endpoint. Overlapping roads
+and uncorroborated clicks are not graded. Direction questions cannot substitute
+for the two required street-identification/location successes. Scored navigation
+also requires explicit evidence for every actual incoming/outgoing movement; the
+absence of a restriction never supplies that evidence. Backup imports preserve
+legacy exploration/routes using conservative maxima and union, without turning
+old aggregates into scored attempts. Attempt IDs are immutable in transactional
+storage, including cross-tab conflicts. Driving settings persist separately.

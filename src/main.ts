@@ -1,3 +1,4 @@
+import {loadSettings,saveSettings} from './training/settings';
 import {LearningSystem} from './training/learning';
 import './style.css';
 import {StreetExplorer} from './training/explorer';
@@ -47,10 +48,11 @@ async function boot() {
   let answersHidden=false;
   let route: Route | null = null;
   let challenge: {destination:string;targetNode:string;status:'active'|'complete';guided:boolean;index:number} | null = null;
-  let guidance = true;
-  let profile: AccelerationProfile = 'QUICK';
-  let maxSpeed = 100;
-  let assist = true;
+  const settings=loadSettings(localStorage);
+  let guidance = settings.guidance;
+  let profile: AccelerationProfile = settings.profile;
+  let maxSpeed = settings.maxSpeed;
+  let assist = settings.assist;
   let pendingTurn: Turn | undefined;
   let lastPersist = 0;
   let quizStreet = '';
@@ -174,13 +176,15 @@ async function boot() {
   $('reset-drive').onclick=reset;
   for(const m of ['free','navigation','quiz'] as const)$(`mode-${m}`).onclick=()=>{learning?.cancel();setMode(m);if(m==='free')ui.close();else ui.open('navigation');};
   for(const t of ['left','right','straight','uturn'] as const)$(`turn-${t}`).onclick=()=>queue(t);
-  $('profile').onchange=()=>profile=($('profile') as HTMLSelectElement).value as AccelerationProfile;
-  $('max-speed').onchange=()=>{maxSpeed=Math.max(10,Math.min(100,Number(($('max-speed') as HTMLInputElement).value)||100));($('max-speed') as HTMLInputElement).value=String(maxSpeed);};
-  $('assist').onchange=()=>assist=($('assist') as HTMLInputElement).checked;
-  $('guidance').onchange=()=>{guidance=($('guidance') as HTMLInputElement).checked;if(challenge?.status==='active'&&guidance)challenge.guided=true;showRoute();renderMission();training?.guidanceChanged();};
+  const persistSettings=()=>{if(!saveSettings(localStorage,{version:1,profile,maxSpeed,assist,guidance}))say('Driving settings cannot be saved in this browser.');};
+  ($('profile') as HTMLSelectElement).value=profile;($('max-speed') as HTMLInputElement).value=String(maxSpeed);($('assist') as HTMLInputElement).checked=assist;($('guidance') as HTMLInputElement).checked=guidance;
+  $('profile').onchange=()=>{profile=($('profile') as HTMLSelectElement).value as AccelerationProfile;persistSettings();};
+  $('max-speed').onchange=()=>{maxSpeed=Math.max(10,Math.min(100,Number(($('max-speed') as HTMLInputElement).value)||100));($('max-speed') as HTMLInputElement).value=String(maxSpeed);persistSettings();};
+  $('assist').onchange=()=>{assist=($('assist') as HTMLInputElement).checked;persistSettings();};
+  $('guidance').onchange=()=>{guidance=($('guidance') as HTMLInputElement).checked;if(challenge?.status==='active'&&guidance)challenge.guided=true;showRoute();renderMission();training?.guidanceChanged();persistSettings();};
   $('save-route').onclick=()=>{if(!route)return;progress=savePracticeRoute(progress,game.zoneId,{id:crypto.randomUUID(),name:challenge?.destination??'Fremont practice route',edgeIds:route.edgeIds,destinationNode:route.nodeIds.at(-1)!,savedAt:new Date().toISOString()});persist();say('Practice route saved in this browser.');};
   for(const id of ['throttle','brake']){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(id);});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(id));}
-  document.addEventListener('keydown',e=>{if(editorActive||ui.isOpen)return;if(e.key==='Escape'){e.preventDefault();learning?.cancel();ui.open('menu');return;}if(learning?.blocking&&e.key.toLowerCase()!=='c')return;if((e.target as HTMLElement)?.closest('input,select,textarea,[contenteditable=true]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
+  document.addEventListener('keydown',e=>{if(editorActive||ui.isOpen)return;if(e.key==='Escape'){e.preventDefault();learning?.cancel();ui.open('menu');return;}if(learning?.blocking&&e.key.toLowerCase()!=='c')return;if((e.target as HTMLElement)?.closest('input,select,textarea,[contenteditable=true]'))return;if((e.target as HTMLElement)?.closest('button,summary')&&[' ','Enter'].includes(e.key))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
   document.addEventListener('focusin',e=>{if((e.target as HTMLElement)?.matches('input,select,textarea'))keys.clear();});
   document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();persist();}});
@@ -230,7 +234,7 @@ async function boot() {
   const openStudy=(zone1=false)=>{if(editorActive)return;learning?.cancel();selectArea(zone1?'zone1':'all');($('zone-select') as HTMLSelectElement).value=game.zoneId;setMode('study');training!.enter(zone1);$('mission').innerHTML='<strong>Your roads. Your navigation.</strong>Preview the listed roads, then start from headquarters. Any supported legal route can count.';};
   $('mode-study').onclick=()=>{if(mode!=='study')openStudy();ui.open('study');};$('mode-zone1-main').onclick=()=>{openStudy(true);ui.open('study');};
   learning=new LearningSystem({dashboard:$('learning-dashboard'),viewport:$('driving-viewport'),network:studyNetwork,evidence:verification,graph,overhead,explorer,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,clearInputs:()=>{keys.clear();pendingTurn=undefined;},close:()=>ui.close(),open:()=>ui.open('learning'),map:()=>switchCamera('overhead'),message:say,
-    policy:hidden=>protectAnswers(hidden),prepare:()=>{training?.leave();mode='free';quizAnswered=true;$('quiz').hidden=true;$('overhead-view').classList.remove('quiz-hidden');challenge=null;route=null;protectAnswers(false);},
+    reloadLegacy:()=>{progress=loadProgress(localStorage);training?.reloadProgress();renderProgress();},policy:hidden=>protectAnswers(hidden),prepare:()=>{training?.leave();mode='free';quizAnswered=true;$('quiz').hidden=true;$('overhead-view').classList.remove('quiz-hidden');challenge=null;route=null;protectAnswers(false);},
     startDrive:(vehicle,nextRoute,guided)=>{training?.leave();mode='free';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;guidance=guided;($('guidance') as HTMLInputElement).checked=guided;keys.clear();pendingTurn=undefined;paused=false;$('pause').textContent='Pause';showRoute();},setRoute:nextRoute=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
   app.addEventListener('click',event=>{const button=(event.target as HTMLElement).closest('[data-open-panel]');if(button&&learning?.hiddenAnswers)learning.cancel();},true);
   await learning.initialize();

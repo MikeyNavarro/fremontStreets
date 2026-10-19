@@ -57,6 +57,7 @@ export class StudyMode {
   cancel(){this.mission=null;this.quiz=null;if(this.active)this.renderMission();}
   snapshot(){return {active:this.active,entryCount:this.options.network.entries.length,group:this.group,selected:this.selected,mission:this.mission?structuredClone(this.mission):null,progress:structuredClone(this.progress),quiz:this.quiz?structuredClone(this.quiz):null,readyIds:readyStudyEntries(this.options.network).map(entry=>entry.id)};}
   get missionState(){return this.active?this.mission:null;}
+  reloadProgress(){this.progress=loadStudyProgress(this.options.storage);if(this.active)this.renderProgress();}
   guidanceChanged(){this.renderMission();if(this.active)this.options.onMessage(this.options.getGuidance()?'Study route guidance enabled.':'Study route guidance hidden. Navigate using street names and intersections.');}
 
   private render(){

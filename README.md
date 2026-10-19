@@ -17,7 +17,47 @@ npm ci
 npm run dev
 ```
 
-Use the existing checkout at `/workspace/fremontStreets` in the Codex cloud environment. The bundled road data loads locally; gameplay does not repeatedly call map or routing services. Progress and saved routes are stored in this browser's local storage.
+Use the existing checkout at `/workspace/fremontStreets` in the Codex cloud environment. The bundled road data loads locally; gameplay does not repeatedly call map or routing services. Settings and legacy exploration use localStorage; detailed learning attempts and exam checkpoints use IndexedDB. Export a JSON backup from the learning dashboard to keep a portable copy.
+
+## Street learning and free exploration
+
+Open **Learn** or **Street-learning Dashboard**. Recommendations begin with a few
+Zone 1 streets; all 38 original curriculum entries remain manually selectable.
+Study corroborated street sections, identify a highlighted road, locate a street
+by clicking the map, identify your current location, and compare directions
+between specific sourced points. Hints are recorded as assistance. Driving pauses
+while an answer is required, and answer-revealing map/HUD/search labels are hidden.
+
+Drag the overhead map to enter **Explore**. Drive, zoom, change zones or switch
+cameras while keeping that map position. **Center on Vehicle** is the sole action
+that restores Follow; it keeps your zoom. **Explore streets** provides source-road
+search, separate disconnected sections/carriageways, label controls and geographic
+QA source IDs/nodes. Ambiguous overlaps and uncorroborated map clicks receive no
+score.
+
+Patrol practice includes HQ departures, no-GPS navigation, returns to the
+approximate public-road HQ point, and two-stop patrols. Connected alternative
+routes count. These drives remain **unscored for mastery** while independent
+movement evidence is unresolved. Existing Free Drive, all three approximate
+patrol zones, saved routes and both renderers remain available. QUICK acceleration
+and the adjustable default 100 mph vehicle capability are retained.
+
+The evidence registry separately records street identity, geometry, topology and
+maneuvers. All 38 entries have corroborated recognition locations, comprising
+12,279 directed segments. Eighteen entries match City centerlines across all their
+imported segments under the documented 15 m comparison policy. This is not a
+claim of surveyed geometry, full-city coverage, or legal-turn verification.
+
+**The full exam and higher mastery levels are geographically blocked.** The
+current evidence supplies no independently verified intersection/maneuver tasks.
+The app discloses the missing categories instead of inventing a 20-task exam.
+Recognized requires two different unaided identification/location questions;
+visits alone never grant mastery. Historical attempts retain their geographic
+version and do not automatically qualify after corrections.
+
+See the [38-entry accuracy report](docs/learning-accuracy.md),
+[implementation and verification report](docs/learning-implementation.md), and
+[Stevenson startup investigation](docs/startup-timeout.md).
 
 ## Driving-first interface
 
