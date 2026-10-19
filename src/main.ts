@@ -4,6 +4,7 @@ import { PatrolStudy } from './patrol';
 import { chooseStudyRoute, loadPracticeZone, POLICE_STATION, practiceRouteFromStation, rememberPracticeZone, stationDeparture } from './departure';
 import { StudyMode } from './study-mode';
 import type { StudyNetwork } from './study-network';
+import {recognitionEligible, type VerificationRegistry} from './training/verification';
 import { APPROXIMATE_ZONE_NOTICE, type ZoneDocument } from './core/zones';
 import { buildGraph, isValidRoute, createVehicle, stepVehicle, outgoingChoices, nextDecision, routeFromVehicle, legalOutgoing, nearestNode, createProgress, getZoneProgress, recordExploration, recordQuiz, recordChallenge, savePracticeRoute, loadProgress, persistProgress, setCamera, createGameState } from './core';
 import type { RoadData, RoadGraph, VehicleState, Turn, Route, AccelerationProfile } from './core';
@@ -19,12 +20,15 @@ const app = $('app');
 app.innerHTML = '<div class="loading"><h1>FREMONT STREETS</h1><p>Loading the local road network…</p></div>';
 
 async function boot() {
-  const [roadsResponse, zonesResponse, studyResponse] = await Promise.all([fetch(`${import.meta.env.BASE_URL}data/roads.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/zones.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/study-network.json?v=${__FREMONT_DATA_VERSION__}`)]);
+  const [roadsResponse, zonesResponse, studyResponse, verificationResponse] = await Promise.all([fetch(`${import.meta.env.BASE_URL}data/roads.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/zones.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/study-network.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/verification.json?v=${__FREMONT_DATA_VERSION__}`)]);
   if (!roadsResponse.ok) throw new Error('The real Fremont road dataset is missing. Run the documented geographic import before playing.');
   const data = await roadsResponse.json() as RoadData;
   const zones = (zonesResponse.ok ? await zonesResponse.json() : {metadata:{sourceUrl:'',boundaryVersion:null},zones:[]}) as ZoneDocument;
   if (!studyResponse.ok) throw new Error('The personalized study inventory is missing. Run npm run data:study.');
   const studyNetwork = await studyResponse.json() as StudyNetwork;
+  if(!verificationResponse.ok)throw new Error('The geographic evidence registry is missing. Run npm run data:verify.');
+  const verification = await verificationResponse.json() as VerificationRegistry;
+  if(verification.roadsSha256!==studyNetwork.roadsSha256)throw new Error('Geographic evidence and road inventory versions do not match. Reload the complete release.');
   const graph = buildGraph(data);
   if (!graph.edges.size) throw new Error('The geographic dataset contains no usable driving roads.');
   const study = new PatrolStudy(graph,zones);

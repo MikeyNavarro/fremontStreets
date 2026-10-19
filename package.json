@@ -11,7 +11,8 @@
     "test:e2e": "playwright test",
     "data:import": "node scripts/import-roads.mjs",
     "test:production": "playwright test --config playwright.production.config.ts",
-    "data:study": "tsx scripts/analyze-study.ts && python3 scripts/render-study-reports.py"
+    "data:study": "tsx scripts/analyze-study.ts && python3 scripts/render-study-reports.py",
+    "data:verify": "tsx scripts/verify-learning.ts"
   },
   "dependencies": {
     "maplibre-gl": "^6.15.0",
