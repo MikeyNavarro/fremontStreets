@@ -59,6 +59,14 @@ See the [38-entry accuracy report](docs/learning-accuracy.md),
 [implementation and verification report](docs/learning-implementation.md), and
 [Stevenson startup investigation](docs/startup-timeout.md).
 
+The [expanded geographic audit](docs/geographic-audit.md) separates nine evidence
+dimensions and compares the unchanged baseline with newly retrieved City
+intersection and federal bridge records. It includes a [directed 38-entry
+matrix](docs/geographic-connectivity.md) and [independent-source provenance](docs/junction-source-research.md).
+These records corroborate named physical sites and grade separation within their
+documented scope; they do not establish individual turning permissions. Reproduce
+the audit from the committed snapshots with `npm run data:verify && npm run data:audit`.
+
 ## Driving-first interface
 
 The full-viewport dark driving screen keeps the road central. Open **Menu** for training, zones, progress, saved routes and help; **Settings** controls map orientation/zoom, following, HUD visibility and graphics resolution as well as the existing driving preferences. Panels suspend movement without resetting the vehicle, route or camera. **Escape** opens or dismisses the menu.

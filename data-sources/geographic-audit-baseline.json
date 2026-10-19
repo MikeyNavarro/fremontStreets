@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "baselineCommit": "a416cdd",
+  "reproducedCommand": "npm run data:verify",
+  "recordedDate": "2026-10-19",
+  "evidenceVersion": "evidence-v1-a0bc94350862be33",
+  "files": {
+    "public/data/roads.json": "047fb0260932381c7067b04e27f400b2aa377a9248f4d2f3edf3185495fb3414",
+    "public/data/study-network.json": "524180544938a5b284cd9b655e5aed5eccf41e67f0175683b9296f19c1b54c34",
+    "public/data/zones.json": "4141c862f835c251ba15b2053fa83b600e8827e78b58db6916d51d849386802f",
+    "data-sources/study-entries.json": "26542112bf058649a13d5cbe9a573c5b9d613005e12ebf621b90fead39451d53",
+    "public/data/verification.json": "9ed1c3dd07f335eaf72c40670390431c83f7a7285f8c800b0210c37ac65d58f0",
+    "data-sources/city-streets-full.geojson": "457588c1a2a7f8434d64a25294a813e3c5cc912bc4d2d88ff2536102e5714f14"
+  },
+  "counts": {
+    "studyEntries": 38,
+    "corroboratedIdentities": 38,
+    "corroboratedDirectedSegments": 12279,
+    "wholeImportedGeometryEntries": 18,
+    "partiallyCorroboratedEntries": 20,
+    "relevantJunctions": 219,
+    "independentlySupportedIntersectionLocations": 0,
+    "independentlySupportedPhysicalConnections": 0,
+    "individuallyVerifiedLegalMovements": 0,
+    "geographicErrorsCorrected": 0,
+    "junctionsWithUnresolvedManeuvers": 219,
+    "independentlySupportedHQRoutes": 0,
+    "independentlySupportedRoadToRoadRoutes": 0,
+    "graphReachableDirectedPairs": 1406,
+    "unsupportedRestrictionRecords": 232
+  }
+}

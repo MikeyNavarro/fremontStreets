@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "files": [
+    {
+      "file": "city-intersections-item.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/ceded4848c094e2f98a555556c252f6a?f=json",
+      "retrievedAt": "2026-10-19T12:42:41.008789+00:00",
+      "sha256": "99edf2a2ad8f75aea7668b8bce066940946332da6145f0732b51b7413e834038",
+      "bytes": 1412
+    },
+    {
+      "file": "city-intersections-layer.json",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0?f=json",
+      "retrievedAt": "2026-10-19T12:42:41.541224+00:00",
+      "sha256": "26578921b1fcc76d918e0f869898a9e5ce16389867a6b151580a102f92849ae6",
+      "bytes": 8439
+    },
+    {
+      "file": "city-intersections-query-0.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25ALBRAE+ST%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25ALDER+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25AUTO+MALL+PKWY%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25BART+WAY%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25BLACOW+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25BROWN+RD%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:43.704505+00:00",
+      "sha256": "973cb3a2c88b0765c1512d2a834d67499f004de91459b4ca44d93ec5921a7d92",
+      "bytes": 28675
+    },
+    {
+      "file": "city-intersections-query-6.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25CABRILLO+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25CENTRAL+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25CIVIC+CENTER+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25CUSHING+PKWY%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25DECOTO+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25DELAWARE+DR%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:44.553989+00:00",
+      "sha256": "e91204f06e473442966dee6e944602ffb992049476c38b9044933795cc332a6e",
+      "bytes": 23884
+    },
+    {
+      "file": "city-intersections-query-12.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25DRISCOLL+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25DURHAM+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25EAST+WARREN+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25EGGERS+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25FARWELL+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25FREMONT+BLVD%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:45.738472+00:00",
+      "sha256": "eca9e7dfa978315e954804bea5176844096d3b4079fa2c9d20fbe43901ed2204",
+      "bytes": 63526
+    },
+    {
+      "file": "city-intersections-query-18.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25GABLE+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25GRIMMER+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25I-680%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25I-880%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25KATO+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25LAKE+ARROWHEAD+AVE%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:47.079715+00:00",
+      "sha256": "bf7bd4a80f578362026160d6679640f573a013323e4256aa74593021a765a4fa",
+      "bytes": 66890
+    },
+    {
+      "file": "city-intersections-query-24.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25LIBERTY+ST%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25LOGAN+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25MISSION+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25MOWRY+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25NICOLET+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25NILES+BLVD%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:48.204643+00:00",
+      "sha256": "1254c9ce9628330e3683212eb0d6a51c783fbd797dc3809de603db9ec6f752a0",
+      "bytes": 63616
+    },
+    {
+      "file": "city-intersections-query-30.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25NILES+CANYON+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25OSGOOD+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25PACIFIC+COMMONS+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25PASEO+PADRE+PKWY%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25PERALTA+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25SCOTT+CREEK+RD%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:49.186487+00:00",
+      "sha256": "027bf8a02c0d67fe3edc4ee0ebbbfe5e07d994a0d566e88001d332d7c31bb375",
+      "bytes": 50402
+    },
+    {
+      "file": "city-intersections-query-36.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25SOUTH+GRIMMER+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25STEVENSON+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25SUNDALE+DR%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25THORNTON+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25WALNUT+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25WARM+SPRINGS+BLVD%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:50.299325+00:00",
+      "sha256": "3c8fd878a559261e800496a4e35bd55c787d1dbb7957b51c94ff1fcb8922f920",
+      "bytes": 49905
+    },
+    {
+      "file": "city-intersections-query-42.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25WARREN+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25WASHINGTON+BLVD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25WEST+WARREN+AVE%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:51.057177+00:00",
+      "sha256": "bb5e7d6e9fa47e39f206bb53e005f14a7798d15ef0874591b22884b9998f1979",
+      "bytes": 14567
+    },
+    {
+      "file": "city-transportation-item.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/e523f6e5c38540d6ba631248548db3aa?f=json",
+      "retrievedAt": "2026-10-19T12:42:52.620822+00:00",
+      "sha256": "fb31837fe386ab09692166865a58fe9d3a972a051f1ea740bf63a8ab7b9650d1",
+      "bytes": 2630
+    },
+    {
+      "file": "city-transportation-official-catalog-item.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/9c65728e37a54ff6939e0e5c6c0a0e14?f=json",
+      "retrievedAt": "2026-10-19T12:42:53.150783+00:00",
+      "sha256": "b744ce898c5a3921f01a8833f6168761ac41043b60200f87f13957318c244ac9",
+      "bytes": 2199
+    },
+    {
+      "file": "city-transportation-storymap.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/e523f6e5c38540d6ba631248548db3aa/data?f=json",
+      "retrievedAt": "2026-10-19T12:42:55.184809+00:00",
+      "sha256": "620e9e882913cc8993665e50d0030f76defd251c1787b7960ccb3bcacdc96e9b",
+      "bytes": 171728
+    },
+    {
+      "file": "city-protected-intersections-item.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/b5bef070482a4a5998e524cdd46c6d5f?f=json",
+      "retrievedAt": "2026-10-19T12:42:56.711572+00:00",
+      "sha256": "782c5ca8f20cc3db842968fc3598cc2e83820e6f3485896539ef2144c34c4b4e",
+      "bytes": 1773
+    },
+    {
+      "file": "city-protected-intersections-layer.json",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Traffic_Storymap_Project_Locations_Basemap1_2024/FeatureServer/1?f=json",
+      "retrievedAt": "2026-10-19T12:42:57.570216+00:00",
+      "sha256": "d2d94a208620c37db4bdc735a71c5407f7fe8eeabf20076e63fa9b3386731a86",
+      "bytes": 12345
+    },
+    {
+      "file": "city-protected-intersections.geojson",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Traffic_Storymap_Project_Locations_Basemap1_2024/FeatureServer/1/query?f=geojson&where=1%3D1&outFields=%2A&outSR=4326",
+      "retrievedAt": "2026-10-19T12:42:58.246682+00:00",
+      "sha256": "3242a82055df64294c082af812cd5323e29ced5d31797f3d9ef20d291ba3c4e1",
+      "bytes": 17162
+    },
+    {
+      "file": "nbi-item.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/bd1b6ee967134ea68fac351cef461b5e?f=json",
+      "retrievedAt": "2026-10-19T12:43:39.117652+00:00",
+      "sha256": "bb0ba8fdb9cc92aaf8f4b297b811126a57993d9b59258be449d7b3601beaa97e",
+      "bytes": 3351
+    },
+    {
+      "file": "nbi-layer.json",
+      "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_National_Bridge_Inventory/FeatureServer/0?f=json",
+      "retrievedAt": "2026-10-19T12:43:40.746467+00:00",
+      "sha256": "cf3dce410649e1ad927f2dd3fa87f8702f77ca70840057144bc77bc73686abe5",
+      "bytes": 35285
+    },
+    {
+      "file": "nbi-fremont-bridges.geojson",
+      "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_National_Bridge_Inventory/FeatureServer/0/query?f=geojson&where=STATE_CODE_001%3D%2706%27+AND+COUNTY_CODE_003%3D%27001%27&geometry=-122.12%2C37.44%2C-121.87%2C37.61&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&outFields=OBJECTID%2CSTATE_CODE_001%2CCOUNTY_CODE_003%2CSTRUCTURE_NUMBER_008%2CRECORD_TYPE_005A%2CROUTE_PREFIX_005B%2CROUTE_NUMBER_005D%2CDIRECTION_005E%2CFEATURES_DESC_006A%2CFACILITY_CARRIED_007%2CLOCATION_009%2COPEN_CLOSED_POSTED_041%2CTRAFFIC_DIRECTION_102%2CSERVICE_ON_042A%2CSERVICE_UND_042B%2CTRAFFIC_LANES_ON_028A%2CTRAFFIC_LANES_UND_028B%2CDATE_OF_INSPECT_090%2CDATE%2CSTATUS&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:43:41.997065+00:00",
+      "sha256": "c765dbe0129cb50708eb448e883a6220d4fd4065a6f32ef356bf79c91cf22822",
+      "bytes": 73420
+    },
+    {
+      "file": "city-protected-intersection-handout-item.json",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/04bd532104134dac8059ef4f52a53e61?f=json",
+      "retrievedAt": "2026-10-19T12:44:52.341842+00:00",
+      "sha256": "5a11cd9e06717dc558722ad3b6b515d7f7fdc77eda9b8e05e9624e33ac11d7af",
+      "bytes": 1743
+    },
+    {
+      "file": "city-protected-intersection-handout.pdf",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/04bd532104134dac8059ef4f52a53e61/data",
+      "retrievedAt": "2026-10-19T12:44:56.410020+00:00",
+      "sha256": "911b58ecfc2152e0a04bb525cd2c83f868986c442c04549edb38873f08afa003",
+      "bytes": 261548
+    }
+  ],
+  "derivedFiles": [
+    {
+      "file": "city-study-intersections.geojson",
+      "derivedFrom": [
+        "city-intersections-query-0.geojson",
+        "city-intersections-query-6.geojson",
+        "city-intersections-query-12.geojson",
+        "city-intersections-query-18.geojson",
+        "city-intersections-query-24.geojson",
+        "city-intersections-query-30.geojson",
+        "city-intersections-query-36.geojson",
+        "city-intersections-query-42.geojson"
+      ],
+      "derivation": "Union curriculum-name query batches by OBJECTID, retaining unchanged feature geometry/properties."
+    }
+  ],
+  "scope": "City GIS intersection catalog subset matching exact curriculum road-name variants plus Liberty Street, Civic Center Drive, BART Way. No road graph import."
+}

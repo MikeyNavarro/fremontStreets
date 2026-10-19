@@ -1,0 +1,2338 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "id": "city-intersection-catalog-2023",
+      "provider": "City of Fremont GIS Division",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Intersections/FeatureServer/0/query?f=geojson&where=%28UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25ALBRAE+ST%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25ALDER+AVE%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25AUTO+MALL+PKWY%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25BART+WAY%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25BLACOW+RD%25%27+OR+UPPER%28CROSS_ST_NAMES%29+LIKE+%27%25BROWN+RD%25%27%29+AND+CROSS_ST_NAMES+LIKE+%27%25%2F%25%27&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:42:43.704505+00:00",
+      "itemId": "ceded4848c094e2f98a555556c252f6a",
+      "owner": "OpenData_cofgis",
+      "itemCreatedAt": "2016-05-04T23:07:00+00:00",
+      "itemModifiedAt": "2023-03-28T18:25:11+00:00",
+      "dataModifiedAt": "2023-03-28T18:43:43.552000+00:00",
+      "sourceFile": "city-intersections-query-0.geojson",
+      "sha256": "973cb3a2c88b0765c1512d2a834d67499f004de91459b4ca44d93ec5921a7d92",
+      "credit": "City of Fremont - GIS Division",
+      "licenseStatement": "City of Fremont Open Data",
+      "scope": "Named intersection point catalog. Complete query provenance for all8batches is in retrieval-manifest.json.",
+      "limitations": [
+        "Independent of OSM but related to City street-centerline lineage; do not count as a second independent City survey.",
+        "Last published data modification is2023-03-28, not a guarantee of current2026conditions.",
+        "Contains self-road and ramp-name records; catalog point is not individual lane or source-node proof.",
+        "No grade, legal access, oneway or permitted-turn attributes."
+      ]
+    },
+    {
+      "id": "city-implemented-protected-intersections-2024",
+      "provider": "City of Fremont Public Works / Transportation Engineering",
+      "url": "https://services2.arcgis.com/AVso4yDITKsybTJg/arcgis/rest/services/Traffic_Storymap_Project_Locations_Basemap1_2024/FeatureServer/1/query?f=geojson&where=1%3D1&outFields=%2A&outSR=4326",
+      "retrievedAt": "2026-10-19T12:42:58.246682+00:00",
+      "itemId": "b5bef070482a4a5998e524cdd46c6d5f",
+      "owner": "EChew_cofgis",
+      "itemCreatedAt": "2024-09-30T19:45:09+00:00",
+      "itemModifiedAt": "2024-10-07T19:17:57+00:00",
+      "dataModifiedAt": "2024-10-07T19:17:44.149000+00:00",
+      "sourceFile": "city-protected-intersections.geojson",
+      "sha256": "3242a82055df64294c082af812cd5323e29ced5d31797f3d9ef20d291ba3c4e1",
+      "credit": "City of Fremont GIS Division",
+      "licenseStatement": "City of Fremont Open Data",
+      "scope": "City implemented protected-intersection project locations; Status and Status2 retained.",
+      "limitations": [
+        "Physical named-junction and at-grade design corroboration only for Status=Implemented, with no inference about every carriageway approach.",
+        "One In Design/Fully Funded project is excluded from implemented evidence.",
+        "Project-point geometry can share City GIS lineage; engineering implementation status provides additional independent subject evidence beyond line proximity.",
+        "No intersection-specific current signal/turn-control plan or permitted movement list.",
+        "Generic motorist guidance explicitly warns to check whether right turns on red are prohibited."
+      ]
+    },
+    {
+      "id": "usdot-fhwa-nbi-2025",
+      "provider": "USDOT Bureau of Transportation Statistics / Federal Highway Administration, NBI",
+      "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_National_Bridge_Inventory/FeatureServer/0/query?f=geojson&where=STATE_CODE_001%3D%2706%27+AND+COUNTY_CODE_003%3D%27001%27&geometry=-122.12%2C37.44%2C-121.87%2C37.61&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&outFields=OBJECTID%2CSTATE_CODE_001%2CCOUNTY_CODE_003%2CSTRUCTURE_NUMBER_008%2CRECORD_TYPE_005A%2CROUTE_PREFIX_005B%2CROUTE_NUMBER_005D%2CDIRECTION_005E%2CFEATURES_DESC_006A%2CFACILITY_CARRIED_007%2CLOCATION_009%2COPEN_CLOSED_POSTED_041%2CTRAFFIC_DIRECTION_102%2CSERVICE_ON_042A%2CSERVICE_UND_042B%2CTRAFFIC_LANES_ON_028A%2CTRAFFIC_LANES_UND_028B%2CDATE_OF_INSPECT_090%2CDATE%2CSTATUS&resultRecordCount=1000",
+      "retrievedAt": "2026-10-19T12:43:41.997065+00:00",
+      "itemId": "bd1b6ee967134ea68fac351cef461b5e",
+      "owner": "USDOT_BTS",
+      "itemCreatedAt": "2024-07-09T15:12:46+00:00",
+      "itemModifiedAt": "2025-08-11T21:32:43+00:00",
+      "dataModifiedAt": "2025-08-11T22:25:05.167000+00:00",
+      "sourceFile": "nbi-fremont-bridges.geojson",
+      "sha256": "c765dbe0129cb50708eb448e883a6220d4fd4065a6f32ef356bf79c91cf22822",
+      "credit": "Acknowledgment of the Federal Highway Administration (FHWA) and the Bureau of Transportation Statistics (BTS) [distributor].",
+      "licenseStatement": "This NTAD dataset is a work of the United States government as defined in 17 U.S.C. \u00a7 101 and as such are not protected by any U.S. copyrights.\u00a0This work is available for unrestricted public use.",
+      "scope": "Official National Bridge Inventory, dataset asof2025-06-20; boundedFremont-area extract.",
+      "limitations": [
+        "FHWA aggregation of jurisdiction-submitted bridge records; do not count Caltrans and NBI reproductions as two independent sources.",
+        "Bridge-point location is not exact deck footprint, ramp topology or turn permission.",
+        "Facility-carried and crossed-feature names may be historical, including AutoMallParkway overI680. Retain source wording.",
+        "Raw direction/open status codes are retained; no whole-route driving permission is inferred.",
+        "Not a real-time construction/closure source."
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "id": "city-protected-22",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 22,
+        "sourceLabel": "Civic Center/BART Way",
+        "roadNames": [
+          "Civic Center Drive",
+          "BART Way"
+        ],
+        "position": [
+          -121.978390961426,
+          37.5554024553211
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "BART Way",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Civic Center/BART Way",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 35
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-23",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 23,
+        "sourceLabel": "Walnut/Paseo",
+        "roadNames": [
+          "Walnut Avenue",
+          "Paseo Padre Parkway"
+        ],
+        "position": [
+          -121.977844471557,
+          37.5518841550931
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [
+        {
+          "id": "osm-node-53101680",
+          "logicalId": "osm-node-53101680",
+          "distanceMetres": 10.82,
+          "position": [
+            -121.9779655,
+            37.5518684
+          ]
+        },
+        {
+          "id": "osm-node-611603743",
+          "logicalId": "osm-node-53101680",
+          "distanceMetres": 11.89,
+          "position": [
+            -121.9778673,
+            37.5519894
+          ]
+        },
+        {
+          "id": "osm-node-1666819823",
+          "logicalId": "osm-node-1666819823",
+          "distanceMetres": 9.0,
+          "position": [
+            -121.9778405,
+            37.5518034
+          ]
+        },
+        {
+          "id": "osm-node-1666819834",
+          "logicalId": "osm-node-1666819823",
+          "distanceMetres": 9.86,
+          "position": [
+            -121.9777476,
+            37.5519283
+          ]
+        }
+      ],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Walnut Avenue Bikeway - Phase 1",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Walnut/Paseo",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 36
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-24",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 24,
+        "sourceLabel": "Walnut/Civic Center",
+        "roadNames": [
+          "Walnut Avenue",
+          "Civic Center Drive"
+        ],
+        "position": [
+          -121.976057726478,
+          37.5542093805401
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Walnut Avenue Bikeway - Phase 1",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Walnut/Civic Center",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 37
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-25",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 25,
+        "sourceLabel": "Walnut/Guardino",
+        "roadNames": [
+          "Walnut Avenue",
+          "Guardino Drive"
+        ],
+        "position": [
+          -121.971233392461,
+          37.5593110161577
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Walnut Avenue Bikeway - Phase 1",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Walnut/Guardino",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 38
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-26",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 26,
+        "sourceLabel": "Walnut/Gallaudet",
+        "roadNames": [
+          "Walnut Avenue",
+          "Gallaudet Drive"
+        ],
+        "position": [
+          -121.967972383584,
+          37.5613209484989
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Walnut Avenue Bikeway - Phase 1",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Walnut/Gallaudet",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 39
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-27",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 27,
+        "sourceLabel": "Fremont/Stevenson",
+        "roadNames": [
+          "Fremont Boulevard",
+          "Stevenson Boulevard"
+        ],
+        "position": [
+          -121.97300782669,
+          37.5407052761911
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [
+        {
+          "id": "osm-node-660020956",
+          "logicalId": "osm-node-1578762389",
+          "distanceMetres": 14.98,
+          "position": [
+            -121.9731773,
+            37.5407123
+          ]
+        },
+        {
+          "id": "osm-node-1578762389",
+          "logicalId": "osm-node-1578762389",
+          "distanceMetres": 8.0,
+          "position": [
+            -121.9729422,
+            37.5407549
+          ]
+        },
+        {
+          "id": "osm-node-1578762396",
+          "logicalId": "osm-node-1578762389",
+          "distanceMetres": 17.76,
+          "position": [
+            -121.9730983,
+            37.5408478
+          ]
+        },
+        {
+          "id": "osm-node-1675977852",
+          "logicalId": "osm-node-1578762389",
+          "distanceMetres": 9.36,
+          "position": [
+            -121.9730203,
+            37.5406218
+          ]
+        }
+      ],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Fremont Blvd Intersection Improvements",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Fremont/Stevenson",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 40
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-28",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 28,
+        "sourceLabel": "Fremont/Mowry",
+        "roadNames": [
+          "Fremont Boulevard",
+          "Mowry Avenue"
+        ],
+        "position": [
+          -121.988368700128,
+          37.5486222919368
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [
+        {
+          "id": "osm-node-53026855",
+          "logicalId": "osm-node-392976504",
+          "distanceMetres": 12.97,
+          "position": [
+            -121.9885127,
+            37.5485991
+          ]
+        },
+        {
+          "id": "osm-node-392976504",
+          "logicalId": "osm-node-392976504",
+          "distanceMetres": 12.11,
+          "position": [
+            -121.9882351,
+            37.548647
+          ]
+        },
+        {
+          "id": "osm-node-392976517",
+          "logicalId": "osm-node-392976504",
+          "distanceMetres": 12.63,
+          "position": [
+            -121.9883463,
+            37.5485102
+          ]
+        },
+        {
+          "id": "osm-node-2954360056",
+          "logicalId": "osm-node-2954360056",
+          "distanceMetres": 12.49,
+          "position": [
+            -121.9884032,
+            37.5487311
+          ]
+        }
+      ],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Fremont Blvd Intersection Improvements",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Fremont/Mowry",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 41
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-29",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 29,
+        "sourceLabel": "Cushing/Northport (East)",
+        "roadNames": [
+          "Cushing Parkway",
+          "Northport Loop East"
+        ],
+        "position": [
+          -121.95247496111,
+          37.4899035612807
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented (Quick Build)",
+      "evidenceExcerpt": {
+        "Prj_Name": "LAM Research Quick Build",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Cushing/Northport (East)",
+        "Status": "Implemented (Quick Build)",
+        "Status2": "Implemented (Quick Build)",
+        "GIS_JnID": 33
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-30",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 30,
+        "sourceLabel": "Cushing/Northport (West)",
+        "roadNames": [
+          "Cushing Parkway",
+          "Northport Loop West"
+        ],
+        "position": [
+          -121.955899754817,
+          37.4895484758388
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented (Quick Build)",
+      "evidenceExcerpt": {
+        "Prj_Name": "LAM Research Quick Build",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Cushing/Northport (West)",
+        "Status": "Implemented (Quick Build)",
+        "Status2": "Implemented (Quick Build)",
+        "GIS_JnID": 34
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-31",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 31,
+        "sourceLabel": "Washington/Osgood",
+        "roadNames": [
+          "Washington Boulevard",
+          "Osgood Road"
+        ],
+        "position": [
+          -121.953323639089,
+          37.5332688688678
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [
+        {
+          "id": "osm-node-1710267766",
+          "logicalId": "osm-node-1710267766",
+          "distanceMetres": 15.65,
+          "position": [
+            -121.9534584,
+            37.5331775
+          ]
+        },
+        {
+          "id": "osm-node-1710267880",
+          "logicalId": "osm-node-1710267766",
+          "distanceMetres": 8.14,
+          "position": [
+            -121.9532808,
+            37.5332041
+          ]
+        }
+      ],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Washington/Osgood Intersection Improvements",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Washington/Osgood",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 44
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-32",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 32,
+        "sourceLabel": "Fremont/Grimmer",
+        "roadNames": [
+          "Fremont Boulevard",
+          "Grimmer Boulevard"
+        ],
+        "position": [
+          -121.965458679612,
+          37.5364513441552
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [
+        {
+          "id": "osm-node-53026887",
+          "logicalId": "osm-node-53026887",
+          "distanceMetres": 13.98,
+          "position": [
+            -121.9655146,
+            37.5365688
+          ]
+        },
+        {
+          "id": "osm-node-660020962",
+          "logicalId": "osm-node-2502491382",
+          "distanceMetres": 12.66,
+          "position": [
+            -121.9656012,
+            37.5364637
+          ]
+        },
+        {
+          "id": "osm-node-2502491382",
+          "logicalId": "osm-node-2502491382",
+          "distanceMetres": 7.01,
+          "position": [
+            -121.9654715,
+            37.5363892
+          ]
+        },
+        {
+          "id": "osm-node-2502491384",
+          "logicalId": "osm-node-2502491382",
+          "distanceMetres": 8.12,
+          "position": [
+            -121.9653832,
+            37.536493
+          ]
+        }
+      ],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Fremont/Grimmer Intersection Improvements (MTC Qu*",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Fremont/Grimmer",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 46
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-33",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 33,
+        "sourceLabel": "Fremont/Eugene",
+        "roadNames": [
+          "Fremont Boulevard",
+          "Eugene Street"
+        ],
+        "position": [
+          -121.966328549682,
+          37.5369406984401
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Fremont/Grimmer Intersection Improvements (MTC Qu*",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Fremont/Eugene",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 47
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-34",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 34,
+        "sourceLabel": "Fremont/Walnut",
+        "roadNames": [
+          "Fremont Boulevard",
+          "Walnut Avenue"
+        ],
+        "position": [
+          -121.982620606636,
+          37.5456507793443
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [
+        {
+          "id": "osm-node-53026863",
+          "logicalId": "osm-node-392976494",
+          "distanceMetres": 9.6,
+          "position": [
+            -121.9827278,
+            37.5456362
+          ]
+        },
+        {
+          "id": "osm-node-392976494",
+          "logicalId": "osm-node-392976494",
+          "distanceMetres": 10.86,
+          "position": [
+            -121.9826326,
+            37.5457479
+          ]
+        },
+        {
+          "id": "osm-node-1666819839",
+          "logicalId": "osm-node-1666819839",
+          "distanceMetres": 9.53,
+          "position": [
+            -121.9825253,
+            37.5456911
+          ]
+        },
+        {
+          "id": "osm-node-1666819847",
+          "logicalId": "osm-node-1666819839",
+          "distanceMetres": 7.77,
+          "position": [
+            -121.9826207,
+            37.545581
+          ]
+        }
+      ],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Fremont/Walnut Intersection Improvements (MTC Qui*",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Fremont/Walnut",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 48
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-35",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 35,
+        "sourceLabel": "Mowry/State",
+        "roadNames": [
+          "Mowry Avenue",
+          "State Street"
+        ],
+        "position": [
+          -121.986421174001,
+          37.5509997110021
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Unresolved",
+        "topology": "Unresolved",
+        "gradeSeparation": "Unresolved"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "In Design, Fully Funded",
+      "evidenceExcerpt": {
+        "Prj_Name": "State Street Complete Streets",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Mowry/State",
+        "Status": "In Design, Fully Funded",
+        "Status2": "In Design, Fully Funded",
+        "GIS_JnID": 49
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-36",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 36,
+        "sourceLabel": "Walnut/Liberty",
+        "roadNames": [
+          "Walnut Avenue",
+          "Liberty Street"
+        ],
+        "position": [
+          -121.979642244039,
+          37.5496059928628
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Walnut Ave/Liberty Street Intersection Improvemen*",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Walnut/Liberty",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 45
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-37",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 37,
+        "sourceLabel": "Warm Springs/Wisdom",
+        "roadNames": [
+          "Warm Springs Boulevard",
+          "Wisdom Road"
+        ],
+        "position": [
+          -121.945908187374,
+          37.5031511658599
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Warm Springs Private Development",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Warm Springs/Wisdom",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 43
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "city-protected-38",
+      "subject": {
+        "kind": "named-intersection",
+        "sourceObjectId": 38,
+        "sourceLabel": "Warm Springs/Lopes",
+        "roadNames": [
+          "Warm Springs Boulevard",
+          "Lopes Road"
+        ],
+        "position": [
+          -121.943206970044,
+          37.5040598182419
+        ]
+      },
+      "sourceIds": [
+        "city-implemented-protected-intersections-2024"
+      ],
+      "graphCandidateJunctions": [],
+      "supportedDimensions": {
+        "intersectionLocation": "Verified",
+        "topology": "Verified",
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Existence of the named physical at-grade protected intersection at the City project point, as documented by implementation status. Does not establish every individual carriageway connection or vehicle maneuver.",
+      "implementationStatus": "Implemented",
+      "evidenceExcerpt": {
+        "Prj_Name": "Warm Springs Private Development",
+        "Prj_Desc": "Protected Intersection",
+        "Location_Gen": "Warm Springs/Lopes",
+        "Status": "Implemented",
+        "Status2": "Implemented",
+        "GIS_JnID": 42
+      },
+      "unresolvedDimensions": [
+        "vehicleAccess",
+        "oneWay",
+        "maneuvers",
+        "routeReachability"
+      ],
+      "graphMatchPolicy": "Where two curriculum entries are named, both exact entryIDs plus <=40m from City point. These are location associations, not fabricated new graph links."
+    },
+    {
+      "id": "nbi-bridge-33-0237",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0237",
+        "position": [
+          -121.948556000045,
+          37.492577999966
+        ],
+        "facilityCarried": "FREMONT BOULEVARD",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47878,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0237",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "FREMONT BOULEVARD",
+        "LOCATION_009": "04-ALA-880-3.25-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "7",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0243",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0243",
+        "position": [
+          -122.038347000064,
+          37.5635719998953
+        ],
+        "facilityCarried": "STATE ROUTE 84",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47882,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0243",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "3",
+        "ROUTE_NUMBER_005D": "00084",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "STATE ROUTE 84",
+        "LOCATION_009": "04-ALA-084-R5.98-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "6",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "823",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0261L",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0261L",
+        "position": [
+          -122.017460999927,
+          37.5392579997495
+        ],
+        "facilityCarried": "CENTRAL AVE SB",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47891,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0261L",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "CENTRAL AVE SB",
+        "LOCATION_009": "04-ALA-880-8.25-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "2",
+        "TRAFFIC_LANES_UND_028B": "9",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0261R",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0261R",
+        "position": [
+          -122.017291999873,
+          37.5394919999246
+        ],
+        "facilityCarried": "CENTRAL AVE NB",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47892,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0261R",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "CENTRAL AVE NB",
+        "LOCATION_009": "04-ALA-880-8.24-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "2",
+        "TRAFFIC_LANES_UND_028B": "9",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0264",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0264",
+        "position": [
+          -122.022789000404,
+          37.5467919997544
+        ],
+        "facilityCarried": "SR 84 (THORNTON)",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47893,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0264",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "3",
+        "ROUTE_NUMBER_005D": "00084",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "SR 84 (THORNTON)",
+        "LOCATION_009": "04-ALA-084-6.93-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "6",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "823",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0267L",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0267L",
+        "position": [
+          -122.002258000094,
+          37.5299280001006
+        ],
+        "facilityCarried": "MOWRY AVENUE WB",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47894,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0267L",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "MOWRY AVENUE WB",
+        "LOCATION_009": "04-ALA-880-7.19-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0267R",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0267R",
+        "position": [
+          -122.002085999666,
+          37.5298329999381
+        ],
+        "facilityCarried": "MOWRY AVENUE EB",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47895,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0267R",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "MOWRY AVENUE EB",
+        "LOCATION_009": "04-ALA-880-7.18-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0268",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0268",
+        "position": [
+          -121.967267000115,
+          37.5073360002252
+        ],
+        "facilityCarried": "AUTO MALL PARKWAY",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47896,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0268",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "AUTO MALL PARKWAY",
+        "LOCATION_009": "04-ALA-880-4.71-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "8",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0294",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0294",
+        "position": [
+          -121.924452999924,
+          37.5406110002619
+        ],
+        "facilityCarried": "INTERSTATE 680",
+        "featureBelow": "SR 238 (MISSION BLVD)"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47914,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0294",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "SR 238 (MISSION BLVD)",
+        "FACILITY_CARRIED_007": "INTERSTATE 680",
+        "LOCATION_009": "04-ALA-680-R6.38-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "8",
+        "TRAFFIC_LANES_UND_028B": "5",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0361",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0361",
+        "position": [
+          -121.941446999686,
+          37.5310470000538
+        ],
+        "facilityCarried": "WASHINGTON BLVD",
+        "featureBelow": "INTERSTATE 680"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 47996,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0361",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "4",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 680",
+        "FACILITY_CARRIED_007": "WASHINGTON BLVD",
+        "LOCATION_009": "04-ALA-680-M5.37-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "8",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0368",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0368",
+        "position": [
+          -121.93990299963,
+          37.5146470002885
+        ],
+        "facilityCarried": "AUTO MALL PARKWAY",
+        "featureBelow": "INTERSTATE 680"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48009,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0368",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 680",
+        "FACILITY_CARRIED_007": "AUTO MALL PARKWAY",
+        "LOCATION_009": "04-ALA-680-M4.02-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "0603",
+        "STATUS": "MM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0405",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0405",
+        "position": [
+          -121.937022000106,
+          37.5333940002771
+        ],
+        "facilityCarried": "PASEO PADRE PKWY",
+        "featureBelow": "INTERSTATE 680"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48041,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0405",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 680",
+        "FACILITY_CARRIED_007": "PASEO PADRE PKWY",
+        "LOCATION_009": "04-ALA-680-M5.67-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "8",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0424L",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0424L",
+        "position": [
+          -121.905822000221,
+          37.4664250000952
+        ],
+        "facilityCarried": "INTERSTATE 680 SB",
+        "featureBelow": "SCOTT CREEK RD"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48073,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0424L",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "SCOTT CREEK RD",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 SB",
+        "LOCATION_009": "04-ALA-680-M0.13-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "3",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0424R",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0424R",
+        "position": [
+          -121.905460999647,
+          37.4664610002587
+        ],
+        "facilityCarried": "INTERSTATE 680 NB",
+        "featureBelow": "SCOTT CREEK RD"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48074,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0424R",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "SCOTT CREEK RD",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 NB",
+        "LOCATION_009": "04-ALA-680-M0.13-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "2",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0427L",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0427L",
+        "position": [
+          -121.91878100039,
+          37.4906830000127
+        ],
+        "facilityCarried": "INTERSTATE 680 SB",
+        "featureBelow": "E WARREN AVE"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48075,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0427L",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "E WARREN AVE",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 SB",
+        "LOCATION_009": "04-ALA-680-M1.96-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "5",
+        "TRAFFIC_LANES_UND_028B": "4",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0427R",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0427R",
+        "position": [
+          -121.918568999779,
+          37.4910890000272
+        ],
+        "facilityCarried": "INTERSTATE 680 NB",
+        "featureBelow": "E WARREN AVE"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48076,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0427R",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "E WARREN AVE",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 NB",
+        "LOCATION_009": "04-ALA-680-M1.97-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "4",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0428L",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0428L",
+        "position": [
+          -121.923380999872,
+          37.4954999997229
+        ],
+        "facilityCarried": "INTERSTATE 680 SB",
+        "featureBelow": "SR 262 (MISSION BLVD)"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48077,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0428L",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "SR 262 (MISSION BLVD)",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 SB",
+        "LOCATION_009": "04-ALA-680-M2.38-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "6",
+        "TRAFFIC_LANES_UND_028B": "6",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0428R",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0428R",
+        "position": [
+          -121.923142000395,
+          37.4956670001236
+        ],
+        "facilityCarried": "INTERSTATE 680 NB",
+        "featureBelow": "SR 262 (MISSION BLVD)"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48078,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0428R",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "SR 262 (MISSION BLVD)",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 NB",
+        "LOCATION_009": "04-ALA-680-M2.38-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "5",
+        "TRAFFIC_LANES_UND_028B": "6",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0429L",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0429L",
+        "position": [
+          -121.934903000115,
+          37.5060970002818
+        ],
+        "facilityCarried": "INTERSTATE 680 SB",
+        "featureBelow": "GRIMMER BLVD"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48079,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0429L",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "GRIMMER BLVD",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 SB",
+        "LOCATION_009": "04-ALA-680-M3.35-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "5",
+        "TRAFFIC_LANES_UND_028B": "2",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0429R",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0429R",
+        "position": [
+          -121.934638999626,
+          37.5062030000622
+        ],
+        "facilityCarried": "INTERSTATE 680 NB",
+        "featureBelow": "GRIMMER BLVD"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48080,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0429R",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00680",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "GRIMMER BLVD",
+        "FACILITY_CARRIED_007": "INTERSTATE 680 NB",
+        "LOCATION_009": "04-ALA-680-M3.35-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "3",
+        "TRAFFIC_LANES_UND_028B": "2",
+        "DATE_OF_INSPECT_090": "324",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0515",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0515",
+        "position": [
+          -122.045258000057,
+          37.5709469998907
+        ],
+        "facilityCarried": "PASEO PADRE PKWY",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48117,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0515",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "PASEO PADRE PKWY",
+        "LOCATION_009": "04-ALA-880-10.93-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "9",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0591",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0591",
+        "position": [
+          -121.987517000217,
+          37.5224890000258
+        ],
+        "facilityCarried": "STEVENSON BLVD",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48137,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0591",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "STEVENSON BLVD",
+        "LOCATION_009": "04-ALA-880-6.24-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "8",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0618",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0618",
+        "position": [
+          -122.048388999826,
+          37.5787859997198
+        ],
+        "facilityCarried": "FREMONT BOULEVARD",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48150,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0618",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "FREMONT BOULEVARD",
+        "LOCATION_009": "04-ALA-880-11.50-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "8",
+        "TRAFFIC_LANES_UND_028B": "9",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "1202",
+        "STATUS": "AM"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0665F",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0665F",
+        "position": [
+          -121.935625000363,
+          37.4809500000821
+        ],
+        "facilityCarried": "W262-S880 CONNECTR",
+        "featureBelow": "I 880  WARREN AVE  RAMPS"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48163,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0665F",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00880",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "I 880  WARREN AVE  RAMPS",
+        "FACILITY_CARRIED_007": "W262-S880 CONNECTR",
+        "LOCATION_009": "04-ALA-880-2.48-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "3",
+        "TRAFFIC_LANES_UND_028B": "16",
+        "DATE_OF_INSPECT_090": "1124",
+        "DATE": "0825",
+        "STATUS": "ST"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0666F",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0666F",
+        "position": [
+          -121.938067000395,
+          37.4840940000336
+        ],
+        "facilityCarried": "S880-E262 CONNECTR",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48164,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0666F",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "1",
+        "ROUTE_NUMBER_005D": "00880",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "S880-E262 CONNECTR",
+        "LOCATION_009": "04-ALA-880-2.55-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "1",
+        "SERVICE_ON_042A": "1",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "2",
+        "TRAFFIC_LANES_UND_028B": "10",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "0825",
+        "STATUS": "ST"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0667",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0667",
+        "position": [
+          -121.937528000444,
+          37.4834219998695
+        ],
+        "facilityCarried": "WARREN AVENUE",
+        "featureBelow": "INTERSTATE 880"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48165,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0667",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "INTERSTATE 880",
+        "FACILITY_CARRIED_007": "WARREN AVENUE",
+        "LOCATION_009": "04-ALA-880-2.51-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "4",
+        "TRAFFIC_LANES_UND_028B": "13",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "0825",
+        "STATUS": "ST"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0668",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0668",
+        "position": [
+          -121.934958000367,
+          37.4841109996783
+        ],
+        "facilityCarried": "WARREN AVENUE",
+        "featureBelow": "N880-E262 CONNECTOR RAMP"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48166,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0668",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "N880-E262 CONNECTOR RAMP",
+        "FACILITY_CARRIED_007": "WARREN AVENUE",
+        "LOCATION_009": "04-ALA-880-2.29-FMT",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "5",
+        "TRAFFIC_LANES_UND_028B": "2",
+        "DATE_OF_INSPECT_090": "423",
+        "DATE": "0825",
+        "STATUS": "ST"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    },
+    {
+      "id": "nbi-bridge-33-0669",
+      "subject": {
+        "kind": "grade-separated-crossing",
+        "structureNumber": "33 0669",
+        "position": [
+          -121.933805999948,
+          37.4862669998674
+        ],
+        "facilityCarried": "KATO ROAD",
+        "featureBelow": "ST RTE 262 (MISSION BL)"
+      },
+      "sourceIds": [
+        "usdot-fhwa-nbi-2025"
+      ],
+      "supportedDimensions": {
+        "gradeSeparation": "Verified"
+      },
+      "scope": "Named bridge structure carrying the stated facility over the stated feature; no direct at-grade junction at the bridge crossing. Adjacent access via ramps remains independently unresolved. This is not a new graph junction.",
+      "evidenceExcerpt": {
+        "OBJECTID": 48167,
+        "STATE_CODE_001": "06",
+        "COUNTY_CODE_003": "001",
+        "STRUCTURE_NUMBER_008": "33 0669",
+        "RECORD_TYPE_005A": "1",
+        "ROUTE_PREFIX_005B": "5",
+        "ROUTE_NUMBER_005D": "00000",
+        "DIRECTION_005E": "0",
+        "FEATURES_DESC_006A": "ST RTE 262 (MISSION BL)",
+        "FACILITY_CARRIED_007": "KATO ROAD",
+        "LOCATION_009": "04-ALA-262-R0.28",
+        "OPEN_CLOSED_POSTED_041": "A",
+        "TRAFFIC_DIRECTION_102": "2",
+        "SERVICE_ON_042A": "5",
+        "SERVICE_UND_042B": "1",
+        "TRAFFIC_LANES_ON_028A": "3",
+        "TRAFFIC_LANES_UND_028B": "5",
+        "DATE_OF_INSPECT_090": "1124",
+        "DATE": "0825",
+        "STATUS": "ST"
+      },
+      "unresolvedDimensions": [
+        "exactRampConnectivity",
+        "vehicleAccessOnSpecificRamp",
+        "individualPermittedMovements"
+      ],
+      "sourceNameCaution": "Retain historical source facility names; resolve using geometry and additional named records without silently renaming mapped roads."
+    }
+  ],
+  "policy": "These are scoped geographic evidence proposals, not imported driving rules. No individual maneuver permission is established. Rawsource geometries/roadgraph/curriculum are unchanged."
+}
