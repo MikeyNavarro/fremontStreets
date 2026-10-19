@@ -64,9 +64,15 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('starts with actual Fremont roads and selectable patrol study areas', async ({ page }) => {
-  const snapshot = await state(page, true);
-  expect(snapshot.graph.nodes.length).toBeGreaterThan(100);
-  expect(snapshot.graph.edges.length).toBeGreaterThan(100);
+  const snapshot = await state(page);
+  // Assert inside the browser: transferring the complete 41 MB graph through
+  // Playwright's protocol consumed 23 seconds locally and timed out in CI.
+  const counts = await page.evaluate(() => {
+    const graph = (window as unknown as { __FREMONT_GAME__: Snapshot }).__FREMONT_GAME__.graph;
+    return { nodes: graph.nodes.length, edges: graph.edges.length };
+  });
+  expect(counts.nodes).toBeGreaterThan(100);
+  expect(counts.edges).toBeGreaterThan(100);
   expect(snapshot.vehicle.position[0]).toBeGreaterThan(-122.1);
   expect(snapshot.vehicle.position[0]).toBeLessThan(-121.8);
   expect(snapshot.vehicle.position[1]).toBeGreaterThan(37.4);

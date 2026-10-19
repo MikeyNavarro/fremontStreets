@@ -52,6 +52,17 @@ jobs:
       - name: Test production files at the Pages subdirectory
         run: npm run test:production
 
+      - name: Retain browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-evidence
+          path: |
+            test-results/
+            test-results-production/
+          retention-days: 7
+          if-no-files-found: ignore
+
       # Pull requests exercise the same build and tests without publishing.
       - name: Upload tested production files
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
