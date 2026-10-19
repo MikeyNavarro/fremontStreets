@@ -12,6 +12,11 @@ test('recognized requires two distinct unaided questions; visits and repeated pr
  let state=EMPTY_LEARNING();state.attempts=[attempt(0),attempt(1,{questionId:'q0'})];assert.equal(streetProgress(entry.id,state,fixture).level,'Unfamiliar');
  state.attempts=[attempt(0),attempt(1,{assisted:true})];assert.equal(streetProgress(entry.id,state,fixture).level,'Unfamiliar');state.attempts=[attempt(0),attempt(1)];assert.equal(streetProgress(entry.id,state,fixture).level,'Recognized');
 });
+test('repeated map-location prompts and reverse edges cannot pretend to be different recognition questions',()=>{
+ const state=EMPTY_LEARNING();state.attempts=[attempt(0,{kind:'locate',questionId:'locate:entry:way:0:f'}),attempt(1,{kind:'locate',questionId:'locate:entry:other:3:f'})];assert.equal(streetProgress(entry.id,state,fixture).level,'Unfamiliar');
+ state.attempts=[attempt(0,{questionId:'identify:entry:way:0:f'}),attempt(1,{questionId:'identify:entry:way:0:r'})];assert.equal(streetProgress(entry.id,state,fixture).level,'Unfamiliar');
+ state.attempts.push(attempt(2,{category:'recognition',kind:'identify',questionId:'identify:entry:way:1:f'}));assert.equal(streetProgress(entry.id,state,fixture).level,'Recognized');
+});
 test('navigation and retained mastery require distinct sessions, ten attempts and seven days',()=>{
  const state=EMPTY_LEARNING();state.attempts=Array.from({length:10},(_,i)=>attempt(i));assert.equal(streetProgress(entry.id,state,fixture).level,'Mastered');
  const oneDay={...state,attempts:state.attempts.map(a=>({...a,at:'2026-01-01T12:00:00Z'}))};assert.equal(streetProgress(entry.id,oneDay,fixture).level,'Navigable');

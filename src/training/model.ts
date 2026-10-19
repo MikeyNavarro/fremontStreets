@@ -7,6 +7,12 @@ export interface Exam {id:string;geoVersion:string;sessionId:string;tasks:Traini
 export interface LearningState {schema:1;attempts:Attempt[];exam:Exam|null;sessionId:string;legacy:Record<string,string>}
 export const EMPTY_LEARNING=():LearningState=>({schema:1,attempts:[],exam:null,sessionId:'',legacy:{}});
 const DAY=86_400_000;
+/** Finding any eligible part of the same street is one question, regardless of
+ * the internal representative edge. Reverse edges also show the same geometry. */
+function recognitionQuestion(a:Attempt):string {
+ if(a.kind==='locate')return `locate:${a.entryId}`;
+ return /^(identify|location):/.test(a.questionId)?a.questionId.replace(/:[fr]$/,''):a.questionId;
+}
 export function taskEligible(task:TrainingTask,registry:VerificationRegistry):boolean {
  if(task.geoVersion!==registry.version)return false;
  const entry=registry.entries.find(e=>e.id===task.entryId);
@@ -18,7 +24,7 @@ export function streetProgress(id:string,state:LearningState,registry:Verificati
  const history=state.attempts.filter(a=>a.entryId===id);
  const attempts=history.filter(a=>a.geoVersion===registry.version&&a.eligible&&(a.outcome==='correct'||a.outcome==='incorrect')).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)||a.id.localeCompare(b.id));
  const unaided=attempts.filter(a=>!a.assisted&&a.hints===0),correct=unaided.filter(a=>a.outcome==='correct');
- const recognized=new Set(correct.filter(a=>a.category==='recognition'&&['identify','locate','location'].includes(a.kind)).map(a=>a.questionId)).size>=2;
+ const recognized=new Set(correct.filter(a=>a.category==='recognition'&&['identify','locate','location'].includes(a.kind)).map(recognitionQuestion)).size>=2;
  const nav=correct.filter(a=>a.category==='navigation'),intersection=correct.some(a=>a.category==='intersection');
  const evidence=registry.entries.find(e=>e.id===id),hasIntersection=registry.junctions.some(j=>j.entryIds.includes(id)&&intersectionEligible(j));
  const blocked=!navigationEligible(evidence)||!hasIntersection;
@@ -28,7 +34,7 @@ export function streetProgress(id:string,state:LearningState,registry:Verificati
  // A later recognition success must not retroactively validate an earlier window.
  if(navigable){const identities=new Set<string>(),sessions=new Set<string>(),navSessions=new Set<string>();let firstSuccess:number|null=null,lastSuccess=0,navSuccesses=0,intersectionSuccess=false;const window:boolean[]=[];
   for(const a of unaided){const success=a.outcome==='correct';window.push(success);if(window.length>10)window.shift();
-   if(success){sessions.add(a.sessionId);firstSuccess??=Date.parse(a.at);lastSuccess=Date.parse(a.at);if(a.category==='recognition'&&['identify','locate','location'].includes(a.kind))identities.add(a.questionId);if(a.category==='navigation'){navSuccesses++;navSessions.add(a.sessionId);}if(a.category==='intersection')intersectionSuccess=true;}
+   if(success){sessions.add(a.sessionId);firstSuccess??=Date.parse(a.at);lastSuccess=Date.parse(a.at);if(a.category==='recognition'&&['identify','locate','location'].includes(a.kind))identities.add(recognitionQuestion(a));if(a.category==='navigation'){navSuccesses++;navSessions.add(a.sessionId);}if(a.category==='intersection')intersectionSuccess=true;}
    if(window.length===10&&window.filter(Boolean).length>=8&&identities.size>=2&&navSuccesses>=2&&navSessions.size>=2&&intersectionSuccess&&sessions.size>=3&&firstSuccess!==null&&lastSuccess-firstSuccess>=7*DAY){mastered=true;break;}
   }
  }

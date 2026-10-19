@@ -47,7 +47,7 @@ export class LearningSystem {
  private pool():TrainingTask[]{
   const tasks:TrainingTask[]=[];
   for(const e of this.o.network.entries){const f=this.fact(e.id);const preferred=f.segments.filter(s=>e.zone1EdgeIds.includes(s.edgeId));const list=preferred.length?preferred:f.segments;const samples=[list[0],list[Math.floor(list.length/2)],list.at(-1)].filter((s):s is NonNullable<typeof s>=>!!s);
-   for(const s of samples)for(const kind of ['identify','locate'] as const)tasks.push({id:`${kind}:${e.id}:${s.edgeId}`,entryId:e.id,edgeId:s.edgeId,category:'recognition',kind,geoVersion:this.o.evidence.version,eligible:recognitionEligible(f,s.edgeId)});
+   for(const s of samples)for(const kind of ['identify','locate'] as const)tasks.push({id:kind==='locate'?`locate:${e.id}`:`identify:${e.id}:${s.edgeId.replace(/:[fr]$/,'')}`,entryId:e.id,edgeId:s.edgeId,category:'recognition',kind,geoVersion:this.o.evidence.version,eligible:recognitionEligible(f,s.edgeId)});
    for(const j of this.o.evidence.junctions.filter(j=>j.entryIds.includes(e.id)&&intersectionEligible(j))){const source=this.o.network.intersections.find(s=>s.id===j.id);const edgeId=source?.incomingEdgeIds.find(id=>f.segments.some(s=>s.edgeId===id));if(edgeId)tasks.push({id:`intersection:${j.id}:${e.id}`,entryId:e.id,edgeId,junctionId:j.id,category:'intersection',kind:'intersection',geoVersion:this.o.evidence.version,eligible:true});}
    const destination=e.fromHeadquarters?.edgeIds.at(-1);if(navigationEligible(f)&&destination&&recognitionEligible(f,destination))tasks.push({id:`navigate:${e.id}:${destination}`,entryId:e.id,edgeId:destination,category:'navigation',kind:'navigate',geoVersion:this.o.evidence.version,eligible:true,routeEdgeIds:e.fromHeadquarters?.edgeIds});
   }
