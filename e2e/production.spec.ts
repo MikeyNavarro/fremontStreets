@@ -1,3 +1,4 @@
+import {closePanel,chooseMode,openPanel,selectZone,saveCurrentRoute} from './ui-helpers';
 import { readdir, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { expect, test as base, type Page } from '@playwright/test';
@@ -76,6 +77,7 @@ async function openGame(page: Page, query = '') {
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
   await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready', 'true');
   await expect(page.getByTestId('overhead-view')).not.toHaveAttribute('data-renderer-error', /.+/);
+  await closePanel(page);
 }
 
 test('production artifact contains all runtime assets and only serves the Pages subdirectory', async ({ request }) => {
@@ -128,7 +130,7 @@ test('static production game loads real Fremont roads, its MapLibre worker, and 
   expect(audit.requests.some(url => new URL(url).pathname === `${prefix}data/roads.json` && new URL(url).searchParams.has('v'))).toBe(true);
   expect(audit.requests.some(url => new URL(url).pathname === `${prefix}data/zones.json` && new URL(url).searchParams.has('v'))).toBe(true);
   for (const id of ['zone1', 'zone2', 'zone3']) {
-    await page.getByTestId('zone-select').selectOption(id);
+    await selectZone(page,id);
     await expect.poll(async () => (await state(page)).overlay.renderedZoneIds).toContain(id);
     const selected = await state(page);
     expect(selected.zoneId).toBe(id);
@@ -141,7 +143,7 @@ test('static production game loads real Fremont roads, its MapLibre worker, and 
 
 test('driving and both cameras work from static files without changing paused vehicle or route state', async ({ page }) => {
   await openGame(page);
-  await page.locator('#mode-navigation').click();
+  await chooseMode(page,'navigation');
   await page.getByTestId('challenge-start').click();
   await expect.poll(async () => (await state(page)).route).not.toBeNull();
   await page.keyboard.down('ArrowUp');
@@ -174,8 +176,8 @@ test('all zones support quizzes, real navigation routes, saved routes, and persi
   await openGame(page);
   const quizPlayed=new Set<string>();
   for (const id of ['zone1', 'zone2', 'zone3']) {
-    await page.getByTestId('zone-select').selectOption(id);
-    await page.locator('#mode-quiz').click();
+    await selectZone(page,id);
+    await chooseMode(page,'quiz');
     const selected = await state(page);
     if(selected.quiz.street){
     quizPlayed.add(id);
@@ -185,27 +187,27 @@ test('all zones support quizzes, real navigation routes, saved routes, and persi
     await page.locator('#quiz').getByRole('button', { name: selected.quiz.street, exact: true }).click();
     expect((await state(page)).progress.zones[id].quizCorrect).toBe(1);
     }else{await expect(page.locator('#quiz')).toContainText('outside this study area');expect(selected.quiz.choices).toEqual([]);}
-    await page.locator('#mode-navigation').click();
+    await chooseMode(page,'navigation');
     await page.getByTestId('challenge-start').click();
     await expect.poll(async () => (await state(page)).route).not.toBeNull();
     const navigation = await state(page);
     expect(navigation.route!.edgeIds.length).toBeGreaterThan(3);
     expect(selected.zoneCoverage[id].safeDestinationNodeIds).toContain(navigation.challenge!.targetNode);
-    await page.locator('#save-route').click();
+    await saveCurrentRoute(page);
     expect((await state(page)).progress.zones[id].savedRoutes).toHaveLength(1);
   }
   const saved = (await state(page)).progress;
   await page.reload();
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
   for (const id of ['zone1', 'zone2', 'zone3']) {
-    await page.getByTestId('zone-select').selectOption(id);
+    await selectZone(page,id);
     const restored = (await state(page)).progress.zones[id];
     expect(restored.quizCorrect).toBe(quizPlayed.has(id)?1:0);
     expect(restored.quizTotal).toBe(quizPlayed.has(id)?1:0);
     expect(restored.savedRoutes).toEqual(saved.zones[id].savedRoutes);
     await expect(page.locator('#metric-accuracy')).toHaveText(quizPlayed.has(id)?'100%':'—');
     await expect(page.locator('#metric-saved')).toHaveText('1');
-    await page.locator('#saved-routes button').click();
+    await openPanel(page,'routes');await page.locator('#saved-routes button').click();
     expect((await state(page)).route?.edgeIds).toEqual(saved.zones[id].savedRoutes[0].edgeIds);
   }
 });

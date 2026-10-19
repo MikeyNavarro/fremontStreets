@@ -14,6 +14,9 @@ export class OverheadView {
   private loaded = false;
   private active = true;
   private lastFollow = 0;
+  private headingUp=false;
+  private preferredZoom=16.5;
+  private readonly reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   private lastLabelRefresh = 0;
   private lastSnapshot: VehicleSnapshot | null = null;
   private route = emptyLines();
@@ -33,7 +36,8 @@ export class OverheadView {
   private destinationMarker: Marker | null = null;
 
   constructor(private container: HTMLElement, roads: RoadCollection, bounds?: [LonLat, LonLat]) {
-    this.roads = roads;
+    const rank:Record<string,number>={primary:0,motorway:1,trunk:1,secondary:2,tertiary:3,residential:4};
+    this.roads={...roads,features:[...roads.features].sort((a,b)=>(rank[String(a.properties?.highway)]??5)-(rank[String(b.properties?.highway)]??5))};
     container.dataset.renderer = 'overhead';
     try {
       // MapLibre 6 ships its worker as a separate ESM asset. Vite's dependency
@@ -59,18 +63,19 @@ export class OverheadView {
             'study-intersections': { type: 'geojson', data: this.studyJunctions },
           },
           layers: [
-            { id: 'ground', type: 'background', paint: { 'background-color': '#dce6d7' } },
-            { id: 'study-zone-fill', type: 'fill', source: 'study-zones', paint: { 'fill-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#899e92']], 'fill-opacity': ['case', ['boolean', ['get', 'selected'], false], 0.19, 0.09] } },
-            { id: 'road-casing', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#a6b4a4', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 2.2, 16, 12, 20, 58] } },
-            { id: 'roads', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['match', ['get', 'highway'], ['primary', 'secondary', 'trunk', 'motorway'], '#f4d8a1', '#fcfcf4'], 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.2, 16, 9, 20, 51] } },
-            { id:'study-target-lines',type:'line',source:'study-targets',paint:{'line-color':['case',['boolean',['get','selected'],false],'#087c65',['match',['get','group'],'ew','#2778bd','#c16c27']],'line-width':['interpolate',['linear'],['zoom'],11,2,16,5,20,18],'line-opacity':.95} },
-            { id:'study-intersection-points',type:'circle',source:'study-intersections',paint:{'circle-radius':['interpolate',['linear'],['zoom'],11,2,16,6],'circle-color':'#f1c34f','circle-stroke-color':'#31463c','circle-stroke-width':1.5} },
-            { id: 'study-zone-border', type: 'line', source: 'study-zones', paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#60796b']], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 4, 2], 'line-dasharray': [3, 2] } },
+            { id: 'ground', type: 'background', paint: { 'background-color': '#101f29' } },
+            { id: 'study-zone-fill', type: 'fill', source: 'study-zones', paint: { 'fill-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#899e92']], 'fill-opacity': ['case', ['boolean', ['get', 'selected'], false], 0.045, 0.02] } },
+            { id: 'road-casing', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#304957', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, ['match',['get','highway'],['motorway','trunk','primary'],3,1.2], 16, ['match',['get','highway'],['motorway','trunk'],11,['primary','secondary'],9,['tertiary'],7,['service','living_street'],3.5,5], 20, ['match',['get','highway'],['motorway','trunk','primary'],46,23]] } },
+            { id: 'roads', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['match', ['get', 'highway'], ['motorway','trunk'], '#87929e', ['primary'], '#72868f', ['secondary','tertiary'], '#4b6676', ['service','living_street'],'#20333e', '#2d4656'], 'line-width': ['interpolate', ['linear'], ['zoom'], 12, ['match',['get','highway'],['motorway','trunk','primary'],1.8,.6], 16, ['match',['get','highway'],['motorway','trunk'],8.5,['primary','secondary'],6.5,['tertiary'],4.5,['service','living_street'],2,3], 20, ['match',['get','highway'],['motorway','trunk','primary'],40,18]] } },
+            { id:'study-target-lines',type:'line',source:'study-targets',paint:{'line-color':['case',['boolean',['get','selected'],false],'#8becce',['match',['get','group'],'ew','#6aabd0','#c8a27f']],'line-width':['interpolate',['linear'],['zoom'],11,2,16,5,20,18],'line-opacity':.95} },
+            { id:'study-intersection-points',type:'circle',source:'study-intersections',paint:{'circle-radius':['interpolate',['linear'],['zoom'],11,2,16,6],'circle-color':'#cfb486','circle-stroke-color':'#182e3a','circle-stroke-width':1.5} },
+            { id: 'study-zone-border', type: 'line', source: 'study-zones', paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#60796b']], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 2, 1], 'line-dasharray': [3, 2] } },
             { id: 'classified-roads', type: 'line', source: 'classified-roads', filter: ['!=', ['get', 'uncertain'], true], paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'zoneId'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#597766']], 'line-width': 4 } },
             { id: 'uncertain-roads', type: 'line', source: 'classified-roads', filter: ['==', ['get', 'uncertain'], true], paint: { 'line-color': '#3b4442', 'line-width': 5, 'line-dasharray': [1, 1] } },
-            { id: 'route-border', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#075b64', 'line-width': 9, 'line-opacity': 0.85 } },
-            { id: 'route', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#42d9d0', 'line-width': 5, 'line-opacity': 0.95 } },
-            { id: 'turns', type: 'line', source: 'turns', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['case', ['boolean', ['get', 'selected'], false], '#e88828', '#58766a'], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 8, 4], 'line-opacity': 0.95 } },
+            { id:'route-glow',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#60dfc4','line-width':18,'line-opacity':.12} },
+            { id: 'route-border', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#173d41', 'line-width': 9, 'line-opacity': 0.85 } },
+            { id: 'route', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#74e0c4', 'line-width': 5, 'line-opacity': 0.95 } },
+            { id: 'turns', type: 'line', source: 'turns', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['case', ['boolean', ['get', 'selected'], false], '#e6bb80', '#668b98'], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 8, 4], 'line-opacity': 0.95 } },
           ],
         },
       });
@@ -80,8 +85,8 @@ export class OverheadView {
       const car = document.createElement('div');
       car.className = 'vehicle-map-marker';
       car.setAttribute('aria-label', 'Your vehicle');
-      car.style.cssText = 'width:38px;height:44px;filter:drop-shadow(0 3px 5px #102f4560);';
-      car.innerHTML = '<svg width="38" height="44" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg"><path d="M19 2 35 37 19 30 3 37Z" fill="#063f4a" stroke="#fff" stroke-width="3"/><path d="m19 9 8 20-8-4-8 4Z" fill="#61efdc"/></svg>';
+      car.style.cssText = 'width:44px;height:48px;filter:drop-shadow(0 4px 7px #0007);';
+      car.innerHTML = '<svg width="44" height="48" viewBox="0 0 44 48" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="25" r="19" fill="#64e7ce" fill-opacity=".13" stroke="#8cead8" stroke-opacity=".4"/><path d="M22 6 36 38 22 31 8 38Z" fill="#9ff3df" stroke="#102c35" stroke-width="2.5"/><path d="m22 14 6 15-6-3-6 3Z" fill="#1b5b56"/></svg>';
       this.marker = new maplibregl.Marker({ element: car, rotationAlignment: 'map' }).setLngLat([-121.9886, 37.5485]).addTo(this.map);
       this.map.on('load', () => {
         this.loaded = true;
@@ -107,7 +112,10 @@ export class OverheadView {
     this.marker?.setLngLat(snapshot.position).setRotation(snapshot.heading * 180 / Math.PI);
     const now = performance.now();
     if (this.followVehicle && this.active && !this.container.hidden && this.map && now - this.lastFollow > 80) {
-      this.map.jumpTo({ center: snapshot.position });
+      const heading=this.headingUp?snapshot.heading*180/Math.PI:0;
+      const current=this.map.getBearing(),delta=((heading-current+540)%360)-180;
+      if(this.reducedMotion)this.map.jumpTo({center:snapshot.position,bearing:current+delta});
+      else this.map.easeTo({center:snapshot.position,bearing:current+delta,duration:110,easing:t=>t});
       this.lastFollow = now;
     }
   }
@@ -117,7 +125,7 @@ export class OverheadView {
       type: 'FeatureCollection',
       features: coordinates.length > 1 ? [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates } }] : [],
     };
-    this.syncOverlays();
+    this.syncSource('route',this.route);
   }
 
   setTurns(turns: TurnPreview[]): void {
@@ -128,7 +136,7 @@ export class OverheadView {
       type: 'FeatureCollection',
       features: turns.filter((turn) => turn.coordinates.length > 1).map((turn) => ({ type: 'Feature', properties: { selected: !!turn.selected }, geometry: { type: 'LineString', coordinates: turn.coordinates } })),
     };
-    this.syncOverlays();
+    this.syncSource('turns',this.turns);
   }
 
   setActive(active: boolean): void {
@@ -148,19 +156,19 @@ export class OverheadView {
         .filter((feature) => showAll || !selectedZoneId || feature.properties?.id === selectedZoneId)
         .map((feature) => ({ ...feature, properties: { ...feature.properties, selected: feature.properties?.id === selectedZoneId } })),
     };
-    this.syncOverlays();
+    this.syncSource('study-zones',this.boundaries);
   }
 
   setFollowVehicle(enabled: boolean): void {
     if (enabled && !this.followVehicle && this.map && this.lastSnapshot) {
-      this.map.jumpTo({ center: this.lastSnapshot.position, zoom: 16.5 });
+      this.map.jumpTo({ center: this.lastSnapshot.position, zoom: this.preferredZoom });
     }
     this.followVehicle = enabled;
   }
 
   setStation(position: LonLat): void {
     if(!this.map)return;
-    const element=document.createElement('div');element.className='station-map-label';element.textContent='Police HQ';element.setAttribute('aria-label','Fremont Police Headquarters building reference');
+    const element=document.createElement('div');element.className='station-map-label';element.textContent='Police headquarters';element.setAttribute('aria-label','Fremont Police Headquarters building reference');
     this.stationMarker?.remove();this.stationMarker=new maplibregl.Marker({element,anchor:'bottom'}).setLngLat(position).addTo(this.map);
   }
 
@@ -172,14 +180,14 @@ export class OverheadView {
     if(!this.loaded||!this.map)return;
     (this.map.getSource('study-targets') as GeoJSONSource)?.setData(this.studyRoads);
     (this.map.getSource('study-intersections') as GeoJSONSource)?.setData(this.studyJunctions);
-    this.map.setPaintProperty('roads','line-opacity',this.studyNames?.size ? .38 : 1);
-    this.map.setPaintProperty('road-casing','line-opacity',this.studyNames?.size ? .35 : 1);
+    this.map.setPaintProperty('roads','line-opacity',this.studyNames?.size ? .62 : 1);
+    this.map.setPaintProperty('road-casing','line-opacity',this.studyNames?.size ? .6 : 1);
     this.container.dataset.studyTargetCount=String(this.studyRoads.features.length);
     this.container.dataset.studyIntersectionCount=String(this.studyJunctions.features.length);
   }
 
   focusPosition(position: LonLat, label?: string): void {
-    if(!this.map)return;this.followVehicle=false;this.map.stop();this.map.jumpTo({center:position,zoom:16.5});
+    if(!this.map)return;this.followVehicle=false;this.map.stop();this.map.jumpTo({center:position,zoom:this.preferredZoom});
     this.destinationMarker?.remove();this.destinationMarker=null;
     if(label){const element=document.createElement('div');element.className='destination-map-label';element.textContent=label;this.destinationMarker=new maplibregl.Marker({element,anchor:'bottom'}).setLngLat(position).addTo(this.map);}
   }
@@ -209,12 +217,12 @@ export class OverheadView {
     if (!coordinates.length || !this.map) return;
     const bounds = new maplibregl.LngLatBounds();
     coordinates.forEach((point) => bounds.extend(point as LonLat));
-    this.map.fitBounds(bounds, { padding: 55, duration: 350, maxZoom: 16.5 });
+    this.map.fitBounds(bounds, { padding: 55, duration: this.reducedMotion?0:250, maxZoom: 16.5 });
   }
 
   setClassifiedRoads(collection: FeatureCollection<LineString>): void {
     this.classifiedRoads = collection;
-    this.syncOverlays();
+    this.syncSource('classified-roads',this.classifiedRoads);
   }
 
   /** Draggable vertices stay encapsulated here; a validator must accept each drop.
@@ -278,6 +286,11 @@ export class OverheadView {
     return stop;
   }
 
+  setHeadingUp(enabled:boolean):void {this.headingUp=enabled;if(this.map)this.map.jumpTo({bearing:enabled&&this.lastSnapshot?this.lastSnapshot.heading*180/Math.PI:0});}
+  setZoom(zoom:number):void {this.preferredZoom=Math.max(10,Math.min(20,zoom));this.map?.jumpTo({zoom:this.preferredZoom});}
+  setQuality(quality:'low'|'balanced'|'high'):void {this.map?.setPixelRatio(Math.min(window.devicePixelRatio||1,quality==='low'?.65:quality==='balanced'?1.25:2));}
+  presentation(){return {headingUp:this.headingUp,zoom:this.map?.getZoom(),bearing:this.map?.getBearing(),followVehicle:this.followVehicle,pixelRatio:this.map?.getPixelRatio(),width:this.container.clientWidth,height:this.container.clientHeight};}
+
   resize(): void {
     if (this.active && !this.container.hidden && this.container.clientWidth && this.container.clientHeight) this.map?.resize();
   }
@@ -291,6 +304,8 @@ export class OverheadView {
     this.map?.remove();
     this.map = null;
   }
+
+  private syncSource(name:string,data:FeatureCollection):void {if(this.map&&this.loaded&&this.active&&!this.container.hidden)(this.map.getSource(name) as GeoJSONSource)?.setData(data);}
 
   private syncOverlays(): void {
     if (!this.map || !this.loaded || !this.active || this.container.hidden) return;
@@ -314,7 +329,7 @@ export class OverheadView {
     this.lastLabelRefresh = now;
     this.labels.forEach((label) => label.remove());
     this.labels = [];
-    if (this.map.getZoom() < 14.1) return;
+    if (this.map.getZoom() < 13.5) return;
     const bounds = this.map.getBounds();
     const seen = new Set<string>();
     const points: { point: maplibregl.Point; name: string }[] = [];
@@ -328,17 +343,19 @@ export class OverheadView {
         const coordinate = line[Math.floor(line.length / 2)] as LonLat;
         if (!bounds.contains(coordinate)) continue;
         const point = this.map.project(coordinate);
-        if (points.some((item) => Math.abs(item.point.x - point.x) < 116 && Math.abs(item.point.y - point.y) < 33)) continue;
+        const car=this.lastSnapshot?this.map.project(this.lastSnapshot.position):null;if(car&&Math.hypot(point.x-car.x,point.y-car.y)<55)continue;
+        if(point.x<30||point.x>this.container.clientWidth-40||point.y<135||point.y>this.container.clientHeight-100)continue;
+        if (points.some((item) => Math.abs(item.point.x - point.x) < 155 && Math.abs(item.point.y - point.y) < 42)) continue;
         const element = document.createElement('span');
-        element.className = 'map-street-label';
+        element.className = 'map-street-label';if(/^(primary|secondary|trunk|motorway)$/.test(String(feature.properties?.highway)))element.classList.add('major-label');
         element.textContent = name;
-        element.style.cssText = 'font:600 10px/1.2 system-ui,sans-serif;color:#435e54;text-shadow:0 1px 2px #fff,1px 0 2px #fff,-1px 0 2px #fff;white-space:nowrap;pointer-events:none;letter-spacing:.02em;';
+        element.style.cssText = '';
         this.labels.push(new maplibregl.Marker({ element }).setLngLat(coordinate).addTo(this.map));
         points.push({ point, name });
         seen.add(name);
         break;
       }
-      if (this.labels.length >= 65) break;
+      if (this.labels.length >= 45) break;
     }
   }
 }

@@ -6,7 +6,7 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
 
 export default defineConfig({
   testDir: './e2e',
-  testIgnore: ['**/production.spec.ts', '**/study.spec.ts'],
+  testIgnore: ['**/production.spec.ts', '**/study.spec.ts', '**/redesign.spec.ts'],
   fullyParallel: false,
   workers: 1,
   timeout: 45_000,

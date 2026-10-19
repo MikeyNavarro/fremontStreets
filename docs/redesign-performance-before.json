@@ -1,0 +1,21 @@
+{
+  "driver": {
+    "frames": 5,
+    "seconds": 1.0332999999999992,
+    "fps": 4.838865769863547
+  },
+  "overhead": {
+    "frames": 12,
+    "seconds": 1.1166000000000003,
+    "fps": 10.746910263299299
+  },
+  "context": {
+    "browser": "Chromium using SwiftShader",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "reducedMotion": true
+  },
+  "note": "Short software-rendered Chromium samples, not a hardware 60 FPS claim."
+}

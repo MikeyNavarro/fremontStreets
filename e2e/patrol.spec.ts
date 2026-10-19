@@ -1,3 +1,4 @@
+import {closePanel,chooseMode,openPanel,selectZone,saveCurrentRoute} from './ui-helpers';
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
@@ -44,6 +45,7 @@ async function openGame(page: Page, editor = false) {
   await page.goto(editor ? '/?zoneEditor=1' : '/');
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
   await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready', 'true');
+  if(!editor)await closePanel(page);
 }
 
 async function roadGraph(page: Page) {
@@ -114,7 +116,7 @@ test('all three sourced study areas render the correct polygons without changing
   const originalGraph = await roadGraph(page);
   await expect(page.getByTestId('zone-notice')).toHaveText("Patrol-zone boundaries are approximate study areas based on the Fremont Police Department's published map. They are not verified official GIS boundaries.");
   for (const id of ['zone1', 'zone2', 'zone3'] as const) {
-    await page.getByTestId('zone-select').selectOption(id);
+    await selectZone(page,id);
     await expect.poll(async () => (await patrolState(page)).overlay.renderedZoneIds).toContain(id);
     const selected = await patrolState(page);
     expect(selected.zoneId).toBe(id);
@@ -143,7 +145,7 @@ test('zone quizzes, navigation destinations, and saved progress follow actual zo
   const quizPlayed=new Set<string>();
   const played: string[] = [];
   for (const id of ['zone1', 'zone2', 'zone3']) {
-    await page.getByTestId('zone-select').selectOption(id);
+    await selectZone(page,id);
     const area = (await patrolState(page)).zoneCoverage[id];
     if (!area.available) {
       await expect(page.locator('#mode-quiz')).toBeDisabled();
@@ -152,7 +154,7 @@ test('zone quizzes, navigation destinations, and saved progress follow actual zo
       continue;
     }
     played.push(id);
-    await page.locator('#mode-quiz').click();
+    await chooseMode(page,'quiz');
     const quiz = await patrolState(page);
     if(quiz.quiz.street){
     quizPlayed.add(id);
@@ -163,20 +165,20 @@ test('zone quizzes, navigation destinations, and saved progress follow actual zo
     await page.locator('#quiz').getByRole('button', { name: quiz.quiz.street, exact: true }).click();
     expect((await patrolState(page)).progress.zones[id].quizCorrect).toBe(1);
     }else{await expect(page.locator('#quiz')).toContainText('outside this study area');expect(quiz.quiz.choices).toEqual([]);}
-    await page.locator('#mode-navigation').click();
+    await chooseMode(page,'navigation');
     await page.getByTestId('challenge-start').click();
     await expect.poll(async () => (await patrolState(page)).route).not.toBeNull();
     const navigation = await patrolState(page);
     expect(area.safeDestinationNodeIds).toContain(navigation.challenge!.targetNode);
     expect(navigation.route!.edgeIds.length).toBeGreaterThan(3);
-    await page.locator('#save-route').click();
+    await saveCurrentRoute(page);
     expect((await patrolState(page)).progress.zones[id].savedRoutes).toHaveLength(1);
   }
   expect(played).toEqual(['zone1', 'zone2', 'zone3']);
   await page.reload();
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
   for (const id of played) {
-    await page.getByTestId('zone-select').selectOption(id);
+    await selectZone(page,id);
     const restored = await patrolState(page);
     expect(restored.progress.zones[id].quizTotal).toBe(quizPlayed.has(id)?1:0);
     expect(restored.progress.zones[id].quizCorrect).toBe(quizPlayed.has(id)?1:0);

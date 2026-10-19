@@ -1,0 +1,35 @@
+{
+  "driver": {
+    "frames": 13,
+    "seconds": 2.05,
+    "fps": 6.341463414634147
+  },
+  "overhead": {
+    "frames": 22,
+    "seconds": 2.0832000000000006,
+    "fps": 10.560675883256526
+  },
+  "efficient": {
+    "driver": {
+      "frames": 17,
+      "seconds": 2.05,
+      "fps": 8.292682926829269
+    },
+    "overhead": {
+      "frames": 28,
+      "seconds": 2.0665999999999984,
+      "fps": 13.548824155617933
+    }
+  },
+  "context": {
+    "browser": "Chromium using SwiftShader",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "reducedMotion": true,
+    "warmupSeconds": 1,
+    "sampleSeconds": 2
+  },
+  "note": "Short warmed software-rendered Chromium samples, not a hardware 60 FPS claim."
+}

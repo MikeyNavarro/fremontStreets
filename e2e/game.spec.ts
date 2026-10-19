@@ -1,3 +1,4 @@
+import {closePanel,chooseMode,openPanel,saveCurrentRoute} from './ui-helpers';
 import { expect, test, type Page } from '@playwright/test';
 
 interface Snapshot {
@@ -59,6 +60,7 @@ async function state(page: Page, includeGraph = false): Promise<Snapshot> {
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
+  await closePanel(page);
 });
 
 test('starts with actual Fremont roads and selectable patrol study areas', async ({ page }) => {
@@ -69,6 +71,7 @@ test('starts with actual Fremont roads and selectable patrol study areas', async
   expect(snapshot.vehicle.position[0]).toBeLessThan(-121.8);
   expect(snapshot.vehicle.position[1]).toBeGreaterThan(37.4);
   expect(snapshot.vehicle.position[1]).toBeLessThan(37.7);
+  await openPanel(page,'zones');
   await expect(page.getByTestId('coverage')).toBeVisible();
   await expect(page.getByTestId('zone-select')).toHaveCount(1);
   await expect(page.getByTestId('zone-select')).toHaveValue('zone1');
@@ -101,7 +104,7 @@ test('keyboard throttle drives the road graph and braking responds', async ({ pa
 });
 
 test('both rendered cameras use the same paused vehicle, route, and progress', async ({ page }) => {
-  await page.locator('#mode-navigation').click();
+  await chooseMode(page,'navigation');
   await page.getByTestId('challenge-start').click();
   await page.keyboard.down('ArrowUp');
   await expect.poll(async () => (await state(page)).vehicle.totalDistance).toBeGreaterThan(10);
@@ -124,10 +127,10 @@ test('both rendered cameras use the same paused vehicle, route, and progress', a
 });
 
 test('navigation creates a real route and exploration progress survives reload', async ({ page }) => {
-  await page.locator('#mode-navigation').click();
+  await chooseMode(page,'navigation');
   await page.getByTestId('challenge-start').click();
   await expect.poll(async () => (await state(page)).route).not.toBeNull();
-  await page.locator('#save-route').click();
+  await saveCurrentRoute(page);
   await page.keyboard.down('ArrowUp');
   await expect.poll(async () => (await state(page)).vehicle.totalDistance).toBeGreaterThan(35);
   await page.keyboard.up('ArrowUp');
@@ -142,16 +145,16 @@ test('navigation creates a real route and exploration progress survives reload',
   expect(restored.intersectionIds).toEqual(before.progress.zones.zone1.intersectionIds);
   expect(restored.savedRoutes).toEqual(before.progress.zones.zone1.savedRoutes);
   expect(restored.challengesCompleted).toBe(before.progress.zones.zone1.challengesCompleted);
-  await page.locator('#saved-routes button').click();
+  await openPanel(page,'routes');await page.locator('#saved-routes button').click();
   expect((await state(page)).route?.edgeIds).toEqual(before.progress.zones.zone1.savedRoutes[0].edgeIds);
-  await page.locator('#mode-free').click();
+  await chooseMode(page,'free');
   expect((await state(page)).route).toBeNull();
   expect((await state(page)).challenge).toBeNull();
 });
 
 test('a navigation challenge can be completed using driving controls', async ({ page }) => {
   test.setTimeout(120_000);
-  await page.locator('#mode-navigation').click();
+  await chooseMode(page,'navigation');
   await page.getByTestId('challenge-start').click();
   const initial = await state(page);
   expect(initial.route?.edgeIds.length).toBeGreaterThan(3);
@@ -190,7 +193,7 @@ test('street-name practice records demonstrated quiz accuracy', async ({ page })
   const snapshot = await state(page, true);
   const street = snapshot.graph.edges.find(edge => edge.id === snapshot.vehicle.edgeId)!.name;
   expect(street.length).toBeGreaterThan(0);
-  await page.locator('#mode-quiz').click();
+  await chooseMode(page,'quiz');
   await page.locator('#quiz').getByRole('button', { name: street, exact: true }).click();
   await expect(page.locator('#metric-accuracy')).toHaveText('100%');
   const progress = (await state(page)).progress.zones.all;

@@ -90,6 +90,7 @@ export class StudyMode {
   private updateTarget(){
     const entry=this.entry(),exercise=this.el<HTMLSelectElement>('study-exercise').value;
     this.el('study-target-note').textContent=`${entry.mappedNames.join(' / ')||entry.originalLabel} · ${this.entryStatus(entry)}. ${entry.note??''} ${entry.status==='ready'?'Routes checked in supported data; traffic restrictions incomplete.':entry.reason}`;
+    this.el<HTMLButtonElement>('study-start').textContent=exercise==='quiz'?'Start connection quiz':'Start Driving';
     this.el<HTMLButtonElement>('study-start').disabled=entry.status!=='ready'&&exercise!=='random'&&exercise!=='quiz';
     this.el<HTMLButtonElement>('study-preview').disabled=!entry.representativeEdge||Boolean(entry.needsConfirmation);
     this.el('study-from-field').hidden=exercise!=='road-to-road';this.el('study-junction-field').hidden=exercise!=='intersection';

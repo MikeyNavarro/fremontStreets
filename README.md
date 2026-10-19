@@ -19,6 +19,12 @@ npm run dev
 
 Use the existing checkout at `/workspace/fremontStreets` in the Codex cloud environment. The bundled road data loads locally; gameplay does not repeatedly call map or routing services. Progress and saved routes are stored in this browser's local storage.
 
+## Driving-first interface
+
+The full-viewport dark driving screen keeps the road central. Open **Menu** for training, zones, progress, saved routes and help; **Settings** controls map orientation/zoom, following, HUD visibility and graphics resolution as well as the existing driving preferences. Panels suspend movement without resetting the vehicle, route or camera. **Escape** opens or dismisses the menu.
+
+See the [redesign report and visual checks](docs/redesign.md) and [AFTER screenshots](docs/screenshots/README.md). The map style is local; the 3D environment and vehicle interior remain clearly labeled visual approximations. No new map provider, API key, remote font or UI dependency is required.
+
 ## Play
 
 - Hold **W / ↑** to accelerate; hold **S / ↓** to brake.
@@ -33,7 +39,7 @@ The vehicle cap is not a road speed limit. Limits come from source tags and show
 
 ## My Street List — 38 Entries
 
-Choose **My Street List — 38 Entries** under Choose your drive. The exact curriculum contains 21 east–west and 17 north–south entries. Those headings are study categories, not exact bearings. You confirmed **Lake Arrowhead Avenue**, and **Grimmer Boulevard plus South Grimmer Boulevard** remain one study entry. No unlisted road becomes an extra target.
+Choose **My Street List — 38 Entries** in the main menu. The exact curriculum contains 21 east–west and 17 north–south entries. Those headings are study categories, not exact bearings. You confirmed **Lake Arrowhead Avenue**, and **Grimmer Boulevard plus South Grimmer Boulevard** remain one study entry. No unlisted road becomes an extra target.
 
 Browse all entries or either group, preview a destination, then choose Reach a Street, Random Street, Road to Road, Intersection Challenge, No-GPS, Return to Headquarters, or Street Connection Quiz. **Zone 1 — Main Roads** focuses on the Zone 1 portions of your list. Other sourced roads remain usable connectors. Wrong turns can trigger a connected reroute; any supported legal arrival at the marked destination counts.
 
