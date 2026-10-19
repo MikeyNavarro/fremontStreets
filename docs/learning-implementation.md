@@ -174,3 +174,9 @@ corrected: `__FREMONT_GAME__` is exposed only after asynchronous learning storag
 initialization and the initial menu/editor have finished opening. Tests no longer
 observe a half-initialized application before deciding which menu control to use.
 The long-route helper also verifies that Efficient rendering really took effect.
+
+Backup chronology correction: importing older unique attempts no longer moves the
+most-recent practice display backwards. Histories are sorted for calculation;
+original stored attempt order/records remain intact. A focused progress regression
+and TypeScript checks passed. The complete final suite now contains 95 Node cases;
+its final CI result remains the release authority.

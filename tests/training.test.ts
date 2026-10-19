@@ -45,6 +45,10 @@ test('attempt IDs are idempotent and corrupted or incompatible backups do not re
  assert.throws(()=>validateBackup({format:'fremont-streets-learning',schema:1,attempts:[{...a,at:'invalid'}]},new Set([entry.id])));
  assert.throws(()=>validateBackup({format:'fremont-streets-learning',schema:1,attempts:[a,a]},new Set([entry.id])));
 });
+test('merging an older backup does not move the most-recent practice date backwards',()=>{
+ const newer=attempt(1,{at:'2026-02-10T12:00:00Z'}),older=attempt(0,{at:'2026-01-01T12:00:00Z'});const state=addAttempt(addAttempt(EMPTY_LEARNING(),newer),older);
+ assert.equal(streetProgress(entry.id,state,fixture).lastPracticed,newer.at);assert.deepEqual(state.attempts.map(a=>a.id),[newer.id,older.id]);
+});
 
 test('checkpoint arrival requires the same physical source segment and permits either supported direction',async()=>{
  const {buildGraph,createVehicle}=await import('../src/core');const {missionArrived}=await import('../src/training/missions');

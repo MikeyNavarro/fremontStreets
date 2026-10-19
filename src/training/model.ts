@@ -21,7 +21,7 @@ export function taskEligible(task:TrainingTask,registry:VerificationRegistry):bo
  return recognitionEligible(entry,task.edgeId)&&intersectionEligible(registry.junctions.find(j=>j.id===task.junctionId&&j.entryIds.includes(task.entryId)));
 }
 export function streetProgress(id:string,state:LearningState,registry:VerificationRegistry,now=Date.now()){
- const history=state.attempts.filter(a=>a.entryId===id);
+ const history=state.attempts.filter(a=>a.entryId===id).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)||a.id.localeCompare(b.id));
  const attempts=history.filter(a=>a.geoVersion===registry.version&&a.eligible&&(a.outcome==='correct'||a.outcome==='incorrect')).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)||a.id.localeCompare(b.id));
  const unaided=attempts.filter(a=>!a.assisted&&a.hints===0),correct=unaided.filter(a=>a.outcome==='correct');
  const recognized=new Set(correct.filter(a=>a.category==='recognition'&&['identify','locate','location'].includes(a.kind)).map(recognitionQuestion)).size>=2;
