@@ -1,7 +1,8 @@
 import {test,expect,type Page} from '@playwright/test';
 import {closePanel,openPanel,chooseMode} from './ui-helpers';
+import {readFile} from 'node:fs/promises';
 const state=(page:Page)=>page.evaluate(()=>{const g=(window as any).__FREMONT_GAME__;return {vehicle:g.vehicle,camera:g.camera,map:g.presentation.map,learning:g.learning,paused:g.paused};});
-test.beforeEach(async({page})=>{await page.goto('./');await page.waitForFunction(()=>!!(window as any).__FREMONT_GAME__);await closePanel(page);await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready','true');});
+test.beforeEach(async({page})=>{await page.goto('./');await page.waitForFunction(()=>!!(window as any).__FREMONT_GAME__);await expect(page.getByTestId('game-dialog')).toBeVisible();await closePanel(page);await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready','true');});
 test('manual exploration survives driving, zoom, cameras, reset, mission and zone changes',async({page})=>{
  const canvas=page.locator('.maplibregl-canvas');const box=(await canvas.boundingBox())!;
  await page.mouse.move(box.x+box.width*.65,box.y+box.height*.5);await page.mouse.down();await page.mouse.move(box.x+box.width*.45,box.y+box.height*.62,{steps:12});await page.mouse.up();
@@ -35,7 +36,7 @@ test('verified recognition hides answers, earns recognition, persists and export
  await page.locator('#learning-next').click();await page.locator('#learning-hint').click();await page.locator('[data-answer-entry="ns04"]').click();await expect(page.getByTestId('learning-coach')).toContainText('Assisted attempt recorded');
  await page.locator('[data-end]').click();await expect(page.locator('[data-learning-entry="ns04"]')).toContainText('Recognized');expect((await state(page)).learning.progress.find((e:any)=>e.id==='ns04').assisted).toBe(1);
  const downloadPromise=page.waitForEvent('download');await page.locator('#learning-export').click();const download=await downloadPromise;const path=await download.path();expect(path).toBeTruthy();
- await page.reload();await page.waitForFunction(()=>!!(window as any).__FREMONT_GAME__?.learning);await closePanel(page);await page.getByTestId('open-learning').click();await expect(page.locator('[data-learning-entry="ns04"]')).toContainText('Recognized');
+ await page.reload();await page.waitForFunction(()=>!!(window as any).__FREMONT_GAME__?.learning);await expect(page.getByTestId('game-dialog')).toBeVisible();await closePanel(page);await page.getByTestId('open-learning').click();await expect(page.locator('[data-learning-entry="ns04"]')).toContainText('Recognized');
  const before=(await state(page)).learning.attemptCount;await page.locator('#learning-import').setInputFiles(path!);await expect(page.locator('#toast')).toContainText('Backup merged');expect((await state(page)).learning.attemptCount).toBe(before);
  await page.locator('#learning-import').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{"schema":999}')});await expect(page.locator('#backup-result')).toContainText('different curriculum');expect((await state(page)).learning.attemptCount).toBe(before);
 });
@@ -71,4 +72,18 @@ test('a two-stop patrol preserves vehicle continuity between actual driving legs
  const drive=async()=>{let key='';await page.keyboard.down('ArrowUp');try{await expect.poll(async()=>{const s=await page.evaluate(()=>{const g=(window as any).__FREMONT_GAME__;return {mission:g.learning.mission,decision:g.decision,route:g.route};});if(s.mission?.status==='complete')return true;const d=s.decision;if(d&&d.incomingEdgeId!==key){const i=s.route.edgeIds.indexOf(d.incomingEdgeId),next=s.route.edgeIds[i+1],choice=d.choices.find((c:any)=>c.edgeId===next);if(i>=0&&choice){key=d.incomingEdgeId;await page.locator('#turn-'+choice.kind).click();}}return false;},{timeout:80000,intervals:[100]}).toBe(true);}finally{await page.keyboard.up('ArrowUp');}};
  await drive();await expect(page.locator('#patrol-next-stop')).toBeVisible();const first=(await state(page)).vehicle;await page.locator('#patrol-next-stop').click();const next=(await state(page)).vehicle;expect(next.totalDistance).toBeGreaterThanOrEqual(first.totalDistance);expect(next.totalDistance-first.totalDistance).toBeLessThan(10);expect(Math.hypot(next.position[0]-first.position[0],next.position[1]-first.position[1])).toBeLessThan(.001);
  await drive();await expect(page.getByTestId('learning-coach')).toContainText('Destination reached');expect((await state(page)).learning.attemptCount).toBe(2);expect((await state(page)).learning.remainingStops).toEqual([]);
+});
+
+test('blocked storage never prevents startup and session-only learning can be exported',async({page})=>{
+ test.setTimeout(90_000);
+ await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{configurable:true,get(){throw new DOMException('Blocked local storage','SecurityError');}}));
+ const reopen=async()=>{await page.reload();await page.waitForFunction(()=>!!(window as any).__FREMONT_GAME__?.learning);await expect(page.getByTestId('game-dialog')).toBeVisible();await closePanel(page);await page.getByTestId('open-learning').click();};
+ await reopen();await expect(page.getByRole('alert')).toContainText('New learning history can still be saved');
+ const answer=async()=>{await page.locator('#learning-target').selectOption('ns04');await page.locator('#learning-identify').click();await page.locator('[data-answer-entry="ns04"]').click();await expect(page.getByTestId('learning-coach')).toContainText('Unaided answer recorded');await page.locator('[data-end]').click();};
+ await answer();await reopen();expect((await state(page)).learning.attemptCount).toBe(1);
+ await page.addInitScript(()=>Object.defineProperty(window,'indexedDB',{get(){throw new DOMException('Blocked IndexedDB','SecurityError');}}));
+ await reopen();await expect(page.getByRole('alert')).toContainText('session-only');
+ await answer();await expect(page.getByRole('alert')).toContainText('session-only');
+ const downloadPromise=page.waitForEvent('download');await page.locator('#learning-export').click();const download=await downloadPromise;const backup=JSON.parse(await readFile((await download.path())!,'utf8'));expect(backup.attempts).toHaveLength(1);expect(backup.curriculum).toHaveLength(38);
+ await page.locator('#learning-free').click();const before=(await state(page)).vehicle.totalDistance;await page.keyboard.down('w');try{await expect.poll(async()=>(await state(page)).vehicle.totalDistance).toBeGreaterThan(before+3);}finally{await page.keyboard.up('w');}
 });

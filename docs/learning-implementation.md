@@ -55,15 +55,18 @@ are software validation, not real-world verification.
 
 ## Validation at this checkpoint
 
-92 Node tests passed, including existing geography, real driving, acceleration,
+93 Node tests passed, including existing geography, real driving, acceleration,
 camera and graph tests plus new evidence, mastery, review and exam-rule tests.
-TypeScript and the Vite production build passed. Seven focused browser cases
+TypeScript and the Vite production build passed. Eight focused browser cases
 passed: manual exploration lifecycle; search/inspection; two unaided recognition
 answers plus an assisted answer, reload and backup import/export; evidence-gap
 handling with an outside-Zone-1 manual selection; and a no-GPS mission completed
 using real driving controls; a source-point direction and actual map-click task;
-and a two-stop patrol driven through both legs without teleporting. Full existing regressions and deployment verification
-remain separate final gates.
+and a two-stop patrol driven through both legs without teleporting. Browser storage denial was also exercised: blocked localStorage keeps IndexedDB history usable, and blocking both stores preserves driving and session backup export.
+
+The full development regression suite passed all 17 cases before the additional
+storage-failure case. The full production suite and final-revision CI remain
+separate release gates; their results must be checked before claiming publication.
 
 ## Operating the learning system
 
@@ -114,3 +117,11 @@ absence of a restriction never supplies that evidence. Backup imports preserve
 legacy exploration/routes using conservative maxima and union, without turning
 old aggregates into scored attempts. Attempt IDs are immutable in transactional
 storage, including cross-tab conflicts. Driving settings persist separately.
+
+A reproducible browser-policy failure was corrected: reading the localStorage
+property could throw before the existing guarded load/save functions ran. A lazy
+storage adapter now moves that access inside their guards. Legacy storage failure
+no longer closes a working IndexedDB connection. The browser test confirms both
+independent-storage persistence and session-only export/continued driving. Its
+initial harness raced the asynchronously opened startup menu; it now waits for
+the visible startup dialog before closing it, with no application timeout increase.

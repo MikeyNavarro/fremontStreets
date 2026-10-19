@@ -16,7 +16,7 @@ export class LearningStore {
    const [attempts,meta]=await Promise.all([get(tx.objectStore('attempts').getAll()),get(tx.objectStore('meta').get('state'))]);
    this.state={...EMPTY_LEARNING(),...meta,attempts};
    if(this.state.schema!==1)throw new Error('Unrecognized progress schema; existing data retained.');
-   if(!Object.keys(this.state.legacy).length){for(const key of ['fremont-streets-personal-study-v1','fremont-streets-progress-v1']){const old=localStorage.getItem(key);if(old)this.state.legacy[key]=old;}}
+   if(!Object.keys(this.state.legacy).length){try{for(const key of ['fremont-streets-personal-study-v1','fremont-streets-progress-v1']){const old=localStorage.getItem(key);if(old)this.state.legacy[key]=old;}}catch{this.warn('Legacy browser settings are unavailable. New learning history can still be saved in IndexedDB.');}}
   }catch(error){this.db?.close();this.db=null;this.warn('Progress cannot be saved in this browser. Export a JSON backup before leaving. '+String(error));}
  }
  async save(attempt?:Attempt){

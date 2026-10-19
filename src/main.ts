@@ -1,3 +1,4 @@
+import {browserStorage} from './training/browser-storage';
 import {loadSettings,saveSettings} from './training/settings';
 import {LearningSystem} from './training/learning';
 import './style.css';
@@ -23,6 +24,7 @@ const app = $('app');
 app.innerHTML = '<div class="loading"><h1>FREMONT STREETS</h1><p>Loading the local road network…</p></div>';
 
 async function boot() {
+  const localProgressStorage=browserStorage();
   const [roadsResponse, zonesResponse, studyResponse, verificationResponse] = await Promise.all([fetch(`${import.meta.env.BASE_URL}data/roads.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/zones.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/study-network.json?v=${__FREMONT_DATA_VERSION__}`), fetch(`${import.meta.env.BASE_URL}data/verification.json?v=${__FREMONT_DATA_VERSION__}`)]);
   if (!roadsResponse.ok) throw new Error('The real Fremont road dataset is missing. Run the documented geographic import before playing.');
   const data = await roadsResponse.json() as RoadData;
@@ -39,8 +41,8 @@ async function boot() {
   let editorActive = false;
   let editorDocument = zones;
   const departure = stationDeparture(graph);
-  let game = createGameState(departure, loadPracticeZone(localStorage, study));
-  let progress = loadProgress(localStorage);
+  let game = createGameState(departure, loadPracticeZone(localProgressStorage, study));
+  let progress = loadProgress(localProgressStorage);
   let paused = false;
   let mode: 'free' | 'navigation' | 'quiz' | 'study' = 'free';
   let training: StudyMode | null = null;
@@ -48,7 +50,7 @@ async function boot() {
   let answersHidden=false;
   let route: Route | null = null;
   let challenge: {destination:string;targetNode:string;status:'active'|'complete';guided:boolean;index:number} | null = null;
-  const settings=loadSettings(localStorage);
+  const settings=loadSettings(localProgressStorage);
   let guidance = settings.guidance;
   let profile: AccelerationProfile = settings.profile;
   let maxSpeed = settings.maxSpeed;
@@ -91,7 +93,7 @@ async function boot() {
   const explorer=new StreetExplorer(graph,studyNetwork,verification,overhead,$('driving-viewport'));
   let recentMessageUntil = 0;
   function say(message:string) { $('status').textContent=message;ui.toast(message); recentMessageUntil=performance.now()+6000; }
-  function persist() { if(!persistProgress(localStorage,progress)) $('progress-area').textContent='Progress storage unavailable · this session only'; renderProgress();if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress); }
+  function persist() { if(!persistProgress(localProgressStorage,progress)) $('progress-area').textContent='Progress storage unavailable · this session only'; renderProgress();if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress); }
   function routeCoords(r:Route|null) { return r ? r.nodeIds.map(id=>graph.nodes.get(id)!.position) : []; }
   function protectAnswers(hidden=learning?.hiddenAnswers??false){answersHidden=hidden||mode==='quiz'&&!quizAnswered&&!!quizStreet;app.classList.toggle('answer-protected',answersHidden);overhead.setAssistanceHidden(answersHidden);explorer.setHidden(answersHidden);if(answersHidden){$('status').textContent='Recall practice · assistance hidden';$('toast').hidden=true;}showRoute();}
   function showRoute() { const c=guidance&&!answersHidden?routeCoords(route):[]; overhead.setRoute(c);driver?.setRoute(c); }
@@ -110,7 +112,7 @@ async function boot() {
   }
   function selectArea(id:string) {
     if(editorActive||id!=='all'&&!study.zone(id)?.geometry)return;
-    learning?.cancel();training?.leave();persist();keys.clear();pendingTurn=undefined;route=null;game.activeRoute=null;challenge=null;game.zoneId=id;rememberPracticeZone(localStorage,id);
+    learning?.cancel();training?.leave();persist();keys.clear();pendingTurn=undefined;route=null;game.activeRoute=null;challenge=null;game.zoneId=id;rememberPracticeZone(localProgressStorage,id);
     const edgeId=areaHasRoads()?departure.edgeId:null;
     game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);
     showRoute();$('save-route').setAttribute('disabled','');mode='free';setMode('free');renderArea();renderProgress();persist();
@@ -179,7 +181,7 @@ async function boot() {
   $('reset-drive').onclick=reset;
   for(const m of ['free','navigation','quiz'] as const)$(`mode-${m}`).onclick=()=>{learning?.cancel();setMode(m);if(m==='free')ui.close();else ui.open('navigation');};
   for(const t of ['left','right','straight','uturn'] as const)$(`turn-${t}`).onclick=()=>queue(t);
-  const persistSettings=()=>{if(!saveSettings(localStorage,{version:1,profile,maxSpeed,assist,guidance}))say('Driving settings cannot be saved in this browser.');};
+  const persistSettings=()=>{if(!saveSettings(localProgressStorage,{version:1,profile,maxSpeed,assist,guidance}))say('Driving settings cannot be saved in this browser.');};
   ($('profile') as HTMLSelectElement).value=profile;($('max-speed') as HTMLInputElement).value=String(maxSpeed);($('assist') as HTMLInputElement).checked=assist;($('guidance') as HTMLInputElement).checked=guidance;
   $('profile').onchange=()=>{profile=($('profile') as HTMLSelectElement).value as AccelerationProfile;persistSettings();};
   $('max-speed').onchange=()=>{maxSpeed=Math.max(10,Math.min(100,Number(($('max-speed') as HTMLInputElement).value)||100));($('max-speed') as HTMLInputElement).value=String(maxSpeed);persistSettings();};
@@ -233,11 +235,11 @@ async function boot() {
     if(now-lastPersist>2000){lastPersist=now;persist();}
     requestAnimationFrame(frame);
   }
-  training=new StudyMode({container:$('study-panel'),network:studyNetwork,graph,overhead,storage:localStorage,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,setGuidance:(enabled)=>{guidance=enabled;($('guidance') as HTMLInputElement).checked=enabled;showRoute();},onMessage:say,onStart:(vehicle,nextRoute)=>{keys.clear();pendingTurn=undefined;paused=false;$('pause').classList.remove('active');$('pause').textContent='Pause';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;progress=study.record(progress,game.vehicle);$('save-route').toggleAttribute('disabled',!nextRoute);showRoute();if(nextRoute)ui.close();},onRoute:(nextRoute)=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
+  training=new StudyMode({container:$('study-panel'),network:studyNetwork,graph,overhead,storage:localProgressStorage,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,setGuidance:(enabled)=>{guidance=enabled;($('guidance') as HTMLInputElement).checked=enabled;showRoute();},onMessage:say,onStart:(vehicle,nextRoute)=>{keys.clear();pendingTurn=undefined;paused=false;$('pause').classList.remove('active');$('pause').textContent='Pause';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;progress=study.record(progress,game.vehicle);$('save-route').toggleAttribute('disabled',!nextRoute);showRoute();if(nextRoute)ui.close();},onRoute:(nextRoute)=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
   const openStudy=(zone1=false)=>{if(editorActive)return;learning?.cancel();selectArea(zone1?'zone1':'all');($('zone-select') as HTMLSelectElement).value=game.zoneId;setMode('study');training!.enter(zone1);$('mission').innerHTML='<strong>Your roads. Your navigation.</strong>Preview the listed roads, then start from headquarters. Any supported legal route can count.';};
   $('mode-study').onclick=()=>{if(mode!=='study')openStudy();ui.open('study');};$('mode-zone1-main').onclick=()=>{openStudy(true);ui.open('study');};
   learning=new LearningSystem({dashboard:$('learning-dashboard'),viewport:$('driving-viewport'),network:studyNetwork,evidence:verification,graph,overhead,explorer,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,clearInputs:()=>{keys.clear();pendingTurn=undefined;},close:()=>ui.close(),open:()=>ui.open('learning'),map:()=>switchCamera('overhead'),message:say,
-    reloadLegacy:()=>{progress=loadProgress(localStorage);training?.reloadProgress();renderProgress();},policy:hidden=>protectAnswers(hidden),prepare:()=>{training?.leave();mode='free';quizAnswered=true;$('quiz').hidden=true;$('overhead-view').classList.remove('quiz-hidden');challenge=null;route=null;protectAnswers(false);},
+    reloadLegacy:()=>{progress=loadProgress(localProgressStorage);training?.reloadProgress();renderProgress();},policy:hidden=>protectAnswers(hidden),prepare:()=>{training?.leave();mode='free';quizAnswered=true;$('quiz').hidden=true;$('overhead-view').classList.remove('quiz-hidden');challenge=null;route=null;protectAnswers(false);},
     startDrive:(vehicle,nextRoute,guided)=>{training?.leave();mode='free';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;guidance=guided;($('guidance') as HTMLInputElement).checked=guided;keys.clear();pendingTurn=undefined;paused=false;$('pause').textContent='Pause';showRoute();},setRoute:nextRoute=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
   app.addEventListener('click',event=>{const button=(event.target as HTMLElement).closest('[data-open-panel]');if(button&&learning?.hiddenAnswers)learning.cancel();},true);
   await learning.initialize();
