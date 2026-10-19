@@ -180,3 +180,23 @@ most-recent practice display backwards. Histories are sorted for calculation;
 original stored attempt order/records remain intact. A focused progress regression
 and TypeScript checks passed. The complete final suite now contains 95 Node cases;
 its final CI result remains the release authority.
+
+The subsequent CI run 39223851654 passed all 95 Node cases, all 18 development
+browser cases, and 25/26 production cases; deployment was correctly skipped.
+Its remaining failure exposed an intermittent native drag cancellation. In the
+installed MapLibre implementation, `easeTo` resets gesture handlers. A follow
+update could therefore reset a mouse press before `dragstart`; calling `stop()`
+inside `dragstart` could also cancel the newly established gesture.
+
+The camera now suspends follow updates from the first map-canvas/marker pointer-down,
+cancels the existing animation before MapLibre starts handling that press, and
+keeps native drag/rotation/pitch handlers alive when entering Explore. Multiple
+pointers retain the interaction lock until all are released. Wheel zoom also
+suspends follow updates without changing Follow/Explore mode. Its pending first
+event is protected before MapLibre finishes distinguishing wheel/trackpad input;
+`isZooming()` alone was insufficient, as the expanded browser regression exposed. Cleanup handles
+pointer cancellation, window blur and view disposal. The browser regression
+holds the mouse down across several follow ticks and requires both Explore mode
+and actual map movement, then checks driving, zoom, camera return, reset,
+mission and zone changes, including a drag originating on the vehicle marker. The unit suite now contains 96 cases. Publication
+still requires the final complete CI run and live verification.

@@ -10,3 +10,11 @@ test('manual exploration cancels animation, ignores vehicle updates, and explici
  camera.centerOnVehicle([-121.97,37.52]);assert.equal(camera.follow,true);assert.equal(pose.zoom,15.2);assert.equal(pose.pitch,30);
  camera.focus({center:[-122,37.6]});assert.equal(camera.follow,false);
 });
+test('pointer interaction blocks follow animations before dragstart and preserves click-only follow state',()=>{
+ let moves=0,stops=0;const pose:CameraPose={center:[-122,37.55],zoom:16,bearing:0,pitch:0};
+ const camera=new CameraController({stop:()=>stops++,read:()=>pose,move:()=>moves++});
+ camera.update([-122,37.55],0);camera.beginInteraction();for(let i=0;i<10;i++)camera.update([-121.99,37.56],0);assert.equal(moves,1);assert.equal(camera.follow,true);assert.equal(stops,1);
+ camera.endInteraction();camera.update([-121.99,37.56],0);assert.equal(moves,2);
+ camera.beginInteraction();camera.beginInteraction();assert.equal(stops,2);camera.explore(false);assert.equal(stops,2);camera.endInteraction();camera.update([-121.98,37.57],0);assert.equal(moves,2);assert.equal(camera.follow,false);
+ camera.centerOnVehicle([-121.98,37.57]);assert.equal(camera.follow,true);
+});

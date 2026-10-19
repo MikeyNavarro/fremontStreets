@@ -5,9 +5,14 @@ const state=(page:Page)=>page.evaluate(()=>{const g=(window as any).__FREMONT_GA
 test.beforeEach(async({page})=>{await page.goto('./');await page.waitForFunction(()=>!!(window as any).__FREMONT_GAME__);await expect(page.getByTestId('game-dialog')).toBeVisible();await closePanel(page);await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready','true');});
 test('manual exploration survives driving, zoom, cameras, reset, mission and zone changes',async({page})=>{
  const canvas=page.locator('.maplibregl-canvas');const box=(await canvas.boundingBox())!;
- await page.mouse.move(box.x+box.width*.65,box.y+box.height*.5);await page.mouse.down();await page.mouse.move(box.x+box.width*.45,box.y+box.height*.62,{steps:12});await page.mouse.up();
+ const initial=(await state(page)).map;await page.mouse.move(box.x+box.width*.65,box.y+box.height*.5);await page.mouse.wheel(0,120);await expect.poll(async()=>(await state(page)).map.zoom).toBeLessThan(initial.zoom);expect((await state(page)).map.followVehicle).toBe(true);
+ await page.getByRole('button',{name:'Center on Vehicle',exact:true}).click();
+ await page.mouse.move(box.x+box.width*.65,box.y+box.height*.5);await page.mouse.down();
+ // Hold beyond multiple follow ticks: easeTo must not reset a nascent drag.
+ await page.waitForTimeout(250);const beforeDrag=(await state(page)).map.center;
+ await page.mouse.move(box.x+box.width*.45,box.y+box.height*.62,{steps:12});await page.mouse.up();
  await expect.poll(async()=>(await state(page)).map.followVehicle).toBe(false);
- await page.waitForTimeout(350);const detached=await state(page);
+ await page.waitForTimeout(350);const detached=await state(page);expect(detached.map.center).not.toEqual(beforeDrag);
  await page.keyboard.down('ArrowUp');await expect.poll(async()=>(await state(page)).vehicle.totalDistance).toBeGreaterThan(detached.vehicle.totalDistance+8);await page.keyboard.up('ArrowUp');await page.getByTestId('pause-toggle').click();
  expect((await state(page)).map.center).toEqual(detached.map.center);
  await page.mouse.move(box.x+box.width*.65,box.y+box.height*.5);await page.mouse.wheel(0,180);await page.waitForTimeout(500);const zoomed=await state(page);expect(zoomed.map.zoom).toBeLessThan(detached.map.zoom);expect(zoomed.map.followVehicle).toBe(false);
@@ -17,6 +22,10 @@ test('manual exploration survives driving, zoom, cameras, reset, mission and zon
  await chooseMode(page,'navigation');await page.getByTestId('challenge-start').click();expect((await state(page)).map.center).toEqual(zoomed.map.center);expect((await state(page)).map.followVehicle).toBe(false);
  await openPanel(page,'zones');await page.getByTestId('zone-select').selectOption('zone2');await closePanel(page);expect((await state(page)).map.followVehicle).toBe(false);expect((await state(page)).map.center).toEqual(zoomed.map.center);
  await page.getByRole('button',{name:'Center on Vehicle',exact:true}).click();await expect.poll(async()=>(await state(page)).map.followVehicle).toBe(true);expect((await state(page)).map.zoom).toBeCloseTo(zoomed.map.zoom,5);
+ // Native map markers must not create a drag dead zone over the vehicle.
+ await page.waitForTimeout(200);const marker=(await page.locator('.vehicle-map-marker').boundingBox())!;
+ await page.mouse.move(marker.x+marker.width/2,marker.y+marker.height/2);await page.mouse.down();await page.waitForTimeout(250);const markerStart=(await state(page)).map.center;
+ await page.mouse.move(marker.x+marker.width/2+130,marker.y+marker.height/2+60,{steps:12});await page.mouse.up();await expect.poll(async()=>(await state(page)).map.followVehicle).toBe(false);expect((await state(page)).map.center).not.toEqual(markerStart);
 });
 test('search inspects source-connected sections without moving the vehicle or reattaching follow',async({page})=>{
  await page.getByTestId('pause-toggle').click();

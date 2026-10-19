@@ -36,6 +36,7 @@ export class OverheadView {
   onRoadClick:((wayId:string,position:LonLat)=>void)|null=null;
   private vertexMarkers: Marker[] = [];
   private stopVertexEditing: (() => void) | null = null;
+  private stopPointerInteraction:(()=>void)|null=null;
   private studyRoads = emptyLines();
   private studyJunctions: FeatureCollection<Point> = {type:'FeatureCollection',features:[]};
   private studyNames: Set<string> | null = null;
@@ -98,9 +99,24 @@ export class OverheadView {
       const map=this.map;
       this.camera=new CameraController({stop:()=>map.stop(),read:()=>({center:map.getCenter().toArray() as LonLat,zoom:map.getZoom(),bearing:map.getBearing(),pitch:map.getPitch()}),move:(pose,animate)=>{if(animate&&!this.reducedMotion)map.easeTo({...pose,duration:110,easing:t=>t});else map.jumpTo(pose);}},follow=>{this.container.dataset.cameraMode=follow?'Follow':'Explore';const status=document.getElementById('camera-mode');if(status)status.textContent=follow?'Follow vehicle':'Explore freely';const control=document.getElementById('map-follow') as HTMLInputElement|null;if(control)control.checked=follow;});
       this.container.dataset.cameraMode='Follow';
-      map.on('dragstart',()=>this.camera?.explore());
-      map.on('rotatestart',event=>{if(event.originalEvent)this.camera?.explore();});
-      map.on('pitchstart',event=>{if(event.originalEvent)this.camera?.explore();});
+      // MapLibre easeTo stops gesture handlers. Hold follow updates from pointer
+      // down, before dragstart exists, and stop animations without killing gestures.
+      const canvas=map.getCanvasContainer(),pointers=new Set<number>();
+      let wheelTimer:ReturnType<typeof setTimeout>|null=null;
+      const finish=()=>{if(!pointers.size&&wheelTimer===null)this.camera?.endInteraction();};
+      const down=(event:PointerEvent)=>{pointers.add(event.pointerId);this.camera?.beginInteraction();};
+      const up=(event:PointerEvent)=>{pointers.delete(event.pointerId);finish();};
+      // ScrollZoom delays the first wheel event to distinguish wheel/trackpad.
+      // isZooming alone cannot protect that pending native gesture from easeTo.
+      const wheel=()=>{this.camera?.beginInteraction();if(wheelTimer!==null)clearTimeout(wheelTimer);wheelTimer=setTimeout(()=>{wheelTimer=null;finish();},200);};
+      const release=()=>{pointers.clear();if(wheelTimer!==null)clearTimeout(wheelTimer);wheelTimer=null;finish();};
+      canvas.addEventListener('pointerdown',down,true);canvas.addEventListener('wheel',wheel,{capture:true,passive:true});window.addEventListener('pointerup',up,true);window.addEventListener('pointercancel',up,true);window.addEventListener('blur',release);
+      this.stopPointerInteraction=()=>{canvas.removeEventListener('pointerdown',down,true);canvas.removeEventListener('wheel',wheel,true);window.removeEventListener('pointerup',up,true);window.removeEventListener('pointercancel',up,true);window.removeEventListener('blur',release);release();};
+      // Pointer-down already canceled the follow animation. Calling map.stop
+      // here would also cancel the user's newly established native gesture.
+      map.on('dragstart',()=>this.camera?.explore(false));
+      map.on('rotatestart',event=>{if(event.originalEvent)this.camera?.explore(false);});
+      map.on('pitchstart',event=>{if(event.originalEvent)this.camera?.explore(false);});
       map.on('click',event=>{if(!this.onRoadClick)return;
         const hits=map.queryRenderedFeatures([[event.point.x-6,event.point.y-6],[event.point.x+6,event.point.y+6]],{layers:['roads']}).map(hit=>{let distance=Infinity;const lines=hit.geometry.type==='LineString'?[hit.geometry.coordinates]:hit.geometry.type==='MultiLineString'?hit.geometry.coordinates:[];for(const line of lines)for(let i=1;i<line.length;i++){const a=map.project(line[i-1] as LonLat),b=map.project(line[i] as LonLat),dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((event.point.x-a.x)*dx+(event.point.y-a.y)*dy)/(dx*dx+dy*dy||1)));distance=Math.min(distance,Math.hypot(event.point.x-a.x-t*dx,event.point.y-a.y-t*dy));}return {hit,distance};}).sort((a,b)=>a.distance-b.distance);
         if(!hits.length)return;
@@ -139,7 +155,7 @@ export class OverheadView {
     this.lastSnapshot = snapshot;
     this.marker?.setLngLat(snapshot.position).setRotation(snapshot.heading * 180 / Math.PI);
     const now = performance.now();
-    if (this.camera?.follow && this.active && !this.container.hidden && this.map && now - this.lastFollow > 80) {
+    if (this.camera?.follow && this.active && !this.container.hidden && this.map && !this.map.isZooming() && now - this.lastFollow > 80) {
       const heading=this.headingUp?snapshot.heading*180/Math.PI:0;
       const current=this.map.getBearing(),delta=((heading-current+540)%360)-180;
       this.camera.update(snapshot.position,current+delta);
@@ -331,6 +347,7 @@ export class OverheadView {
 
   dispose(): void {
     this.observer?.disconnect();
+    this.stopPointerInteraction?.();
     this.stopVertexEditing?.();
     this.clearVertexMarkers();
     this.labels.forEach((label) => label.remove());
