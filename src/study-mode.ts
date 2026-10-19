@@ -50,7 +50,7 @@ export class StudyMode {
   enter(zone1=false){
     this.active=true;this.group=zone1?'zone1':'all';this.mission=null;this.quiz=null;this.seenThisSession.clear();
     this.options.onStart(stationDeparture(this.options.graph),null);
-    this.render();this.overlay();this.options.overhead.focusPosition(this.options.network.station.departurePosition);
+    this.render();this.overlay();
     this.options.onMessage('New training session at police headquarters. Preview your roads, then choose an exercise.');
   }
   leave(){if(!this.active)return;this.active=false;this.mission=null;this.quiz=null;this.options.overhead.setStudyOverlay({type:'FeatureCollection',features:[]},{type:'FeatureCollection',features:[]},null);this.options.overhead.clearStudyDestination();const info=document.getElementById('drive-view-label');if(info)info.textContent='Real roads. One shared simulation.';this.persist();}
@@ -140,7 +140,7 @@ export class StudyMode {
     const record=this.progress.entries[entry.id]??emptyStudyRecord();this.progress.entries[entry.id]={...record,repetitions:record.repetitions+1};this.persist();
     this.options.onStart(vehicle,route);this.renderMission();this.renderProgress();
     const destination=goal.kind==='headquarters'?this.options.network.station.departurePosition:graph.nodes.get(graph.edges.get(route.edgeIds.at(-1)!)!.to)!.position;
-    this.options.overhead.focusPosition(destination,goal.kind==='headquarters'?'Police HQ departure point':entry.originalLabel);this.options.overhead.setFollowVehicle(true);
+    // Starting a mission preserves the overhead camera's exploration state.
     this.options.onMessage(`Challenge started: ${exercise==='return'?'return to police headquarters':exercise==='intersection'?'traverse the selected source junction':`reach the marked location on ${entry.originalLabel}`}. ${this.options.getGuidance()?'Guidance is on.':'No GPS guidance.'}`);
   }
 

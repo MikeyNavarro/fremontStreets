@@ -1,4 +1,5 @@
 import './style.css';
+import {StreetExplorer} from './training/explorer';
 import {DrivingShell} from './ui/shell';
 import { PatrolStudy } from './patrol';
 import { chooseStudyRoute, loadPracticeZone, POLICE_STATION, practiceRouteFromStation, rememberPracticeZone, stationDeparture } from './departure';
@@ -75,13 +76,13 @@ async function boot() {
     </main><footer class="footer"><span>FREMONT STREETS <span style="margin:0 9px">/</span> A city learned one intersection at a time.</span><span>Local road data · local progress · no accounts required</span></footer>`;
 
   const ui=new DrivingShell(app);
-  let followMode=true;
   let graphicsQuality:'low'|'balanced'|'high'='balanced';
   const roadsGeo = roadPresentation(data,graph);
   const coords = Object.values(data.nodes);
   const bounds: [[number,number],[number,number]] = [[Math.min(...coords.map(c=>c[0])),Math.min(...coords.map(c=>c[1]))],[Math.max(...coords.map(c=>c[0])),Math.max(...coords.map(c=>c[1]))]];
   const overhead = new OverheadView($('overhead-view'), roadsGeo, bounds);
   overhead.setStation(POLICE_STATION.position);overhead.setQuality('balanced');
+  const explorer=new StreetExplorer(graph,studyNetwork,verification,overhead,$('driving-viewport'));
   let recentMessageUntil = 0;
   function say(message:string) { $('status').textContent=message;ui.toast(message); recentMessageUntil=performance.now()+6000; }
   function persist() { if(!persistProgress(localStorage,progress)) $('progress-area').textContent='Progress storage unavailable · this session only'; renderProgress();if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress); }
@@ -95,7 +96,7 @@ async function boot() {
     $('zone-coverage-description').textContent=id==='all'?'Partial city coverage. Selecting a zone starts a new practice drive on an existing road; progress is preserved.':coverage?.available?'Partial road coverage only. The colored polygon is an approximate study area. You can drive across its boundary.':'Boundary study only: the existing road extract has no usable streets in this zone. Driving and questions require a source-backed road import; no streets have been created.';
     $('progress-area').textContent=zone?`${zone.name} · ${coverage?.available?'partial roads':'no current road coverage'}`:'All Fremont · loaded roads only';
     overhead.setBoundaries(study.boundaries(),id==='all'?undefined:id,id==='all');
-    if(zone?.geometry&&focusBoundary){overhead.setFollowVehicle(false);overhead.focusBoundary(zone.geometry);}else overhead.setFollowVehicle(true);
+    // Zone changes update the boundary without taking ownership of the camera.
     $('mode-navigation').toggleAttribute('disabled',!areaHasRoads());$('mode-quiz').toggleAttribute('disabled',!areaHasRoads());
     for(const control of ['throttle','brake','turn-left','turn-right','turn-straight','turn-uturn'])$(control).toggleAttribute('disabled',!areaHasRoads());
   }
@@ -159,10 +160,10 @@ async function boot() {
     $('view-note').textContent=camera==='driver'?'Schematic 3D · surfaces / interior approximate · bridge heights & traffic controls unverified':'Real source road centerlines · no external map calls during gameplay';
     requestAnimationFrame(()=>{overhead.resize();driver?.resize();showRoute();renderFrame();});
   }
-  function reset(){if(editorActive)return;training?.cancel();keys.clear();pendingTurn=undefined;game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();overhead.setFollowVehicle(true);say('Back at police headquarters. Your saved progress is preserved.');}
+  function reset(){if(editorActive)return;training?.cancel();keys.clear();pendingTurn=undefined;game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();say('Back at police headquarters. Your saved progress is preserved.');}
 
   $('zone-select').onchange=()=>selectArea(($('zone-select') as HTMLSelectElement).value);
-  $('follow-car').onclick=()=>{if(!editorActive&&areaHasRoads()){followMode=true;($('map-follow') as HTMLInputElement).checked=true;overhead.setFollowVehicle(true);}};
+  $('follow-car').onclick=()=>{if(!editorActive)overhead.centerOnVehicle(game.vehicle.position);};
   $('camera-overhead').onclick=()=>switchCamera('overhead');$('camera-driver').onclick=()=>switchCamera('driver');
   $('pause').onclick=()=>{if(editorActive)return;paused=!paused;$('pause').classList.toggle('active',paused);$('pause').textContent=paused?'Resume':'Pause';keys.clear();};
   $('reset-drive').onclick=reset;
@@ -174,7 +175,8 @@ async function boot() {
   $('guidance').onchange=()=>{guidance=($('guidance') as HTMLInputElement).checked;if(challenge?.status==='active'&&guidance)challenge.guided=true;showRoute();renderMission();training?.guidanceChanged();};
   $('save-route').onclick=()=>{if(!route)return;progress=savePracticeRoute(progress,game.zoneId,{id:crypto.randomUUID(),name:challenge?.destination??'Fremont practice route',edgeIds:route.edgeIds,destinationNode:route.nodeIds.at(-1)!,savedAt:new Date().toISOString()});persist();say('Practice route saved in this browser.');};
   for(const id of ['throttle','brake']){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(id);});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(id));}
-  document.addEventListener('keydown',e=>{if(editorActive||ui.isOpen)return;if(e.key==='Escape'){e.preventDefault();ui.open('menu');return;}if((e.target as HTMLElement)?.matches('input,select,textarea'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
+  document.addEventListener('keydown',e=>{if(editorActive||ui.isOpen)return;if(e.key==='Escape'){e.preventDefault();ui.open('menu');return;}if((e.target as HTMLElement)?.closest('input,select,textarea,[contenteditable=true]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.add(e.key.toLowerCase());if(!e.repeat){if(['arrowleft','a'].includes(e.key.toLowerCase()))queue('left');if(['arrowright','d'].includes(e.key.toLowerCase()))queue('right');if(e.key===' ')$('pause').click();if(e.key.toLowerCase()==='c')switchCamera(game.camera==='overhead'?'driver':'overhead');}});
+  document.addEventListener('focusin',e=>{if((e.target as HTMLElement)?.matches('input,select,textarea'))keys.clear();});
   document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();persist();}});
   window.addEventListener('beforeunload',persist);
@@ -182,18 +184,17 @@ async function boot() {
   ui.configure({resize:()=>requestAnimationFrame(()=>{overhead.resize();driver?.resize();}),suspend:()=>keys.clear(),panel:()=>{if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress);}});
   $('map-orientation').onchange=()=>overhead.setHeadingUp(($('map-orientation') as HTMLSelectElement).value==='heading');
   $('map-zoom').oninput=()=>{const zoom=Number(($('map-zoom') as HTMLInputElement).value);$('map-zoom-value').textContent=zoom.toFixed(1);overhead.setZoom(zoom);};
-  $('map-follow').onchange=()=>{followMode=($('map-follow') as HTMLInputElement).checked;overhead.setFollowVehicle(followMode);};
+  $('map-follow').onchange=()=>{overhead.setFollowVehicle(false);($('map-follow') as HTMLInputElement).checked=false;};
   $('hud-visible').onchange=()=>app.classList.toggle('hud-hidden',!($('hud-visible') as HTMLInputElement).checked);
   $('graphics-quality').onchange=()=>{graphicsQuality=($('graphics-quality') as HTMLSelectElement).value as typeof graphicsQuality;driver?.setQuality(graphicsQuality);overhead.setQuality(graphicsQuality);};
   progress=study.record(progress,game.vehicle);
   let last=performance.now(),accumulator=0,lastHud=0;
-  function renderFrame(){const snapshot={position:game.vehicle.position,heading:game.vehicle.heading,speed:game.vehicle.speed};if(game.camera==='overhead')overhead.update(snapshot);else driver?.update(snapshot);}
+  function renderFrame(){const snapshot={position:game.vehicle.position,heading:game.vehicle.heading,speed:game.vehicle.speed};overhead.update(snapshot);if(game.camera==='driver')driver?.update(snapshot);}
   function frame(now:number){
     accumulator+=Math.min((now-last)/1000,.1);last=now;
     while(accumulator>=1/60){
       accumulator-=1/60;
       if(!paused&&!editorActive&&!ui.isOpen&&areaHasRoads()){
-        if(followMode&&(keys.has('arrowup')||keys.has('w')||keys.has('throttle')))overhead.setFollowVehicle(true);
         game.vehicle=stepVehicle(graph,game.vehicle,{throttle:keys.has('arrowup')||keys.has('w')||keys.has('throttle'),brake:keys.has('arrowdown')||keys.has('s')||keys.has('brake'),turn:pendingTurn},1/60,{profile,maxSpeedMph:maxSpeed,cornerAssist:assist});pendingTurn=undefined;
         if(mode==='study')training?.tick(game.vehicle);
         if(game.vehicle.events.length){progress=study.record(progress,game.vehicle);if(challenge?.status==='active'){
@@ -218,7 +219,7 @@ async function boot() {
     if(now-lastPersist>2000){lastPersist=now;persist();}
     requestAnimationFrame(frame);
   }
-  training=new StudyMode({container:$('study-panel'),network:studyNetwork,graph,overhead,storage:localStorage,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,setGuidance:(enabled)=>{guidance=enabled;($('guidance') as HTMLInputElement).checked=enabled;showRoute();},onMessage:say,onStart:(vehicle,nextRoute)=>{keys.clear();pendingTurn=undefined;paused=false;$('pause').classList.remove('active');$('pause').textContent='Pause';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;progress=study.record(progress,game.vehicle);$('save-route').toggleAttribute('disabled',!nextRoute);showRoute();overhead.setFollowVehicle(true);if(nextRoute)ui.close();},onRoute:(nextRoute)=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
+  training=new StudyMode({container:$('study-panel'),network:studyNetwork,graph,overhead,storage:localStorage,getVehicle:()=>game.vehicle,getGuidance:()=>guidance,setGuidance:(enabled)=>{guidance=enabled;($('guidance') as HTMLInputElement).checked=enabled;showRoute();},onMessage:say,onStart:(vehicle,nextRoute)=>{keys.clear();pendingTurn=undefined;paused=false;$('pause').classList.remove('active');$('pause').textContent='Pause';game.vehicle=vehicle;route=nextRoute;game.activeRoute=nextRoute;challenge=null;progress=study.record(progress,game.vehicle);$('save-route').toggleAttribute('disabled',!nextRoute);showRoute();if(nextRoute)ui.close();},onRoute:(nextRoute)=>{route=nextRoute;game.activeRoute=nextRoute;showRoute();}});
   const openStudy=(zone1=false)=>{if(editorActive)return;selectArea(zone1?'zone1':'all');($('zone-select') as HTMLSelectElement).value=game.zoneId;setMode('study');training!.enter(zone1);$('mission').innerHTML='<strong>Your roads. Your navigation.</strong>Preview the listed roads, then start from headquarters. Any supported legal route can count.';};
   $('mode-study').onclick=()=>{if(mode!=='study')openStudy();ui.open('study');};$('mode-zone1-main').onclick=()=>{openStudy(true);ui.open('study');};
   ($('zone-select') as HTMLSelectElement).value=game.zoneId;
