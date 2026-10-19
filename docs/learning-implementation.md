@@ -55,7 +55,7 @@ are software validation, not real-world verification.
 
 ## Validation at this checkpoint
 
-93 Node tests passed, including existing geography, real driving, acceleration,
+94 Node tests passed, including existing geography, real driving, acceleration,
 camera and graph tests plus new evidence, mastery, review and exam-rule tests.
 TypeScript and the Vite production build passed. Eight focused browser cases
 passed: manual exploration lifecycle; search/inspection; two unaided recognition
@@ -147,3 +147,30 @@ final GitHub Actions remain required; an isolated passing retry alone is not a
 full release result. Workflow 39219293619 was deliberately canceled during this
 investigation, before deployment. Check the subsequent final workflow and live
 site for publication status.
+
+Recognition question identity is based on the actual task, not incidental routing
+representatives. Repeating “find this street” counts as the same question, and
+forward/reverse edges of the same physical segment cannot satisfy the two-distinct-
+question requirement. Existing history is interpreted with the same conservative
+rule. A focused regression covers both cases; a real map-click browser check
+confirms that repeating the location prompt retains its question identity. The
+release workflow was paused again while this scoring correction was verified.
+
+A second full production run then reached the road-to-road destination but hit
+the combined 480-second budget during the HQ return. Its 3,297 snapshots again
+contained no off-route edges. The existing renderer benchmark recorded about
+6.9 overhead FPS at default resolution and 8.6 FPS with the actual Efficient
+setting on this SwiftShader host. This establishes that serial execution alone
+is not sufficient to stabilize real-time tests on this software renderer.
+Long route regressions now select the game's existing Efficient graphics option
+through Settings, alongside their existing 35 mph training cap. Routes, driving
+inputs, arrival checks, simulation behavior and timeouts are unchanged. Other
+browser cases still exercise default graphics and both camera views. The next
+full production result is required before claiming this release passes.
+
+The second full run finished with 24/26 passing; its other failure was the same
+menu race in an older Zone 1 test. The underlying readiness contract is now
+corrected: `__FREMONT_GAME__` is exposed only after asynchronous learning storage
+initialization and the initial menu/editor have finished opening. Tests no longer
+observe a half-initialized application before deciding which menu control to use.
+The long-route helper also verifies that Efficient rendering really took effect.

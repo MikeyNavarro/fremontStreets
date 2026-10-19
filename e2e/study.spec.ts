@@ -6,7 +6,10 @@ async function openStudy(page:Page){await page.goto('./');await page.waitForFunc
 async function driveMission(page:Page,timeout?:number){
   // Exercise the forgiving controls at a normal street-training pace. Separate
   // simulation tests verify 100 mph integration and the default capability.
-  await openPanel(page,'settings');await page.locator('#max-speed').fill('35');await page.locator('#max-speed').dispatchEvent('change');await page.locator('#max-speed').blur();await closePanel(page);
+  // SwiftShader measured ~6.9 FPS at default resolution and ~8.6 FPS in the
+  // existing Efficient mode. Use that real user setting for long route checks;
+  // default rendering/camera behavior is covered separately in redesign.spec.
+  await openPanel(page,'settings');await page.locator('#graphics-quality').selectOption('low');expect(await page.evaluate(()=>(window as any).__FREMONT_GAME__.presentation.map.pixelRatio)).toBeCloseTo(.65,2);await page.locator('#max-speed').fill('35');await page.locator('#max-speed').dispatchEvent('change');await page.locator('#max-speed').blur();await closePanel(page);
   let decisionKey='';const initial=await snapshot(page),first=initial.decision;
   // Source-backed representative routes can change length after a topology fix.
   // Budget for the actual 35 mph route plus software-rendering overhead; still

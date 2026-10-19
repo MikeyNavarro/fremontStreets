@@ -194,7 +194,6 @@ async function boot() {
   document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();persist();}});
   window.addEventListener('beforeunload',persist);
-  Object.defineProperty(window,'__FREMONT_GAME__',{get:()=>({vehicle:structuredClone(game.vehicle),camera:game.camera,route:route?structuredClone(route):null,progress:structuredClone(progress),get graph(){return {nodes:[...graph.nodes.values()],edges:[...graph.edges.values()]};},paused,challenge:challenge?structuredClone(challenge):null,mode,profile,decision:nextDecision(graph,game.vehicle),zoneId:game.zoneId,get zoneDocument(){return structuredClone(editorDocument);},get zoneCoverage(){return structuredClone(study.coverage.zones);},get overlay(){return overhead.getZoneDiagnostics();},quiz:{street:quizStreet,choices:[...quizChoices]},editorActive,study:training?.snapshot()??null,maxSpeed,learning:learning?.snapshot()??null,presentation:{panel:ui.panel,map:overhead.presentation(),driver:driver?.presentation()??null},departure:{edgeId:departure.edgeId,distance:departure.distance,position:departure.position}})});
   ui.configure({resize:()=>requestAnimationFrame(()=>{overhead.resize();driver?.resize();}),suspend:()=>keys.clear(),panel:()=>{if(ui.panel==='learning')learning?.render();if(training)ui.updateProgress(studyNetwork.entries,training.snapshot().progress);}});
   $('map-orientation').onchange=()=>overhead.setHeadingUp(($('map-orientation') as HTMLSelectElement).value==='heading');
   $('map-zoom').oninput=()=>{const zoom=Number(($('map-zoom') as HTMLInputElement).value);$('map-zoom-value').textContent=zoom.toFixed(1);overhead.setZoom(zoom);};
@@ -253,6 +252,8 @@ async function boot() {
     mountZoneEditor({container:$('zone-editor-host'),overhead,baseline:zones,graph,onPreview:doc=>{editorDocument=doc;}});
   }
   if(!editorActive)ui.open('menu');
+  // Report readiness only after asynchronous learning storage and initial UI settle.
+  Object.defineProperty(window,'__FREMONT_GAME__',{get:()=>({vehicle:structuredClone(game.vehicle),camera:game.camera,route:route?structuredClone(route):null,progress:structuredClone(progress),get graph(){return {nodes:[...graph.nodes.values()],edges:[...graph.edges.values()]};},paused,challenge:challenge?structuredClone(challenge):null,mode,profile,decision:nextDecision(graph,game.vehicle),zoneId:game.zoneId,get zoneDocument(){return structuredClone(editorDocument);},get zoneCoverage(){return structuredClone(study.coverage.zones);},get overlay(){return overhead.getZoneDiagnostics();},quiz:{street:quizStreet,choices:[...quizChoices]},editorActive,study:training?.snapshot()??null,maxSpeed,learning:learning?.snapshot()??null,presentation:{panel:ui.panel,map:overhead.presentation(),driver:driver?.presentation()??null},departure:{edgeId:departure.edgeId,distance:departure.distance,position:departure.position}})});
   requestAnimationFrame(frame);
 }
 boot().catch(error=>{app.innerHTML=`<div class="loading"><h1>FREMONT STREETS</h1><p>${esc(error.message)}</p><p>Check geographic import instructions in README.md.</p></div>`;console.error(error);});
