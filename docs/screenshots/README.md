@@ -30,3 +30,11 @@ Road widths, flat 3D surfaces, sky and cockpit are visual approximations. These
 screenshots do not establish real lane geometry, bridge heights, traffic rules
 or full-city coverage. See [the redesign report](../redesign.md) and
 [geographic limitations](../personalized-geography.md).
+
+## Stevenson continuity follow-up
+
+Captured and inspected after the source-graph correction. Stevenson is a solid
+drivable road here while the north–south curriculum is highlighted. Blue/gold
+are study highlights; amber dashes identify roads unavailable in the loaded game.
+
+![Stevenson without a blue study overlay, with the map key open](09-stevenson-map-key.png)

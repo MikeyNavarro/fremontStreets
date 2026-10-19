@@ -177,18 +177,21 @@
       ],
       "outgoingEdgeIds": [
         "6402191:0:f",
+        "417108043:0:f",
         "697663660:0:f"
       ],
       "sourceWayIds": [
         "6402191",
         "417108014",
         "697663661",
+        "417108043",
         "697663660"
       ],
       "movements": [
         {
           "incoming": "6402191:0:r",
           "outgoing": [
+            "417108043:0:f",
             "697663660:0:f",
             "6402191:0:f"
           ]
@@ -197,13 +200,14 @@
           "incoming": "417108014:2:f",
           "outgoing": [
             "697663660:0:f",
-            "6402191:0:f"
+            "6402191:0:f",
+            "417108043:0:f"
           ]
         },
         {
           "incoming": "697663661:8:f",
           "outgoing": [
-            "697663660:0:f",
+            "417108043:0:f",
             "6402191:0:f"
           ]
         }
@@ -485,16 +489,19 @@
       ],
       "outgoingEdgeIds": [
         "6393379:21:r",
-        "6393379:22:f"
+        "6393379:22:f",
+        "40416351:0:f"
       ],
       "sourceWayIds": [
         "6393379",
-        "417110665"
+        "417110665",
+        "40416351"
       ],
       "movements": [
         {
           "incoming": "6393379:21:f",
           "outgoing": [
+            "40416351:0:f",
             "6393379:22:f",
             "6393379:21:r"
           ]
@@ -502,6 +509,7 @@
         {
           "incoming": "6393379:22:r",
           "outgoing": [
+            "40416351:0:f",
             "6393379:21:r",
             "6393379:22:f"
           ]
@@ -510,7 +518,8 @@
           "incoming": "417110665:1:f",
           "outgoing": [
             "6393379:21:r",
-            "6393379:22:f"
+            "6393379:22:f",
+            "40416351:0:f"
           ]
         }
       ],
@@ -520,7 +529,7 @@
     },
     {
       "id": "osm-node-53026855",
-      "logicalId": "osm-node-392976517",
+      "logicalId": "osm-node-392976504",
       "nodeId": "53026855",
       "position": [
         -121.9885127,
@@ -558,7 +567,7 @@
     },
     {
       "id": "osm-node-53026863",
-      "logicalId": "osm-node-53026863",
+      "logicalId": "osm-node-392976494",
       "nodeId": "53026863",
       "position": [
         -121.9827278,
@@ -570,18 +579,26 @@
         "ns03"
       ],
       "incomingEdgeIds": [
-        "417101729:2:f"
+        "417101729:2:f",
+        "417107547:0:f"
       ],
       "outgoingEdgeIds": [
         "417107565:0:f"
       ],
       "sourceWayIds": [
         "417101729",
+        "417107547",
         "417107565"
       ],
       "movements": [
         {
           "incoming": "417101729:2:f",
+          "outgoing": [
+            "417107565:0:f"
+          ]
+        },
+        {
+          "incoming": "417107547:0:f",
           "outgoing": [
             "417107565:0:f"
           ]
@@ -769,7 +786,7 @@
     },
     {
       "id": "osm-node-53026943",
-      "logicalId": "osm-node-53026943",
+      "logicalId": "osm-node-350598939",
       "nodeId": "53026943",
       "position": [
         -121.9511089,
@@ -781,18 +798,26 @@
         "ns03"
       ],
       "incomingEdgeIds": [
-        "394209912:2:f"
+        "394209912:2:f",
+        "417106748:0:f"
       ],
       "outgoingEdgeIds": [
         "51710422:0:f"
       ],
       "sourceWayIds": [
         "394209912",
+        "417106748",
         "51710422"
       ],
       "movements": [
         {
           "incoming": "394209912:2:f",
+          "outgoing": [
+            "51710422:0:f"
+          ]
+        },
+        {
+          "incoming": "417106748:0:f",
           "outgoing": [
             "51710422:0:f"
           ]
@@ -1530,18 +1555,21 @@
         "417713895:0:r"
       ],
       "outgoingEdgeIds": [
+        "32357163:0:f",
         "155161554:7:r",
         "417713895:0:f"
       ],
       "sourceWayIds": [
         "155161554",
         "417220887",
-        "417713895"
+        "417713895",
+        "32357163"
       ],
       "movements": [
         {
           "incoming": "155161554:7:f",
           "outgoing": [
+            "32357163:0:f",
             "417713895:0:f",
             "155161554:7:r"
           ]
@@ -1550,14 +1578,51 @@
           "incoming": "417220887:1:f",
           "outgoing": [
             "417713895:0:f",
-            "155161554:7:r"
+            "155161554:7:r",
+            "32357163:0:f"
           ]
         },
         {
           "incoming": "417713895:0:r",
           "outgoing": [
+            "32357163:0:f",
             "155161554:7:r",
             "417713895:0:f"
+          ]
+        }
+      ],
+      "restrictionIds": [],
+      "status": "Source-node connectivity and supported movements validated; absent/conditional traffic restrictions and signals are unverified.",
+      "connectionType": "shared-node junction"
+    },
+    {
+      "id": "osm-node-53084986",
+      "logicalId": "osm-node-53084986",
+      "nodeId": "53084986",
+      "position": [
+        -121.9951395,
+        37.5610707
+      ],
+      "inZone1Study": false,
+      "entryIds": [
+        "ew06",
+        "ns04"
+      ],
+      "incomingEdgeIds": [
+        "417109177:1:f"
+      ],
+      "outgoingEdgeIds": [
+        "417101890:0:f"
+      ],
+      "sourceWayIds": [
+        "417109177",
+        "417101890"
+      ],
+      "movements": [
+        {
+          "incoming": "417109177:1:f",
+          "outgoing": [
+            "417101890:0:f"
           ]
         }
       ],
@@ -1681,7 +1746,7 @@
     },
     {
       "id": "osm-node-53095708",
-      "logicalId": "osm-node-53095708",
+      "logicalId": "osm-node-1710267885",
       "nodeId": "53095708",
       "position": [
         -121.9342207,
@@ -1693,18 +1758,26 @@
         "ns04"
       ],
       "incomingEdgeIds": [
-        "417106224:1:f"
+        "417106224:1:f",
+        "158905177:0:f"
       ],
       "outgoingEdgeIds": [
         "1032906093:0:f"
       ],
       "sourceWayIds": [
         "417106224",
+        "158905177",
         "1032906093"
       ],
       "movements": [
         {
           "incoming": "417106224:1:f",
+          "outgoing": [
+            "1032906093:0:f"
+          ]
+        },
+        {
+          "incoming": "158905177:0:f",
           "outgoing": [
             "1032906093:0:f"
           ]
@@ -1897,16 +1970,24 @@
         "ns04"
       ],
       "incomingEdgeIds": [
+        "242796007:0:f",
         "1378443044:3:f"
       ],
       "outgoingEdgeIds": [
         "1378443045:0:f"
       ],
       "sourceWayIds": [
+        "242796007",
         "1378443044",
         "1378443045"
       ],
       "movements": [
+        {
+          "incoming": "242796007:0:f",
+          "outgoing": [
+            "1378443045:0:f"
+          ]
+        },
         {
           "incoming": "1378443044:3:f",
           "outgoing": [
@@ -2097,7 +2178,7 @@
     },
     {
       "id": "osm-node-53104758",
-      "logicalId": "osm-node-53104758",
+      "logicalId": "osm-node-1666841950",
       "nodeId": "53104758",
       "position": [
         -121.9572074,
@@ -2109,18 +2190,26 @@
         "ns06"
       ],
       "incomingEdgeIds": [
-        "238530869:2:f"
+        "238530869:2:f",
+        "417706246:0:f"
       ],
       "outgoingEdgeIds": [
         "417706250:0:f"
       ],
       "sourceWayIds": [
         "238530869",
+        "417706246",
         "417706250"
       ],
       "movements": [
         {
           "incoming": "238530869:2:f",
+          "outgoing": [
+            "417706250:0:f"
+          ]
+        },
+        {
+          "incoming": "417706246:0:f",
           "outgoing": [
             "417706250:0:f"
           ]
@@ -2968,13 +3057,15 @@
         "ew10"
       ],
       "incomingEdgeIds": [
-        "417099880:2:f"
+        "417099880:2:f",
+        "516305102:0:f"
       ],
       "outgoingEdgeIds": [
         "417099835:0:f"
       ],
       "sourceWayIds": [
         "417099880",
+        "516305102",
         "417099835"
       ],
       "movements": [
@@ -2982,6 +3073,47 @@
           "incoming": "417099880:2:f",
           "outgoing": [
             "417099835:0:f"
+          ]
+        },
+        {
+          "incoming": "516305102:0:f",
+          "outgoing": [
+            "417099835:0:f"
+          ]
+        }
+      ],
+      "restrictionIds": [],
+      "status": "Source-node connectivity and supported movements validated; absent/conditional traffic restrictions and signals are unverified.",
+      "connectionType": "shared-node junction"
+    },
+    {
+      "id": "osm-node-350564271",
+      "logicalId": "osm-node-350564271",
+      "nodeId": "350564271",
+      "position": [
+        -121.9426312,
+        37.5139045
+      ],
+      "inZone1Study": false,
+      "entryIds": [
+        "ew17",
+        "ns09"
+      ],
+      "incomingEdgeIds": [
+        "393471348:1:f"
+      ],
+      "outgoingEdgeIds": [
+        "417234375:0:f"
+      ],
+      "sourceWayIds": [
+        "393471348",
+        "417234375"
+      ],
+      "movements": [
+        {
+          "incoming": "393471348:1:f",
+          "outgoing": [
+            "417234375:0:f"
           ]
         }
       ],
@@ -3052,17 +3184,20 @@
         "417105967:1:f"
       ],
       "outgoingEdgeIds": [
-        "394209914:0:f"
+        "394209914:0:f",
+        "417106748:0:f"
       ],
       "sourceWayIds": [
         "417105967",
-        "394209914"
+        "394209914",
+        "417106748"
       ],
       "movements": [
         {
           "incoming": "417105967:1:f",
           "outgoing": [
-            "394209914:0:f"
+            "394209914:0:f",
+            "417106748:0:f"
           ]
         }
       ],
@@ -3088,24 +3223,28 @@
         "1078825994:0:f"
       ],
       "outgoingEdgeIds": [
-        "393482931:0:f"
+        "393482931:0:f",
+        "393483700:0:f"
       ],
       "sourceWayIds": [
         "393482921",
         "1078825994",
-        "393482931"
+        "393482931",
+        "393483700"
       ],
       "movements": [
         {
           "incoming": "393482921:3:f",
           "outgoing": [
+            "393483700:0:f",
             "393482931:0:f"
           ]
         },
         {
           "incoming": "1078825994:0:f",
           "outgoing": [
-            "393482931:0:f"
+            "393482931:0:f",
+            "393483700:0:f"
           ]
         }
       ],
@@ -3235,17 +3374,63 @@
         "618458894:2:f"
       ],
       "outgoingEdgeIds": [
+        "417107547:0:f",
         "656736634:0:f"
       ],
       "sourceWayIds": [
         "618458894",
+        "417107547",
         "656736634"
       ],
       "movements": [
         {
           "incoming": "618458894:2:f",
           "outgoing": [
-            "656736634:0:f"
+            "656736634:0:f",
+            "417107547:0:f"
+          ]
+        }
+      ],
+      "restrictionIds": [],
+      "status": "Source-node connectivity and supported movements validated; absent/conditional traffic restrictions and signals are unverified.",
+      "connectionType": "shared-node junction"
+    },
+    {
+      "id": "osm-node-392976504",
+      "logicalId": "osm-node-392976504",
+      "nodeId": "392976504",
+      "position": [
+        -121.9882351,
+        37.548647
+      ],
+      "inZone1Study": false,
+      "entryIds": [
+        "ew10",
+        "ns03"
+      ],
+      "incomingEdgeIds": [
+        "319200186:0:f",
+        "1106133357:2:f"
+      ],
+      "outgoingEdgeIds": [
+        "1106133352:0:f"
+      ],
+      "sourceWayIds": [
+        "319200186",
+        "1106133357",
+        "1106133352"
+      ],
+      "movements": [
+        {
+          "incoming": "319200186:0:f",
+          "outgoing": [
+            "1106133352:0:f"
+          ]
+        },
+        {
+          "incoming": "1106133357:2:f",
+          "outgoing": [
+            "1106133352:0:f"
           ]
         }
       ],
@@ -3255,7 +3440,7 @@
     },
     {
       "id": "osm-node-392976517",
-      "logicalId": "osm-node-392976517",
+      "logicalId": "osm-node-392976504",
       "nodeId": "392976517",
       "position": [
         -121.9883463,
@@ -4317,7 +4502,7 @@
     },
     {
       "id": "osm-node-611603743",
-      "logicalId": "osm-node-611603743",
+      "logicalId": "osm-node-53101680",
       "nodeId": "611603743",
       "position": [
         -121.9778673,
@@ -4332,17 +4517,20 @@
         "618721943:3:f"
       ],
       "outgoingEdgeIds": [
+        "242796007:0:f",
         "618721942:0:f"
       ],
       "sourceWayIds": [
         "618721943",
+        "242796007",
         "618721942"
       ],
       "movements": [
         {
           "incoming": "618721943:3:f",
           "outgoing": [
-            "618721942:0:f"
+            "618721942:0:f",
+            "242796007:0:f"
           ]
         }
       ],
@@ -4554,18 +4742,21 @@
       ],
       "outgoingEdgeIds": [
         "48118888:0:f",
+        "158905177:0:f",
         "518245332:0:r"
       ],
       "sourceWayIds": [
         "417106236",
         "417106259",
         "518245332",
-        "48118888"
+        "48118888",
+        "158905177"
       ],
       "movements": [
         {
           "incoming": "417106236:2:f",
           "outgoing": [
+            "158905177:0:f",
             "518245332:0:r",
             "48118888:0:f"
           ]
@@ -4580,7 +4771,8 @@
         {
           "incoming": "518245332:0:f",
           "outgoing": [
-            "48118888:0:f"
+            "48118888:0:f",
+            "158905177:0:f"
           ]
         }
       ],
@@ -6058,24 +6250,28 @@
         "417111345:0:f"
       ],
       "outgoingEdgeIds": [
-        "392675468:0:f"
+        "392675468:0:f",
+        "670644488:0:f"
       ],
       "sourceWayIds": [
         "392677543",
         "417111345",
-        "392675468"
+        "392675468",
+        "670644488"
       ],
       "movements": [
         {
           "incoming": "392677543:0:f",
           "outgoing": [
+            "670644488:0:f",
             "392675468:0:f"
           ]
         },
         {
           "incoming": "417111345:0:f",
           "outgoing": [
-            "392675468:0:f"
+            "392675468:0:f",
+            "670644488:0:f"
           ]
         }
       ],
@@ -6302,24 +6498,28 @@
         "417245841:1:f"
       ],
       "outgoingEdgeIds": [
+        "618721956:0:f",
         "618721986:0:f"
       ],
       "sourceWayIds": [
         "417245824",
         "417245841",
+        "618721956",
         "618721986"
       ],
       "movements": [
         {
           "incoming": "417245824:0:f",
           "outgoing": [
+            "618721956:0:f",
             "618721986:0:f"
           ]
         },
         {
           "incoming": "417245841:1:f",
           "outgoing": [
-            "618721986:0:f"
+            "618721986:0:f",
+            "618721956:0:f"
           ]
         }
       ],
@@ -6737,6 +6937,7 @@
         "ns13"
       ],
       "incomingEdgeIds": [
+        "1073808084:0:f",
         "1181256373:0:r"
       ],
       "outgoingEdgeIds": [
@@ -6744,14 +6945,23 @@
         "1181256373:0:f"
       ],
       "sourceWayIds": [
+        "1073808084",
         "1181256373",
         "1073808083"
       ],
       "movements": [
         {
+          "incoming": "1073808084:0:f",
+          "outgoing": [
+            "1181256373:0:f",
+            "1073808083:0:f"
+          ]
+        },
+        {
           "incoming": "1181256373:0:r",
           "outgoing": [
-            "1073808083:0:f"
+            "1073808083:0:f",
+            "1181256373:0:f"
           ]
         }
       ],
@@ -6943,11 +7153,13 @@
         "417220909:1:f"
       ],
       "outgoingEdgeIds": [
+        "356864450:0:f",
         "417220848:0:f"
       ],
       "sourceWayIds": [
         "6361190",
         "417220909",
+        "356864450",
         "417220848"
       ],
       "movements": [
@@ -6960,6 +7172,7 @@
         {
           "incoming": "417220909:1:f",
           "outgoing": [
+            "356864450:0:f",
             "417220848:0:f"
           ]
         }
@@ -6985,17 +7198,63 @@
         "1378443035:3:f"
       ],
       "outgoingEdgeIds": [
+        "243743800:0:f",
         "1378443036:0:f"
       ],
       "sourceWayIds": [
         "1378443035",
+        "243743800",
         "1378443036"
       ],
       "movements": [
         {
           "incoming": "1378443035:3:f",
           "outgoing": [
-            "1378443036:0:f"
+            "1378443036:0:f",
+            "243743800:0:f"
+          ]
+        }
+      ],
+      "restrictionIds": [],
+      "status": "Source-node connectivity and supported movements validated; absent/conditional traffic restrictions and signals are unverified.",
+      "connectionType": "shared-node junction"
+    },
+    {
+      "id": "osm-node-1666819825",
+      "logicalId": "osm-node-1666819813",
+      "nodeId": "1666819825",
+      "position": [
+        -121.9615944,
+        37.5654552
+      ],
+      "inZone1Study": true,
+      "entryIds": [
+        "ew11",
+        "ns06"
+      ],
+      "incomingEdgeIds": [
+        "241729800:3:f",
+        "417220848:0:f"
+      ],
+      "outgoingEdgeIds": [
+        "1450175435:0:f"
+      ],
+      "sourceWayIds": [
+        "241729800",
+        "417220848",
+        "1450175435"
+      ],
+      "movements": [
+        {
+          "incoming": "241729800:3:f",
+          "outgoing": [
+            "1450175435:0:f"
+          ]
+        },
+        {
+          "incoming": "417220848:0:f",
+          "outgoing": [
+            "1450175435:0:f"
           ]
         }
       ],
@@ -7005,7 +7264,7 @@
     },
     {
       "id": "osm-node-1666819834",
-      "logicalId": "osm-node-1666819834",
+      "logicalId": "osm-node-1666819823",
       "nodeId": "1666819834",
       "position": [
         -121.9777476,
@@ -7017,16 +7276,24 @@
         "ns04"
       ],
       "incomingEdgeIds": [
+        "243743800:0:f",
         "618721946:4:f"
       ],
       "outgoingEdgeIds": [
         "618721947:0:f"
       ],
       "sourceWayIds": [
+        "243743800",
         "618721946",
         "618721947"
       ],
       "movements": [
+        {
+          "incoming": "243743800:0:f",
+          "outgoing": [
+            "618721947:0:f"
+          ]
+        },
         {
           "incoming": "618721946:4:f",
           "outgoing": [
@@ -7052,16 +7319,24 @@
         "ns03"
       ],
       "incomingEdgeIds": [
+        "417101891:0:f",
         "618722018:2:f"
       ],
       "outgoingEdgeIds": [
         "618722017:0:f"
       ],
       "sourceWayIds": [
+        "417101891",
         "618722018",
         "618722017"
       ],
       "movements": [
+        {
+          "incoming": "417101891:0:f",
+          "outgoing": [
+            "618722017:0:f"
+          ]
+        },
         {
           "incoming": "618722018:2:f",
           "outgoing": [
@@ -7075,7 +7350,7 @@
     },
     {
       "id": "osm-node-1666819847",
-      "logicalId": "osm-node-1666819847",
+      "logicalId": "osm-node-1666819839",
       "nodeId": "1666819847",
       "position": [
         -121.9826207,
@@ -7090,17 +7365,20 @@
         "417107560:3:f"
       ],
       "outgoingEdgeIds": [
-        "244121513:0:f"
+        "244121513:0:f",
+        "417101891:0:f"
       ],
       "sourceWayIds": [
         "417107560",
-        "244121513"
+        "244121513",
+        "417101891"
       ],
       "movements": [
         {
           "incoming": "417107560:3:f",
           "outgoing": [
-            "244121513:0:f"
+            "244121513:0:f",
+            "417101891:0:f"
           ]
         }
       ],
@@ -7328,12 +7606,14 @@
         "417224787:1:f"
       ],
       "outgoingEdgeIds": [
-        "417616842:0:f"
+        "417616842:0:f",
+        "417706246:0:f"
       ],
       "sourceWayIds": [
         "154087274",
         "417224787",
-        "417616842"
+        "417616842",
+        "417706246"
       ],
       "movements": [
         {
@@ -7345,7 +7625,8 @@
         {
           "incoming": "417224787:1:f",
           "outgoing": [
-            "417616842:0:f"
+            "417616842:0:f",
+            "417706246:0:f"
           ]
         }
       ],
@@ -7427,6 +7708,41 @@
           "incoming": "39158023:1:f",
           "outgoing": [
             "732311662:0:f"
+          ]
+        }
+      ],
+      "restrictionIds": [],
+      "status": "Source-node connectivity and supported movements validated; absent/conditional traffic restrictions and signals are unverified.",
+      "connectionType": "shared-node junction"
+    },
+    {
+      "id": "osm-node-1667686705",
+      "logicalId": "osm-node-1667686705",
+      "nodeId": "1667686705",
+      "position": [
+        -121.9950626,
+        37.5612151
+      ],
+      "inZone1Study": false,
+      "entryIds": [
+        "ew06",
+        "ns04"
+      ],
+      "incomingEdgeIds": [
+        "417109211:2:f"
+      ],
+      "outgoingEdgeIds": [
+        "732311659:0:f"
+      ],
+      "sourceWayIds": [
+        "417109211",
+        "732311659"
+      ],
+      "movements": [
+        {
+          "incoming": "417109211:2:f",
+          "outgoing": [
+            "732311659:0:f"
           ]
         }
       ],
@@ -7610,12 +7926,14 @@
         "1125060213:0:r"
       ],
       "outgoingEdgeIds": [
+        "417220976:0:f",
         "6361190:0:f",
         "1125060213:0:f"
       ],
       "sourceWayIds": [
         "516303451",
         "1125060213",
+        "417220976",
         "6361190"
       ],
       "movements": [
@@ -7623,13 +7941,14 @@
           "incoming": "516303451:1:f",
           "outgoing": [
             "6361190:0:f",
-            "1125060213:0:f"
+            "1125060213:0:f",
+            "417220976:0:f"
           ]
         },
         {
           "incoming": "1125060213:0:r",
           "outgoing": [
-            "6361190:0:f",
+            "417220976:0:f",
             "1125060213:0:f"
           ]
         }
@@ -7658,24 +7977,28 @@
         "1477883223:0:f"
       ],
       "outgoingEdgeIds": [
-        "160251184:0:f"
+        "160251184:0:f",
+        "516305102:0:f"
       ],
       "sourceWayIds": [
         "417099869",
         "1477883223",
-        "160251184"
+        "160251184",
+        "516305102"
       ],
       "movements": [
         {
           "incoming": "417099869:0:f",
           "outgoing": [
+            "516305102:0:f",
             "160251184:0:f"
           ]
         },
         {
           "incoming": "1477883223:0:f",
           "outgoing": [
-            "160251184:0:f"
+            "160251184:0:f",
+            "516305102:0:f"
           ]
         }
       ],
@@ -7851,17 +8174,20 @@
         "417100148:1:f"
       ],
       "outgoingEdgeIds": [
-        "155182160:0:f"
+        "155182160:0:f",
+        "417100164:0:f"
       ],
       "sourceWayIds": [
         "417100148",
-        "155182160"
+        "155182160",
+        "417100164"
       ],
       "movements": [
         {
           "incoming": "417100148:1:f",
           "outgoing": [
-            "155182160:0:f"
+            "155182160:0:f",
+            "417100164:0:f"
           ]
         }
       ],
@@ -8093,7 +8419,7 @@
     },
     {
       "id": "osm-node-1710267738",
-      "logicalId": "osm-node-1710267738",
+      "logicalId": "osm-node-1676005285",
       "nodeId": "1710267738",
       "position": [
         -121.9534873,
@@ -8105,18 +8431,26 @@
         "ew15"
       ],
       "incomingEdgeIds": [
-        "417099202:5:f"
+        "417099202:5:f",
+        "417100164:0:f"
       ],
       "outgoingEdgeIds": [
         "1365118940:0:f"
       ],
       "sourceWayIds": [
         "417099202",
+        "417100164",
         "1365118940"
       ],
       "movements": [
         {
           "incoming": "417099202:5:f",
+          "outgoing": [
+            "1365118940:0:f"
+          ]
+        },
+        {
+          "incoming": "417100164:0:f",
           "outgoing": [
             "1365118940:0:f"
           ]
@@ -8143,17 +8477,20 @@
         "685298153:1:f"
       ],
       "outgoingEdgeIds": [
+        "417694105:0:f",
         "1181272790:0:f"
       ],
       "sourceWayIds": [
         "685298153",
+        "417694105",
         "1181272790"
       ],
       "movements": [
         {
           "incoming": "685298153:1:f",
           "outgoing": [
-            "1181272790:0:f"
+            "1181272790:0:f",
+            "417694105:0:f"
           ]
         }
       ],
@@ -8163,7 +8500,7 @@
     },
     {
       "id": "osm-node-1710267880",
-      "logicalId": "osm-node-1710267880",
+      "logicalId": "osm-node-1710267766",
       "nodeId": "1710267880",
       "position": [
         -121.9532808,
@@ -8175,18 +8512,26 @@
         "ns09"
       ],
       "incomingEdgeIds": [
-        "417099206:1:f"
+        "417099206:1:f",
+        "417694105:0:f"
       ],
       "outgoingEdgeIds": [
         "417694101:0:f"
       ],
       "sourceWayIds": [
         "417099206",
+        "417694105",
         "417694101"
       ],
       "movements": [
         {
           "incoming": "417099206:1:f",
+          "outgoing": [
+            "417694101:0:f"
+          ]
+        },
+        {
+          "incoming": "417694105:0:f",
           "outgoing": [
             "417694101:0:f"
           ]
@@ -8810,24 +9155,28 @@
         "1423410189:2:f"
       ],
       "outgoingEdgeIds": [
+        "516542934:0:f",
         "1423410187:0:f"
       ],
       "sourceWayIds": [
         "1042631282",
         "1423410189",
+        "516542934",
         "1423410187"
       ],
       "movements": [
         {
           "incoming": "1042631282:0:f",
           "outgoing": [
+            "516542934:0:f",
             "1423410187:0:f"
           ]
         },
         {
           "incoming": "1423410189:2:f",
           "outgoing": [
-            "1423410187:0:f"
+            "1423410187:0:f",
+            "516542934:0:f"
           ]
         }
       ],
@@ -8837,7 +9186,7 @@
     },
     {
       "id": "osm-node-2502491384",
-      "logicalId": "osm-node-2502491384",
+      "logicalId": "osm-node-2502491382",
       "nodeId": "2502491384",
       "position": [
         -121.9653832,
@@ -8849,16 +9198,24 @@
         "ns08"
       ],
       "incomingEdgeIds": [
+        "516542934:0:f",
         "1423410185:1:f"
       ],
       "outgoingEdgeIds": [
         "1423410190:0:f"
       ],
       "sourceWayIds": [
+        "516542934",
         "1423410185",
         "1423410190"
       ],
       "movements": [
+        {
+          "incoming": "516542934:0:f",
+          "outgoing": [
+            "1423410190:0:f"
+          ]
+        },
         {
           "incoming": "1423410185:1:f",
           "outgoing": [
@@ -9236,18 +9593,26 @@
         "ns13"
       ],
       "incomingEdgeIds": [
-        "518268887:2:f"
+        "518268887:2:f",
+        "618721956:0:f"
       ],
       "outgoingEdgeIds": [
         "116913130:0:f"
       ],
       "sourceWayIds": [
         "518268887",
+        "618721956",
         "116913130"
       ],
       "movements": [
         {
           "incoming": "518268887:2:f",
+          "outgoing": [
+            "116913130:0:f"
+          ]
+        },
+        {
+          "incoming": "618721956:0:f",
           "outgoing": [
             "116913130:0:f"
           ]
@@ -9318,18 +9683,26 @@
         "ns12"
       ],
       "incomingEdgeIds": [
-        "116902497:4:f"
+        "116902497:4:f",
+        "590568542:0:f"
       ],
       "outgoingEdgeIds": [
         "590568541:0:f"
       ],
       "sourceWayIds": [
         "116902497",
+        "590568542",
         "590568541"
       ],
       "movements": [
         {
           "incoming": "116902497:4:f",
+          "outgoing": [
+            "590568541:0:f"
+          ]
+        },
+        {
+          "incoming": "590568542:0:f",
           "outgoing": [
             "590568541:0:f"
           ]
@@ -9343,7 +9716,7 @@
     },
     {
       "id": "osm-node-3872585884",
-      "logicalId": "osm-node-3872585884",
+      "logicalId": "osm-node-3872585879",
       "nodeId": "3872585884",
       "position": [
         -121.9487592,
@@ -9359,24 +9732,28 @@
         "383956183:2:f"
       ],
       "outgoingEdgeIds": [
+        "590568542:0:f",
         "618721993:0:f"
       ],
       "sourceWayIds": [
         "116902501",
         "383956183",
+        "590568542",
         "618721993"
       ],
       "movements": [
         {
           "incoming": "116902501:4:f",
           "outgoing": [
+            "590568542:0:f",
             "618721993:0:f"
           ]
         },
         {
           "incoming": "383956183:2:f",
           "outgoing": [
-            "618721993:0:f"
+            "618721993:0:f",
+            "590568542:0:f"
           ]
         }
       ],
@@ -9738,17 +10115,20 @@
         "1418187540:1:f"
       ],
       "outgoingEdgeIds": [
-        "394209919:0:f"
+        "394209919:0:f",
+        "1068212123:0:f"
       ],
       "sourceWayIds": [
         "1418187540",
-        "394209919"
+        "394209919",
+        "1068212123"
       ],
       "movements": [
         {
           "incoming": "1418187540:1:f",
           "outgoing": [
-            "394209919:0:f"
+            "394209919:0:f",
+            "1068212123:0:f"
           ]
         }
       ],
@@ -9758,7 +10138,7 @@
     },
     {
       "id": "osm-node-4184056312",
-      "logicalId": "osm-node-4184056312",
+      "logicalId": "osm-node-4184056311",
       "nodeId": "4184056312",
       "position": [
         -121.9510368,
@@ -9770,18 +10150,26 @@
         "ns03"
       ],
       "incomingEdgeIds": [
-        "394209920:1:f"
+        "394209920:1:f",
+        "1068212123:0:f"
       ],
       "outgoingEdgeIds": [
         "417934596:0:f"
       ],
       "sourceWayIds": [
         "394209920",
+        "1068212123",
         "417934596"
       ],
       "movements": [
         {
           "incoming": "394209920:1:f",
+          "outgoing": [
+            "417934596:0:f"
+          ]
+        },
+        {
+          "incoming": "1068212123:0:f",
           "outgoing": [
             "417934596:0:f"
           ]
@@ -10011,6 +10399,41 @@
       "connectionType": "shared-node junction"
     },
     {
+      "id": "osm-node-6977471286",
+      "logicalId": "osm-node-6977471286",
+      "nodeId": "6977471286",
+      "position": [
+        -121.9427175,
+        37.5137418
+      ],
+      "inZone1Study": false,
+      "entryIds": [
+        "ew17",
+        "ns09"
+      ],
+      "incomingEdgeIds": [
+        "393471346:0:f"
+      ],
+      "outgoingEdgeIds": [
+        "745395104:0:f"
+      ],
+      "sourceWayIds": [
+        "393471346",
+        "745395104"
+      ],
+      "movements": [
+        {
+          "incoming": "393471346:0:f",
+          "outgoing": [
+            "745395104:0:f"
+          ]
+        }
+      ],
+      "restrictionIds": [],
+      "status": "Source-node connectivity and supported movements validated; absent/conditional traffic restrictions and signals are unverified.",
+      "connectionType": "shared-node junction"
+    },
+    {
       "id": "osm-node-9292869328",
       "logicalId": "osm-node-9292869328",
       "nodeId": "9292869328",
@@ -10028,16 +10451,19 @@
         "1007293437:0:f"
       ],
       "outgoingEdgeIds": [
-        "700277966:3:r"
+        "700277966:3:r",
+        "1007293434:0:f"
       ],
       "sourceWayIds": [
         "700277966",
-        "1007293437"
+        "1007293437",
+        "1007293434"
       ],
       "movements": [
         {
           "incoming": "700277966:3:f",
           "outgoing": [
+            "1007293434:0:f",
             "700277966:3:r"
           ]
         },
@@ -10056,7 +10482,7 @@
     },
     {
       "id": "osm-node-4882628579",
-      "logicalId": "osm-node-3872585884",
+      "logicalId": "osm-node-3872585879",
       "nodeId": "4882628579",
       "position": [
         -121.9484493,

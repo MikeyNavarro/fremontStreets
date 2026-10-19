@@ -47,6 +47,7 @@ export class DrivingShell {
     });
     viewport.id='driving-viewport';viewport.tabIndex=-1;
     viewport.append(toolbar,drivebar,follow,status,controls);
+    toolbar.insertAdjacentHTML('beforeend','<details class="map-key" data-testid="map-key"><summary>Map key</summary><div><span><i class="key-study"></i>Blue / gold: study roads</span><span><i class="key-route"></i>Mint: suggested route</span><span><i class="key-road"></i>Other solid roads: also drivable</span><span><i class="key-unavailable"></i>Amber dashed: unavailable in this game</span><small>Colors do not create road connections. Turn restrictions and one-way travel still apply.</small></div></details>');
     toolbar.querySelector('.live-status')?.classList.add('intersection-caption');
     const street=viewport.querySelector('.street-card')!;street.insertAdjacentHTML('afterbegin',`<span class="hud-location-icon">${icon('pin')}</span>`);street.insertAdjacentHTML('beforeend','<span id="hud-destination" class="hud-destination">Free drive · make yourself familiar</span>');
     viewport.querySelector('.speedometer')!.insertAdjacentHTML('afterbegin','<span class="speed-arc" aria-hidden="true"></span>');viewport.querySelector('.speedometer')!.insertAdjacentHTML('beforeend','<small id="hud-profile">QUICK</small>');

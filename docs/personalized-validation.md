@@ -44,17 +44,18 @@ those same reports by `scripts/render-study-reports.py`.
 - All 38 targets have supported directed headquarters and return routes at
   sampled playable locations. All 1,406 ordered non-self representative pairs
   have routes. Both directions were evaluated separately.
-- There are 213 source-node study junctions and 68 visual crossings without a
+- There are 219 source-node study junctions and 68 visual crossings without a
   common source node. Crossings never create routing edges.
-- The 257 stratified directed approach samples include **24 inaccessible
+- The 256 stratified directed approach samples include **11 inaccessible
   approaches**. Exact IDs and reachability are recorded in the audit; these
   are available-graph gaps, not proof of physical road disconnection.
 - All 22 City ART/PWY/MAJ corridor names intersecting the historical Zone 1
   study/border area have matching source geometry. This does not verify
   legislative road designations or every segment's completeness.
 - Source OSM one-way and supported node-via rules are enforced. The existing
-  conservative policy excludes approaches/via ways affected by **232
-  unsupported restrictions**. Missing rules and traffic controls remain
+  conservative policy blocks unsupported prohibited via ways while retaining their through-road
+  approaches. Only-turn, conditional and incomplete approaches remain blocked;
+  **232 unsupported source records** remain. Missing rules and traffic controls remain
   uncertain, so every successful matrix cell is labeled accordingly.
 - Replaying the cached personal-corridor import was executed and made no
   changes to the dataset or its original provenance report.
@@ -138,7 +139,7 @@ that a particular revision was deployed.
 
 ## Highest-priority remaining work
 
-Investigate the 24 inaccessible sampled approaches and implement fully tested
+Investigate the 11 inaccessible sampled approaches and implement fully tested
 history-dependent/conditional restrictions before expanding legal-movement
 claims. Verify current patrol-boundary adoption and current on-street rules.
 Extend verified end-to-end corridor coverage without replacing existing source

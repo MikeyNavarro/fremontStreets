@@ -5,46 +5,46 @@ Exactly 21 east–west and 17 north–south user entries. Category names are stu
 | Original entry | Mapped names | City classes | Status | HQ / return | Sampled approaches |
 |---|---|---|---|---|---|
 | Lake Arrowhead | Lake Arrowhead Avenue | COL, RES | ready | yes / yes | 7/7 |
-| Decoto Road / Highway 84 | Decoto Road | ART, MAJ, RES | ready | yes / yes | 6/7 |
+| Decoto Road / Highway 84 | Decoto Road | ART, MAJ, RES | ready | yes / yes | 7/7 |
 | Nicolet Avenue | Nicolet Avenue | COL | ready | yes / yes | 6/6 |
 | Alder Avenue | Alder Avenue | COL | ready | yes / yes | 7/7 |
-| Thornton Avenue | Thornton Avenue | ART, MAJ, RES | ready | yes / yes | 6/7 |
+| Thornton Avenue | Thornton Avenue | ART, MAJ, RES | ready | yes / yes | 7/7 |
 | Peralta Boulevard | Peralta Boulevard | ART, RES | ready | yes / yes | 6/7 |
-| Central Avenue | Central Avenue | ART, MAJ, RES | ready | yes / yes | 6/7 |
+| Central Avenue | Central Avenue | ART, MAJ, RES | ready | yes / yes | 7/7 |
 | Eggers Drive | Eggers Drive | COL | ready | yes / yes | 6/6 |
 | Niles Canyon | Niles Canyon Road | ART | ready | yes / yes | 7/7 |
-| Mowry Avenue | Mowry Avenue | ART, MAJ, RES | ready | yes / yes | 6/7 |
-| Walnut Avenue | Walnut Avenue | ART | ready | yes / yes | 5/7 |
+| Mowry Avenue | Mowry Avenue | ART, MAJ, RES | ready | yes / yes | 7/7 |
+| Walnut Avenue | Walnut Avenue | ART | ready | yes / yes | 7/7 |
 | Sundale Drive | Sundale Drive | COL | ready | yes / yes | 6/6 |
 | Stevenson Boulevard | Stevenson Boulevard | ART, RES | ready | yes / yes | 7/7 |
 | Driscoll Road | Driscoll Road | ART | ready | yes / yes | 7/7 |
 | Washington Boulevard | Washington Boulevard | ART | ready | yes / yes | 7/7 |
 | Delaware Drive | Delaware Drive | COL, RES | ready | yes / yes | 7/7 |
-| Auto Mall Parkway / Durham Road | Auto Mall Parkway, Durham Road | ART | ready | yes / yes | 6/7 |
-| Brown Road | Brown Road | COL, RES | ready | yes / yes | 7/7 |
+| Auto Mall Parkway / Durham Road | Auto Mall Parkway, Durham Road | ART | ready | yes / yes | 7/7 |
+| Brown Road | Brown Road | COL, RES | ready | yes / yes | 6/6 |
 | Warren Avenue | West Warren Avenue, East Warren Avenue | ART, PWY, RES | ready | yes / yes | 6/6 |
-| Gable Drive | Gable Drive | COL | ready | yes / yes | 6/7 |
+| Gable Drive | Gable Drive | COL | ready | yes / yes | 6/6 |
 | Scott Creek Road | Scott Creek Road | ART, COL | ready | yes / yes | 6/6 |
 | Interstate 880 (I-880) | Nimitz Freeway | FWY | ready | yes / yes | 4/7 |
 | Interstate 680 (I-680) | Sinclair Freeway | FWY | ready | yes / yes | 1/7 |
 | Fremont Boulevard | Fremont Boulevard | ART, RES | ready | yes / yes | 7/7 |
-| Paseo Padre Parkway | Paseo Padre Parkway | PWY | ready | yes / yes | 6/7 |
-| Blacow Road | Blacow Road | ART, RES | ready | yes / yes | 6/7 |
-| Mission Boulevard | Mission Boulevard | ART, FWY, MAJ, RES | ready | yes / yes | 5/7 |
+| Paseo Padre Parkway | Paseo Padre Parkway | PWY | ready | yes / yes | 7/7 |
+| Blacow Road | Blacow Road | ART, RES | ready | yes / yes | 7/7 |
+| Mission Boulevard | Mission Boulevard | ART, FWY, MAJ, RES | ready | yes / yes | 6/7 |
 | Niles Boulevard | Niles Boulevard | ART, RES | ready | yes / yes | 6/6 |
 | Grimmer Boulevard | Grimmer Boulevard, South Grimmer Boulevard | ART, RES | ready | yes / yes | 6/6 |
-| Osgood Road | Osgood Road | ART | ready | yes / yes | 5/7 |
+| Osgood Road | Osgood Road | ART | ready | yes / yes | 7/7 |
 | Albrae Street | Albrae Street | COL, RES | ready | yes / yes | 7/7 |
 | Pacific Commons Boulevard | Pacific Commons Boulevard | COL | ready | yes / yes | 7/7 |
 | Cushing Parkway | Cushing Parkway | ART | ready | yes / yes | 6/6 |
 | Warm Springs Boulevard | Warm Springs Boulevard | ART | ready | yes / yes | 7/7 |
-| Kato Road | Kato Road | ART, COL, RES | ready | yes / yes | 6/6 |
+| Kato Road | Kato Road | ART, COL, RES | ready | yes / yes | 7/7 |
 | Logan Drive | Logan Drive | COL | ready | yes / yes | 7/7 |
 | Cabrillo Drive | Cabrillo Drive | COL, RES | ready | yes / yes | 7/7 |
 | Farwell Drive | Farwell Drive | COL | ready | yes / yes | 7/7 |
 
 - All route results validate the imported directed graph and supported turn rules, not every real-world traffic movement.
-- Unsupported conditional/via-way approaches are excluded conservatively; missing traffic rules remain unverified.
+- Unsupported prohibited via-way connectors remain excluded while their approach roads are retained; only-turn, conditional and incomplete approaches remain excluded. Missing traffic rules remain unverified.
 - Lake Arrowhead Avenue and the combined Grimmer/South Grimmer study entry follow explicit user confirmation; original labels remain unchanged.
 - Bounded road imports preserve earlier objects; they do not establish complete end-to-end road or full-city coverage.
 - Historical patrol polygons are approximate study boundaries; current adoption unverified.

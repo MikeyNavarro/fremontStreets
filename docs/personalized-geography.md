@@ -24,7 +24,7 @@ never become additional curriculum entries.
   target corridors and an approximately 300 m buffer. Their combined envelope
   is `[-122.078625,37.444,-121.88175,37.624]`, **not a claim of complete envelope
   coverage**. Whole source ways can extend beyond individual request boxes.
-- Merged roads: 22,794 ways, 84,825 nodes, 165,730 playable directed edges.
+- Merged roads: 22,794 ways, 84,825 nodes, 166,282 playable directed edges.
   The merge recorded zero conflicting node coordinates and zero changed
   existing ways. Existing Zone 2 and Zone 3 geography remains intact.
 
@@ -109,8 +109,9 @@ verification. Exact current sample counts and failures are in
 
 All reachable routes are labeled **reachable with uncertain restrictions**.
 Supported one-way/node-via rules are enforced. The current parser conservatively
-excludes approaches/via ways affected by 232 unsupported conditional or
-history-dependent restrictions. Through-training routes also avoid source
+excludes prohibited via ways affected by unsupported rules, retaining their
+through-road approaches. Only-turn, conditional and incomplete rules still
+exclude uncertain approaches. There are 232 unsupported source records. Through-training routes also avoid source
 destination/customer/delivery/permit/emergency-only access and prefer target
 and through roads over residential/service shortcuts. Unlisted roads remain
 in the physical graph; real alternate routes can count toward arrival.

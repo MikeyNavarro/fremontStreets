@@ -23,14 +23,29 @@ function drivingAllowed(way: RoadWay): boolean {
   return true;
 }
 
+/** Blocking a via way prevents an unsupported prohibited movement without
+ * deleting its approach road. Only/conditional/incomplete rules still require
+ * the conservative approach exclusion. Never enable an unparsed movement. */
+export function excludedRestrictionWays(data: RoadData): Set<string> {
+  const rules = [...(data.restrictions ?? []).filter(rule => rule.viaNode === undefined), ...(data.unsupportedRestrictions ?? [])];
+  const excluded = new Set<string>();
+  for (const rule of rules) {
+    for (const way of rule.viaWays ?? []) excluded.add(String(way));
+    const prohibitedVia = rule.viaNode === undefined && Boolean(rule.viaWays?.length)
+      && rule.fromWay !== undefined && rule.toWay !== undefined
+      && /^no_(?:u_turn|left_turn|right_turn|straight_on|entry|exit)$/.test(rule.restriction ?? '')
+      && ['restriction:motorcar', 'restriction:motor_vehicle', 'restriction:vehicle'].every(key => !rule.tags?.[key] || rule.tags[key].startsWith('no_'))
+      && !Object.keys(rule.tags ?? {}).some(key => key.includes('conditional'));
+    if (!prohibitedVia && rule.fromWay !== undefined) excluded.add(String(rule.fromWay));
+  }
+  return excluded;
+}
+
 /** Edges connect only consecutive nodes of original OSM ways. A geometric
  * crossing without a shared node remains disconnected, including bridges. */
 export function buildGraph(data: RoadData): RoadGraph {
   const graph: RoadGraph = { nodes: new Map(), edges: new Map(), outgoing: new Map(), incoming: new Map(), restrictions: data.restrictions ?? [], warnings: [], metadata: data.metadata ?? {} };
-  // A via-way restriction needs history spanning several edges. Until that
-  // parser is supported, omit its affected via-way geometry conservatively.
-  const unsupported = [...graph.restrictions.filter(rule => rule.viaNode === undefined), ...(data.unsupportedRestrictions ?? [])];
-  const unverifiedWays = new Set(unsupported.flatMap(rule => [...(rule.viaWays ?? []), ...(rule.fromWay !== undefined ? [rule.fromWay] : [])].map(String)));
+  const unverifiedWays = excludedRestrictionWays(data);
   for (const [id, position] of Object.entries(data.nodes)) {
     if (!Array.isArray(position) || position.length !== 2 || !position.every(Number.isFinite)) {
       graph.warnings.push(`Invalid node ${id} omitted.`);

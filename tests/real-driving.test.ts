@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildGraph, createVehicle, drivableOutgoing, isIntersection, isValidRoute, legalOutgoing,
+  buildGraph, createVehicle, drivableOutgoing, excludedRestrictionWays, isIntersection, isValidRoute, legalOutgoing,
   nearestNode, nextDecision, routeFromVehicle, selectNextEdge, stepVehicle,
 } from '../src/core/index';
 import type { RoadData, Route, Turn } from '../src/core/index';
@@ -47,7 +47,7 @@ test('actual node-via restrictions are honored and unsupported restriction ways 
     }
   }
   assert.ok(checked >= 5);
-  const omitted = new Set((data.unsupportedRestrictions ?? []).flatMap(rule => [...(rule.viaWays ?? []), ...(rule.fromWay === undefined ? [] : [rule.fromWay])].map(String)));
+  const omitted = excludedRestrictionWays(data);
   for (const edge of graph.edges.values()) assert.equal(omitted.has(edge.wayId), false);
   assert.ok(graph.warnings.length > 0);
 });

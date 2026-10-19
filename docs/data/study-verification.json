@@ -4,91 +4,27 @@
   "needsConfirmation": [],
   "unavailable": [],
   "sourceNodes": 84825,
-  "directedEdges": 165730,
-  "intersections": 213,
+  "directedEdges": 166282,
+  "intersections": 219,
   "unconnectedVisualCrossings": 68,
   "matrixPairs": 1406,
   "reachablePairs": 1406,
-  "approachSamples": 257,
+  "approachSamples": 256,
   "inaccessibleApproaches": [
-    {
-      "entry": "Decoto Road / Highway 84",
-      "edgeId": "1027350437:0:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 19321.558135877636
-    },
-    {
-      "entry": "Thornton Avenue",
-      "edgeId": "392681378:1:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 8740.568525761639
-    },
     {
       "entry": "Peralta Boulevard",
       "edgeId": "417099869:0:f",
       "fromHeadquarters": false,
       "toHeadquarters": true,
       "forwardMetres": null,
-      "returnMetres": 5956.4150029678785
-    },
-    {
-      "entry": "Central Avenue",
-      "edgeId": "1008634469:0:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 15453.996946384566
-    },
-    {
-      "entry": "Mowry Avenue",
-      "edgeId": "40461479:1:f",
-      "fromHeadquarters": true,
-      "toHeadquarters": false,
-      "forwardMetres": 7002.94577963879,
-      "returnMetres": null
-    },
-    {
-      "entry": "Walnut Avenue",
-      "edgeId": "417107573:1:f",
-      "fromHeadquarters": true,
-      "toHeadquarters": false,
-      "forwardMetres": 1203.1138887269133,
-      "returnMetres": null
-    },
-    {
-      "entry": "Walnut Avenue",
-      "edgeId": "417095256:4:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 2947.150573638306
-    },
-    {
-      "entry": "Auto Mall Parkway / Durham Road",
-      "edgeId": "534766522:2:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 8157.562284164184
-    },
-    {
-      "entry": "Gable Drive",
-      "edgeId": "1181256373:0:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 12860.568160611267
+      "returnMetres": 2324.0052449978007
     },
     {
       "entry": "Interstate 880 (I-880)",
       "edgeId": "861090333:2:f",
       "fromHeadquarters": true,
       "toHeadquarters": false,
-      "forwardMetres": 15998.766556765675,
+      "forwardMetres": 14726.59971582821,
       "returnMetres": null
     },
     {
@@ -97,7 +33,7 @@
       "fromHeadquarters": false,
       "toHeadquarters": true,
       "forwardMetres": null,
-      "returnMetres": 19133.711853230965
+      "returnMetres": 16467.678331005616
     },
     {
       "entry": "Interstate 880 (I-880)",
@@ -105,14 +41,14 @@
       "fromHeadquarters": false,
       "toHeadquarters": true,
       "forwardMetres": null,
-      "returnMetres": 17926.50222425579
+      "returnMetres": 14353.25704985476
     },
     {
       "entry": "Interstate 680 (I-680)",
       "edgeId": "863756087:9:f",
       "fromHeadquarters": true,
       "toHeadquarters": false,
-      "forwardMetres": 16237.280851605346,
+      "forwardMetres": 15450.11351352475,
       "returnMetres": null
     },
     {
@@ -120,7 +56,7 @@
       "edgeId": "928193807:22:f",
       "fromHeadquarters": true,
       "toHeadquarters": false,
-      "forwardMetres": 7264.098430302348,
+      "forwardMetres": 6476.931092221753,
       "returnMetres": null
     },
     {
@@ -129,14 +65,14 @@
       "fromHeadquarters": false,
       "toHeadquarters": true,
       "forwardMetres": null,
-      "returnMetres": 7577.22236772072
+      "returnMetres": 7370.259829887791
     },
     {
       "entry": "Interstate 680 (I-680)",
       "edgeId": "45472471:13:f",
       "fromHeadquarters": true,
       "toHeadquarters": false,
-      "forwardMetres": 9177.01116480082,
+      "forwardMetres": 8026.88817446325,
       "returnMetres": null
     },
     {
@@ -145,7 +81,7 @@
       "fromHeadquarters": false,
       "toHeadquarters": true,
       "forwardMetres": null,
-      "returnMetres": 11995.221580732656
+      "returnMetres": 10001.902970642766
     },
     {
       "entry": "Interstate 680 (I-680)",
@@ -156,52 +92,12 @@
       "returnMetres": null
     },
     {
-      "entry": "Paseo Padre Parkway",
-      "edgeId": "417103822:0:f",
-      "fromHeadquarters": true,
-      "toHeadquarters": false,
-      "forwardMetres": 13956.571242522157,
-      "returnMetres": null
-    },
-    {
-      "entry": "Blacow Road",
-      "edgeId": "6403009:5:r",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 8568.771947656922
-    },
-    {
       "entry": "Mission Boulevard",
       "edgeId": "158615260:0:f",
       "fromHeadquarters": false,
       "toHeadquarters": true,
       "forwardMetres": null,
-      "returnMetres": 11872.157272242273
-    },
-    {
-      "entry": "Mission Boulevard",
-      "edgeId": "417220902:0:f",
-      "fromHeadquarters": true,
-      "toHeadquarters": false,
-      "forwardMetres": 4852.8880826032955,
-      "returnMetres": null
-    },
-    {
-      "entry": "Osgood Road",
-      "edgeId": "184388710:0:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 7770.945912636185
-    },
-    {
-      "entry": "Osgood Road",
-      "edgeId": "206086145:1:f",
-      "fromHeadquarters": false,
-      "toHeadquarters": true,
-      "forwardMetres": null,
-      "returnMetres": 8474.868557904203
+      "returnMetres": 10533.315497688178
     }
   ],
   "unsupportedRestrictions": 232,

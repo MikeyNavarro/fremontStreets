@@ -63,7 +63,7 @@ Per-zone source-segment and street counts are calculated from the current datase
 
 **Every zone has partial road coverage.** These are learning-collection counts, not complete inventories; crossing streets can appear in multiple collections. A 75 m review band retains uncertainty near borders and does not claim measured positional accuracy. Navigation prefers in-zone road segments and safely interior destinations. Quizzes use streets in the selected zone and withhold questions outside it or near uncertain borders. Exploration is recorded by actual location, separately from demonstrated quiz/navigation results; citywide totals aggregate zone practice. Saved routes and progress remain available after switching zones.
 
-The personalized expansion preserves **every one of the prior 5,839 source ways and 19,523 source nodes**, plus existing restrictions. The merged dataset has 22,794 ways, 84,825 nodes and 165,730 playable directed edges. No source-node coordinate conflicts or changed existing ways were found. The merged source data records 232 unsupported restrictions, whose affected approaches remain conservatively excluded; traffic-rule completeness is not asserted.
+The personalized expansion preserves **every one of the prior 5,839 source ways and 19,523 source nodes**, plus existing restrictions. The merged dataset has 22,794 ways, 84,825 nodes and 166,282 playable directed edges. No source-node coordinate conflicts or changed existing ways were found. The merged source data records 232 unsupported restrictions, whose prohibited via-way connectors and uncertain only/conditional approaches remain conservatively excluded; traffic-rule completeness is not asserted.
 
 Both cameras share geographic centerlines and one authoritative vehicle state. The citywide local metric projection has a fixed origin at **37.5485° N, 121.9886° W**, with x east and y north. Graph connections use source node identity rather than geometric line crossings, keeping overpasses disconnected unless the source supplies a connection. Known one-way and supported turn restrictions are enforced; missing restrictions are not asserted to be verified. 3D road widths, center guides, and generic scenery are visual approximations, not measured lanes or traffic markings. The driver view is a flat schematic: terrain and bridge heights are not reconstructed, while the source road graph still preserves separate overpass connectivity.
 
@@ -109,6 +109,8 @@ All original vertices remain in the data and precision selector; map handles are
 - `src/study-mode.ts`, `src/study-network.ts`: the exact 38-entry curriculum, exercises, source-backed arrivals and separate personal progress.
 - `src/departure.ts`: verified source reference and approximate headquarters public-road departure.
 - `scripts/`: bounded road imports and official boundary validation.
+
+See [the Stevenson continuity fix](docs/stevenson-continuity.md) for the repaired false stops and map colors.
 
 Next priorities: verify current patrol adoption status, expand partial road coverage across all zones, improve destination selection and rerouting, and incorporate verified traffic controls and complex restrictions. See [personalized validation](docs/personalized-validation.md) for executed checks and known limitations; [the earlier report](docs/validation.md) records the historical patrol release.
 

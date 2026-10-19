@@ -1,0 +1,89 @@
+{
+  "routingPolicy": "prohibited-via-blocked-approach-retained-v2",
+  "roadsSha256": "047fb0260932381c7067b04e27f400b2aa377a9248f4d2f3edf3185495fb3414",
+  "oldDirectedEdges": 165730,
+  "currentDirectedEdges": 166282,
+  "restoredSourceDirectedEdges": 552,
+  "removedPreviouslySupportedEdges": [],
+  "restoredStevensonWays": [
+    "417095793",
+    "417403349",
+    "417403359",
+    "392688397",
+    "394433090",
+    "417103306"
+  ],
+  "repairedFalseStops": [
+    {
+      "incomingEdge": "417617996:3:f",
+      "nodeId": "4179636908",
+      "position": [
+        -121.9682216,
+        37.5540837
+      ],
+      "previousOutgoing": [],
+      "currentOutgoing": [
+        "417403349:0:f"
+      ],
+      "defaultContinuation": "417403349:0:f",
+      "simulatedTwoSecondDrive": {
+        "edgeId": "417403349:0:f",
+        "distanceMetres": 10.728959999999974,
+        "speedMps": 10.72896000000001
+      },
+      "sourceWays": [
+        "https://www.openstreetmap.org/way/417617996",
+        "https://www.openstreetmap.org/way/417403349"
+      ]
+    },
+    {
+      "incomingEdge": "1104357052:0:f",
+      "nodeId": "10105884514",
+      "position": [
+        -121.9694767,
+        37.5533935
+      ],
+      "previousOutgoing": [],
+      "currentOutgoing": [
+        "417403359:0:f"
+      ],
+      "defaultContinuation": "417403359:0:f",
+      "simulatedTwoSecondDrive": {
+        "edgeId": "417403359:0:f",
+        "distanceMetres": 10.728959999999974,
+        "speedMps": 10.72896000000001
+      },
+      "sourceWays": [
+        "https://www.openstreetmap.org/way/1104357052",
+        "https://www.openstreetmap.org/way/417403359"
+      ]
+    },
+    {
+      "incomingEdge": "417102045:0:f",
+      "nodeId": "4177229019",
+      "position": [
+        -121.9928732,
+        37.5164071
+      ],
+      "previousOutgoing": [],
+      "currentOutgoing": [
+        "417103306:0:f"
+      ],
+      "defaultContinuation": "417103306:0:f",
+      "simulatedTwoSecondDrive": {
+        "edgeId": "417103306:0:f",
+        "distanceMetres": 10.728959999999974,
+        "speedMps": 10.72896000000001
+      },
+      "sourceWays": [
+        "https://www.openstreetmap.org/way/417102045",
+        "https://www.openstreetmap.org/way/417103306"
+      ]
+    }
+  ],
+  "limits": [
+    "Prohibited via-way connectors remain excluded; no complete history-based via-way movement support is claimed.",
+    "Only-turn, conditional and incomplete approaches remain conservatively excluded.",
+    "Unknown traffic rules, complete corridor coverage and current official patrol-zone adoption remain unverified."
+  ]
+}

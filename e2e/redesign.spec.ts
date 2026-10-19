@@ -76,3 +76,13 @@ test('reduced motion is respected and C keeps held throttle active across both c
   expect((await snapshot(page)).vehicle.totalDistance).toBeGreaterThan(switched.vehicle.totalDistance);
  }finally{await page.keyboard.up('w');}
 });
+
+
+test('Stevenson stays drivable outside the blue study overlay and map colors explain unavailable roads',async({page},info)=>{
+ await start(page);await chooseMode(page,'study');await page.getByTestId('study-group').selectOption('ns');await closePanel(page);
+ const key=page.getByTestId('map-key');await key.locator('summary').click();await expect(key).toContainText('Other solid roads: also drivable');await expect(key).toContainText('Amber dashed: unavailable');
+ const initial=await snapshot(page);expect(initial.presentation.map.unavailableRoads).toBeGreaterThan(0);expect(initial.presentation.map.unavailableLineDasharray).toEqual([2,2]);expect(initial.vehicle.edgeId).toBe('417403358:0:f');
+ await page.screenshot({path:info.outputPath('stevenson-map-key.png'),animations:'disabled'});
+ await key.locator('summary').click();await page.keyboard.down('w');try{await expect.poll(async()=>(await snapshot(page)).vehicle.totalDistance,{timeout:35000}).toBeGreaterThan(150);}finally{await page.keyboard.up('w');}
+ await expect(page.locator('#street-name')).toHaveText('Stevenson Boulevard');await expect(page.locator('#turn-prompt')).toHaveAttribute('data-road-status','open');expect((await snapshot(page)).vehicle.position).not.toEqual(initial.vehicle.position);
+});

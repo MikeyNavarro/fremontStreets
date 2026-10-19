@@ -22,6 +22,7 @@ export class OverheadView {
   private route = emptyLines();
   private turns = emptyLines();
   private roads: RoadCollection;
+  private readonly unavailableRoadCount:number;
   private observer: ResizeObserver | null = null;
   private turnsKey = '';
   private boundaries: BoundaryCollection = { type: 'FeatureCollection', features: [] };
@@ -38,6 +39,7 @@ export class OverheadView {
   constructor(private container: HTMLElement, roads: RoadCollection, bounds?: [LonLat, LonLat]) {
     const rank:Record<string,number>={primary:0,motorway:1,trunk:1,secondary:2,tertiary:3,residential:4};
     this.roads={...roads,features:[...roads.features].sort((a,b)=>(rank[String(a.properties?.highway)]??5)-(rank[String(b.properties?.highway)]??5))};
+    this.unavailableRoadCount=roads.features.filter(feature=>feature.properties?.playable===false).length;
     container.dataset.renderer = 'overhead';
     try {
       // MapLibre 6 ships its worker as a separate ESM asset. Vite's dependency
@@ -65,9 +67,10 @@ export class OverheadView {
           layers: [
             { id: 'ground', type: 'background', paint: { 'background-color': '#101f29' } },
             { id: 'study-zone-fill', type: 'fill', source: 'study-zones', paint: { 'fill-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#899e92']], 'fill-opacity': ['case', ['boolean', ['get', 'selected'], false], 0.045, 0.02] } },
-            { id: 'road-casing', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#304957', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, ['match',['get','highway'],['motorway','trunk','primary'],3,1.2], 16, ['match',['get','highway'],['motorway','trunk'],11,['primary','secondary'],9,['tertiary'],7,['service','living_street'],3.5,5], 20, ['match',['get','highway'],['motorway','trunk','primary'],46,23]] } },
-            { id: 'roads', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['match', ['get', 'highway'], ['motorway','trunk'], '#87929e', ['primary'], '#72868f', ['secondary','tertiary'], '#4b6676', ['service','living_street'],'#20333e', '#2d4656'], 'line-width': ['interpolate', ['linear'], ['zoom'], 12, ['match',['get','highway'],['motorway','trunk','primary'],1.8,.6], 16, ['match',['get','highway'],['motorway','trunk'],8.5,['primary','secondary'],6.5,['tertiary'],4.5,['service','living_street'],2,3], 20, ['match',['get','highway'],['motorway','trunk','primary'],40,18]] } },
-            { id:'study-target-lines',type:'line',source:'study-targets',paint:{'line-color':['case',['boolean',['get','selected'],false],'#8becce',['match',['get','group'],'ew','#6aabd0','#c8a27f']],'line-width':['interpolate',['linear'],['zoom'],11,2,16,5,20,18],'line-opacity':.95} },
+            { id: 'road-casing', type: 'line', source: 'roads', filter: ['!=',['get','playable'],false], layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#304957', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, ['match',['get','highway'],['motorway','trunk','primary'],3,1.2], 16, ['match',['get','highway'],['motorway','trunk'],11,['primary','secondary'],9,['tertiary'],7,['service','living_street'],3.5,5], 20, ['match',['get','highway'],['motorway','trunk','primary'],46,23]] } },
+            { id: 'roads', type: 'line', source: 'roads', filter: ['!=',['get','playable'],false], layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['match', ['get', 'highway'], ['motorway','trunk'], '#87929e', ['primary'], '#72868f', ['secondary','tertiary'], '#4b6676', ['service','living_street'],'#20333e', '#2d4656'], 'line-width': ['interpolate', ['linear'], ['zoom'], 12, ['match',['get','highway'],['motorway','trunk','primary'],1.8,.6], 16, ['match',['get','highway'],['motorway','trunk'],8.5,['primary','secondary'],6.5,['tertiary'],4.5,['service','living_street'],2,3], 20, ['match',['get','highway'],['motorway','trunk','primary'],40,18]] } },
+            {id:'unavailable-roads',type:'line',source:'roads',filter:['==',['get','playable'],false],paint:{'line-color':'#ce9468','line-width':['interpolate',['linear'],['zoom'],12,1,16,3,20,10],'line-dasharray':[2,2],'line-opacity':.75}},
+            { id:'study-target-lines',type:'line',source:'study-targets',paint:{'line-color':['case',['boolean',['get','selected'],false],'#b3d5ee',['match',['get','group'],'ew','#6aabd0','#c8a27f']],'line-width':['interpolate',['linear'],['zoom'],11,2,16,5,20,18],'line-opacity':.95} },
             { id:'study-intersection-points',type:'circle',source:'study-intersections',paint:{'circle-radius':['interpolate',['linear'],['zoom'],11,2,16,6],'circle-color':'#cfb486','circle-stroke-color':'#182e3a','circle-stroke-width':1.5} },
             { id: 'study-zone-border', type: 'line', source: 'study-zones', paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#60796b']], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 2, 1], 'line-dasharray': [3, 2] } },
             { id: 'classified-roads', type: 'line', source: 'classified-roads', filter: ['!=', ['get', 'uncertain'], true], paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'zoneId'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#597766']], 'line-width': 4 } },
@@ -289,7 +292,7 @@ export class OverheadView {
   setHeadingUp(enabled:boolean):void {this.headingUp=enabled;if(this.map)this.map.jumpTo({bearing:enabled&&this.lastSnapshot?this.lastSnapshot.heading*180/Math.PI:0});}
   setZoom(zoom:number):void {this.preferredZoom=Math.max(10,Math.min(20,zoom));this.map?.jumpTo({zoom:this.preferredZoom});}
   setQuality(quality:'low'|'balanced'|'high'):void {this.map?.setPixelRatio(Math.min(window.devicePixelRatio||1,quality==='low'?.65:quality==='balanced'?1.25:2));}
-  presentation(){return {headingUp:this.headingUp,zoom:this.map?.getZoom(),bearing:this.map?.getBearing(),followVehicle:this.followVehicle,pixelRatio:this.map?.getPixelRatio(),width:this.container.clientWidth,height:this.container.clientHeight};}
+  presentation(){return {headingUp:this.headingUp,zoom:this.map?.getZoom(),bearing:this.map?.getBearing(),followVehicle:this.followVehicle,unavailableRoads:this.unavailableRoadCount,unavailableLineDasharray:this.loaded?this.map?.getPaintProperty('unavailable-roads','line-dasharray'):null,pixelRatio:this.map?.getPixelRatio(),width:this.container.clientWidth,height:this.container.clientHeight};}
 
   resize(): void {
     if (this.active && !this.container.hidden && this.container.clientWidth && this.container.clientHeight) this.map?.resize();

@@ -9,7 +9,7 @@ import { buildGraph, isValidRoute, createVehicle, stepVehicle, outgoingChoices, 
 import type { RoadData, RoadGraph, VehicleState, Turn, Route, AccelerationProfile } from './core';
 import { OverheadView } from './views/overhead';
 import { DriverView } from './views/driver';
-import type { FeatureCollection, LineString } from 'geojson';
+import { roadPresentation } from './views/roads';
 
 declare const __FREMONT_DATA_VERSION__: string;
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -73,7 +73,7 @@ async function boot() {
   const ui=new DrivingShell(app);
   let followMode=true;
   let graphicsQuality:'low'|'balanced'|'high'='balanced';
-  const roadsGeo: FeatureCollection<LineString> = {type:'FeatureCollection',features:data.ways.filter(w=>w.nodes.every(n=>data.nodes[String(n)])).map(w=>({type:'Feature',properties:{name:w.name??w.tags?.name??'',highway:w.highway??w.tags?.highway??''},geometry:{type:'LineString',coordinates:w.nodes.map(n=>data.nodes[String(n)])}}))};
+  const roadsGeo = roadPresentation(data,graph);
   const coords = Object.values(data.nodes);
   const bounds: [[number,number],[number,number]] = [[Math.min(...coords.map(c=>c[0])),Math.min(...coords.map(c=>c[1]))],[Math.max(...coords.map(c=>c[0])),Math.max(...coords.map(c=>c[1]))]];
   const overhead = new OverheadView($('overhead-view'), roadsGeo, bounds);
@@ -200,6 +200,7 @@ async function boot() {
     renderFrame();
     if(now-lastHud>120){lastHud=now;ui.updateSession(mode,game.zoneId,profile);$('hud-guidance').textContent=guidance?'GUIDANCE ON':'NO GPS · STREET NAMES ONLY';const activeMission=training?.missionState;const destination=activeMission?activeMission.goal.kind==='headquarters'?'Police Headquarters':studyNetwork.entries.find(entry=>entry.id===activeMission.targetId)?.originalLabel:challenge?.destination;$('hud-destination').textContent=destination?`DESTINATION · ${destination}`:'Free drive · make yourself familiar';const edge=currentEdge();$('speed').textContent=String(Math.round(mph(game.vehicle.speed)));$('speed-limit').textContent=edge.speedLimitMph===null?'?':String(Math.round(edge.speedLimitMph));$('street-name').textContent=mode==='quiz'&&!quizAnswered?'Street-name practice':edge.name||'Unnamed mapped road';
       const decision=nextDecision(graph,game.vehicle);const choices=decision?.choices??outgoingChoices(graph,game.vehicle);const next=choices.filter(c=>c.kind!=='uturn');const distance=decision?.distance??Math.max(0,edge.length-game.vehicle.distance);const plannedIndex=guidance&&route?route.edgeIds.indexOf(decision?.incomingEdgeId??''):-1;const plannedEdge=plannedIndex>=0?graph.edges.get(route!.edgeIds[plannedIndex+1]):null;const planned=choices.find(choice=>choice.edgeId===plannedEdge?.id);$('turn-prompt').textContent=game.vehicle.pendingTurn?`${game.vehicle.pendingTurn.toUpperCase()} queued · junction in ${Math.round(distance)} m`:planned&&plannedEdge?`In ${Math.round(distance)} m · ${planned.kind==='uturn'?'turn around':planned.kind==='straight'?'continue straight':`turn ${planned.kind}`} onto ${plannedEdge.name||'the mapped connecting road'}`:next.length>1?`Junction in ${Math.round(distance)} m · ${next.map(c=>`${c.kind}: ${c.name||'unnamed road'}`).join(' · ')}`:'Hold W / ↑ to drive · queue a turn with A / D';
+      const unsupportedEnd=Boolean(decision&&!choices.length&&distance<200);$('turn-prompt').dataset.roadStatus=unsupportedEnd?'blocked':'open';if(unsupportedEnd)$('turn-prompt').textContent=distance<1?'No supported continuation here. Reset at HQ to begin another drive; progress is kept.':`Supported road coverage ends in ${Math.round(distance)} m. Choose another connected road before the gap.`;
       overhead.setTurns(next.map(c=>{const e=graph.edges.get(c.edgeId)!;return {coordinates:[graph.nodes.get(e.from)!.position,graph.nodes.get(e.to)!.position],selected:c.kind===game.vehicle.pendingTurn};}));driver?.setTurns(next.map(c=>{const e=graph.edges.get(c.edgeId)!;return {coordinates:[graph.nodes.get(e.from)!.position,graph.nodes.get(e.to)!.position],selected:c.kind===game.vehicle.pendingTurn};}));
       if(challenge?.status==='active'){
         const n=graph.nodes.get(challenge.targetNode)!;const remaining=Math.hypot(game.vehicle.metric.x-n.x,game.vehicle.metric.y-n.y);if($('route-remaining'))$('route-remaining').textContent=`${Math.round(remaining)} m straight-line distance to destination`;

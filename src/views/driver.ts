@@ -73,6 +73,7 @@ export class DriverView {
     // or create junctions where independently sourced centerlines cross.
     const chunks=new Map<string,{surface:number[];edges:number[];colors:number[];uv:number[]}>();
     for(const feature of roads.features){
+      if(feature.properties?.playable===false)continue;
       const highway=String(feature.properties?.highway??'');
       const width=/^(motorway|trunk)/.test(highway)?13:/^primary/.test(highway)?11:/^(secondary|tertiary)/.test(highway)?9:/^(service|living_street)/.test(highway)?4.5:6.5;
       const color=new THREE.Color(/^(motorway|trunk|primary)/.test(highway)?'#424d53':'#39474d');

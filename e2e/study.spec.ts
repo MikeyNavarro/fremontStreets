@@ -3,11 +3,15 @@ import {expect,test,type Page} from '@playwright/test';
 
 async function snapshot(page:Page){return page.evaluate(()=>{const game=(window as any).__FREMONT_GAME__;return {vehicle:game.vehicle,study:game.study,route:game.route,decision:game.decision,zoneId:game.zoneId,camera:game.camera,maxSpeed:game.maxSpeed,profile:game.profile,departure:game.departure};});}
 async function openStudy(page:Page){await page.goto('./');await page.waitForFunction(()=>Boolean((window as any).__FREMONT_GAME__));await expect(page.getByTestId('overhead-view')).toHaveAttribute('data-renderer-ready','true');await chooseMode(page,'study');await expect(page.getByTestId('study-target')).toBeVisible();}
-async function driveMission(page:Page,timeout=150000){
+async function driveMission(page:Page,timeout?:number){
   // Exercise the forgiving controls at a normal street-training pace. Separate
   // simulation tests verify 100 mph integration and the default capability.
   await openPanel(page,'settings');await page.locator('#max-speed').fill('35');await page.locator('#max-speed').dispatchEvent('change');await page.locator('#max-speed').blur();await closePanel(page);
   let decisionKey='';const initial=await snapshot(page),first=initial.decision;
+  // Source-backed representative routes can change length after a topology fix.
+  // Budget for the actual 35 mph route plus software-rendering overhead; still
+  // require real controls, continuous driving and the original arrival result.
+  const budget=timeout??Math.max(150000,initial.study.mission.route.distance/(35*0.44704)*2000+30000);
   if(first){const index=initial.study.mission.route.edgeIds.indexOf(first.incomingEdgeId),next=initial.study.mission.route.edgeIds[index+1];const choice=index>=0&&next?first.choices.find((item:any)=>item.edgeId===next):null;if(choice){decisionKey=`${first.incomingEdgeId}/${next}`;await page.locator(`#turn-${choice.kind}`).click();}}
   await page.keyboard.down('ArrowUp');
   try{await expect.poll(async()=>{
@@ -16,7 +20,7 @@ async function driveMission(page:Page,timeout=150000){
     const index=route.edgeIds.indexOf(decision.incomingEdgeId);const nextId=route.edgeIds[index+1];const key=`${decision.incomingEdgeId}/${nextId}`;
     if(index>=0&&nextId&&key!==decisionKey){const choice=decision.choices.find((item:any)=>item.edgeId===nextId);expect(choice,'The source route must be selectable with the actual turn controls').toBeTruthy();decisionKey=key;await page.locator(`#turn-${choice.kind}`).click();}
     return false;
-  },{timeout,intervals:[100]}).toBe(true);}finally{await page.keyboard.up('ArrowUp');}
+  },{timeout:budget,intervals:[100]}).toBe(true);}finally{await page.keyboard.up('ArrowUp');}
   await page.keyboard.down('ArrowDown');await expect.poll(async()=>(await snapshot(page)).vehicle.speed,{timeout:15000}).toBeLessThan(.2);await page.keyboard.up('ArrowDown');
 }
 
@@ -33,7 +37,7 @@ test('personal curriculum has the exact 38 entries, confirmed road identities, H
 });
 
 test('road-to-road, return-to-HQ, and source-junction challenges complete using real driving controls',async({page})=>{
-  test.setTimeout(360000);await openStudy(page);
+  test.setTimeout(480000);await openStudy(page);
   await page.getByTestId('study-target').selectOption('ns04');await page.getByTestId('study-exercise').selectOption('road-to-road');await page.getByTestId('study-from').selectOption('ew13');await page.getByTestId('study-start').click();
   await driveMission(page);expect((await snapshot(page)).study.progress.entries.ns04.roadToRoad).toBe(1);await expect(page.getByTestId('study-mission')).toContainText('Challenge complete');
   await openPanel(page,'study');await page.getByTestId('study-exercise').selectOption('return');await page.getByTestId('study-start').click();await driveMission(page);expect((await snapshot(page)).study.progress.entries.ns04.returns).toBe(1);
