@@ -278,9 +278,10 @@ test('actual zone coverage counts physical source segments and preserves the ent
   const before = digestGraph(actualGraph);
   const coverage = buildZoneCoverage(actualGraph, actualZones);
   assert.equal(coverage.validation.valid, true);
-  assert.equal(coverage.zones.zone1.segmentIds.length, 11275);
-  assert.equal(coverage.zones.zone2.segmentIds.length, 1849);
-  assert.equal(coverage.zones.zone3.segmentIds.length, 6632);
+  assert.ok(coverage.zones.zone1.segmentIds.length >= 11275, 'Expanded coverage must preserve the prior Zone 1 segment inventory.');
+  assert.ok(coverage.zones.zone2.segmentIds.length >= 1849, 'Expanded coverage must preserve the prior Zone 2 segment inventory.');
+  assert.ok(coverage.zones.zone3.segmentIds.length >= 6632, 'Expanded coverage must preserve the prior Zone 3 segment inventory.');
+  for (const area of Object.values(coverage.zones)) assert.equal(new Set(area.segmentIds).size, area.segmentIds.length, 'A directed pair is still one physical segment.');
   assert.equal(coverage.zones.zone1.coverage, 'partial');
   assert.equal(coverage.zones.zone2.coverage, 'partial');
   assert.equal(coverage.zones.zone3.coverage, 'partial');

@@ -1,3 +1,5 @@
+> Current personalized expansion: see [the coverage audit](personalized-geography.md) and [38-entry inventory](study-road-inventory.md). The original extract described below is preserved as a versioned base.
+
 # Geographic sources and coverage
 
 The application must use real geographic source geometry. A bounded study extract is not a complete Fremont street inventory. Study selection never creates walls or changes the road graph. Roads connect by their source node identity, never because two lines cross on screen or lie close together.
@@ -41,7 +43,7 @@ Both cameras and the vehicle graph use the same longitude/latitude geometry. Sim
 
 `y = R × (lat − lat0) × π/180`, with `R = 6,371,008.8 m`.
 
-This local metric approximation is suitable for a small central Fremont study area. It is not survey-grade lane positioning. Driver-view widths, markings and scenery are generic visual approximations. Missing lanes, signs, traffic signals, speed limits and turn restrictions have not been independently verified. Unknown source speed limits must display as unknown. The vehicle's configurable 55 mph capability is not a road speed limit.
+This local metric approximation is suitable for a small central Fremont study area. It is not survey-grade lane positioning. Driver-view widths, markings and scenery are generic visual approximations. Missing lanes, signs, traffic signals, speed limits and turn restrictions have not been independently verified. Unknown source speed limits must display as unknown. The vehicle's configurable 100 mph capability is not a road speed limit.
 
 ## Patrol boundaries and October 2026 proposal
 

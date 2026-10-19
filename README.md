@@ -25,31 +25,39 @@ Use the existing checkout at `/workspace/fremontStreets` in the Codex cloud envi
 - Press **A / ←** or **D / →** to queue a left or right turn. You can select a turn well before the intersection. A request waits until a matching legal branch exists.
 - Use the **Straight** and **Turn around** buttons for those choices.
 - **Space** pauses; **C** switches cameras. On-screen buttons also support driving.
-- **QUICK** is the default acceleration profile: approximately 2.5 seconds to 30 mph and 4.5 seconds to 45 mph under unconstrained conditions. NORMAL and SPORT are available; vehicle capability is capped at 55 mph.
+- **QUICK** is the default acceleration profile: approximately 2.5 seconds to 30 mph and 4.5 seconds to 45 mph under unconstrained conditions. NORMAL and SPORT are available; the adjustable vehicle cap defaults to 100 mph and accepts 10–100 mph. Real posted limits remain separate.
 - **Free Drive** explores the loaded road network. **Navigation challenge** chooses a reachable real intersection and draws its route. Drive to the destination to complete it, with guidance on or off. Save routes for later practice.
 - **Street-name practice** hides the current street label and overhead map labels while you answer. Exploration counts separately from quiz accuracy and navigation completions.
 
 The vehicle cap is not a road speed limit. Limits come from source tags and show `?` when unknown. Corner assist slows sharp turns as a simulation aid. Traffic waiting is not simulated, and the game does not claim to verify real traffic controls or legal driving conditions.
 
+## My Street List — 38 Entries
+
+Choose **My Street List — 38 Entries** under Choose your drive. The exact curriculum contains 21 east–west and 17 north–south entries. Those headings are study categories, not exact bearings. You confirmed **Lake Arrowhead Avenue**, and **Grimmer Boulevard plus South Grimmer Boulevard** remain one study entry. No unlisted road becomes an extra target.
+
+Browse all entries or either group, preview a destination, then choose Reach a Street, Random Street, Road to Road, Intersection Challenge, No-GPS, Return to Headquarters, or Street Connection Quiz. **Zone 1 — Main Roads** focuses on the Zone 1 portions of your list. Other sourced roads remain usable connectors. Wrong turns can trigger a connected reroute; any supported legal arrival at the marked destination counts.
+
+New sessions begin stopped on a source-backed **Stevenson Boulevard** departure near Fremont Police Headquarters, 2000 Stevenson Boulevard. It is an approximate public-road start, **not a verified driveway or parking-space location**; it leaves a 20 m approach before the first junction. Road-to-road, intersection and return exercises explicitly choose another valid start. QUICK is the default. Both cameras read the same vehicle state.
+
+All 38 entries have playable sampled locations with departure and return routes. All 1,406 non-self directed representative pairs were evaluated. **This does not establish that every segment or traffic movement is verified:** some sampled approaches remain inaccessible in the available graph, unsupported restrictions are excluded, and real traffic controls remain unverified. Personal progress records reached locations, repetitions and identifications, not whole-road mastery.
+
+See [road inventory](docs/study-road-inventory.md), [coverage and source audit](docs/personalized-geography.md), [directed matrix](docs/data/study-connectivity.json), [source-node intersections](docs/data/study-intersections.json), and [verification results](docs/data/study-verification.json).
+
 ## Geographic coverage and patrol zones
 
-The game uses bounded **central Fremont and northern Irvington** road extracts with a buffer, not full-city coverage. Its exact bounds, source date, provenance, licensing, and import limitations are recorded in [`public/data/roads.json`](public/data/roads.json) and [`docs/geography.md`](docs/geography.md).
+The game preserves its original extracts and adds **all 64 buffered Zone 1 bounding-box tiles plus 85 bounded tiles around the exact personalized study corridors**. This is not full-city or verified end-to-end corridor coverage. Its exact bounds, source date, provenance, licensing, and import limitations are recorded in [`public/data/roads.json`](public/data/roads.json) and [`docs/geography.md`](docs/geography.md).
 
-All four area choices work: **All Fremont**, **Zone 1 — Central Fremont (blue)**, **Zone 2 — North Fremont (pink)**, and **Zone 3 — South Fremont (orange)**. Selecting an area starts a fresh practice drive on a real road inside it, centers its boundary, and preserves all learning records. Accelerating or pressing **Follow car** returns the map to the driving view. Roads remain connected across zone borders.
+All four area choices work: **All Fremont**, **Zone 1 — Central Fremont (blue)**, **Zone 2 — North Fremont (pink)**, and **Zone 3 — South Fremont (orange)**. Zone 1 is the default, and the last selected patrol zone is remembered. New drives start at the headquarters departure; selecting another zone centers its boundary and preserves all learning records. Drive over the continuous road network to reach it. Accelerating or pressing **Follow car** returns the map to the driving view. Roads remain connected across zone borders.
 
 > Patrol-zone boundaries are approximate study areas based on the Fremont Police Department's published map. They are not verified official GIS boundaries.
 
 The geometry comes directly from the City of Fremont GIS Division's historical Police_Zones service and visually matches the user-supplied screenshot. The source layer dates to December 2020; current 2026 adoption is unverified. No screenshot coordinates were invented. Version, source URLs, calibration, screenshot reference and limitations are retained in [`public/data/zones.json`](public/data/zones.json) and [`docs/patrol-sources.md`](docs/patrol-sources.md).
 
-| Study area | Playable source segments | Named streets |
-| --- | ---: | ---: |
-| Zone 1 | 11,275 | 588 |
-| Zone 2 | 1,849 | 185 |
-| Zone 3 | 6,632 | 273 |
+Per-zone source-segment and street counts are calculated from the current dataset in the game. The earlier patrol release counts remain in the historical validation report.
 
 **Every zone has partial road coverage.** These are learning-collection counts, not complete inventories; crossing streets can appear in multiple collections. A 75 m review band retains uncertainty near borders and does not claim measured positional accuracy. Navigation prefers in-zone road segments and safely interior destinations. Quizzes use streets in the selected zone and withhold questions outside it or near uncertain borders. Exploration is recorded by actual location, separately from demonstrated quiz/navigation results; citywide totals aggregate zone practice. Saved routes and progress remain available after switching zones.
 
-The separately authorized Zone 3 road append preserves every original node, way, restriction and all 18,854 original directed edges. Only additional source-backed geography was added.
+The personalized expansion preserves **every one of the prior 5,839 source ways and 19,523 source nodes**, plus existing restrictions. The merged dataset has 22,794 ways, 84,825 nodes and 165,730 playable directed edges. No source-node coordinate conflicts or changed existing ways were found. The merged source data records 232 unsupported restrictions, whose affected approaches remain conservatively excluded; traffic-rule completeness is not asserted.
 
 Both cameras share geographic centerlines and one authoritative vehicle state. The citywide local metric projection has a fixed origin at **37.5485° N, 121.9886° W**, with x east and y north. Graph connections use source node identity rather than geometric line crossings, keeping overpasses disconnected unless the source supplies a connection. Known one-way and supported turn restrictions are enforced; missing restrictions are not asserted to be verified. 3D road widths, center guides, and generic scenery are visual approximations, not measured lanes or traffic markings. The driver view is a flat schematic: terrain and bridge heights are not reconstructed, while the source road graph still preserves separate overpass connectivity.
 
@@ -65,6 +73,8 @@ npm run test:production # built static game at the GitHub Pages subdirectory
 Playwright uses an installed Chromium when available, or its managed browser. Install the managed browser with `npx playwright install chromium` if needed. `PLAYWRIGHT_CHROMIUM_EXECUTABLE` can select a system executable.
 
 ## Geographic imports
+
+Rebuild the personalized reports from the committed source data with `npm run data:study`. See [the import procedure](docs/personalized-geography.md) for the cached OSM API and paginated City GIS pipelines. Neither runs during gameplay.
 
 ```sh
 # Generate a bounded source extract for review (does not replace bundled roads):
@@ -89,9 +99,11 @@ All original vertices remain in the data and precision selector; map handles are
 
 - `src/core/`: pure road graph, fixed projection, vehicle physics, legal turn selection, routing, learning and persistence.
 - `src/views/`: MapLibre and Three.js presentation of the same simulation state.
-- `src/main.ts`: keyboard/touch controls, challenges, quizzes, progress dashboard, and saved routes.
+- `src/main.ts`: authoritative game wiring, keyboard/touch controls, patrol challenges and saved routes.
+- `src/study-mode.ts`, `src/study-network.ts`: the exact 38-entry curriculum, exercises, source-backed arrivals and separate personal progress.
+- `src/departure.ts`: verified source reference and approximate headquarters public-road departure.
 - `scripts/`: bounded road imports and official boundary validation.
 
-Next priorities: verify current patrol adoption status, expand partial road coverage across all zones, improve destination selection and rerouting, and incorporate verified traffic controls and complex restrictions. See [`docs/validation.md`](docs/validation.md) for executed checks and known limitations.
+Next priorities: verify current patrol adoption status, expand partial road coverage across all zones, improve destination selection and rerouting, and incorporate verified traffic controls and complex restrictions. See [personalized validation](docs/personalized-validation.md) for executed checks and known limitations; [the earlier report](docs/validation.md) records the historical patrol release.
 
 Road data © OpenStreetMap contributors, available under the [Open Database License](https://www.openstreetmap.org/copyright). Application code has no license grant beyond any license the repository owner adds.

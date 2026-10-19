@@ -6,7 +6,7 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: 'production.spec.ts',
+  testMatch: ['production.spec.ts', 'study.spec.ts'],
   fullyParallel: false,
   workers: 1,
   outputDir: 'test-results-production',

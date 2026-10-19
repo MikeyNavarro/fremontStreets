@@ -61,7 +61,10 @@ On Linux, Playwright may also need browser system dependencies:
 Vite's production base path is `/fremontStreets/`. JavaScript, CSS, and public
 geographic data must resolve below that path; a root-relative `/data/...` URL
 would request the wrong directory on GitHub Pages. Keep the production tests
-when adding assets or changing runtime loading.
+when adding assets or changing runtime loading. The three geographic/catalog JSON
+requests carry a content fingerprint compiled into the release; preserve this
+cache key when updating the data so Pages cannot mix stale roads with a new
+study catalog.
 
 ## Runtime and saved progress
 

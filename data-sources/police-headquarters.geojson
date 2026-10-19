@@ -1,0 +1,83 @@
+{
+  "type": "Feature",
+  "properties": {
+    "osmWayId": "37751672",
+    "sourceVersion": "8",
+    "sourceTimestamp": "2022-12-31T21:36:08Z",
+    "sourceUrl": "https://www.openstreetmap.org/way/37751672",
+    "retrievedAt": "2026-10-19",
+    "referencePointMethod": "Arithmetic mean of unique footprint vertices; not a surveyed entrance.",
+    "tags": {
+      "addr:housenumber": "1950;1970;1990;1996;2000",
+      "addr:street": "Stevenson Boulevard",
+      "amenity": "police",
+      "building": "yes",
+      "building:levels": "3",
+      "gnis:feature_id": "2755725",
+      "name": "Fremont Police Department"
+    }
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -121.96964,
+          37.5527415
+        ],
+        [
+          -121.9695634,
+          37.5527732
+        ],
+        [
+          -121.9694896,
+          37.5528038
+        ],
+        [
+          -121.969252,
+          37.5529021
+        ],
+        [
+          -121.9690178,
+          37.5530004
+        ],
+        [
+          -121.9689416,
+          37.5530323
+        ],
+        [
+          -121.9688677,
+          37.5530633
+        ],
+        [
+          -121.9686264,
+          37.5526973
+        ],
+        [
+          -121.9686999,
+          37.5526667
+        ],
+        [
+          -121.9687758,
+          37.5526351
+        ],
+        [
+          -121.9692462,
+          37.5524389
+        ],
+        [
+          -121.9693214,
+          37.5524075
+        ],
+        [
+          -121.9693985,
+          37.5523753
+        ],
+        [
+          -121.96964,
+          37.5527415
+        ]
+      ]
+    ]
+  }
+}

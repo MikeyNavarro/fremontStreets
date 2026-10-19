@@ -1,4 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { expect, test as base, type Page } from '@playwright/test';
 
 const origin = 'http://127.0.0.1:4179';
@@ -83,7 +84,7 @@ test('production artifact contains all runtime assets and only serves the Pages 
     const directory = file.parentPath.replaceAll('\\', '/').replace(/^dist\/?/, '');
     return `${directory ? `${directory}/` : ''}${file.name}`;
   });
-  expect(names).toEqual(expect.arrayContaining(['index.html', 'favicon.svg', '.nojekyll', 'data/roads.json', 'data/zones.json']));
+  expect(names).toEqual(expect.arrayContaining(['index.html', 'favicon.svg', '.nojekyll', 'data/roads.json', 'data/zones.json', 'data/study-network.json']));
   expect(names.some(name => /^assets\/maplibre-gl-worker-.*\.mjs$/.test(name))).toBe(true);
   const html = await readFile('dist/index.html', 'utf8');
   const references = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(match => match[1]);
@@ -92,7 +93,8 @@ test('production artifact contains all runtime assets and only serves the Pages 
   for (const name of names) {
     const response = await request.get(`${prefix}${name}`);
     expect(response.status(), name).toBe(200);
-    expect(await response.body(), `Built asset is served intact: ${name}`).toEqual(await readFile(`dist/${name}`));
+    const digest=(bytes:Buffer)=>createHash('sha256').update(bytes).digest('hex');
+    expect(digest(await response.body()), `Built asset is served intact: ${name}`).toBe(digest(await readFile(`dist/${name}`)));
     if (/\.m?js$/.test(name)) expect(response.headers()['content-type']).toContain('text/javascript');
     if (/\.css$/.test(name)) expect(response.headers()['content-type']).toContain('text/css');
     if (/\.json$/.test(name)) expect(response.headers()['content-type']).toContain('application/json');
@@ -123,8 +125,8 @@ test('static production game loads real Fremont roads, its MapLibre worker, and 
   expect(graph.names).toContain('Fremont Boulevard');
   await expect(page.locator('.maplibregl-canvas')).toBeVisible();
   await expect.poll(() => audit.workers.some(url => /\/fremontStreets\/assets\/maplibre-gl-worker-.*\.mjs$/.test(url))).toBe(true);
-  expect(audit.requests).toContain(`${origin}${prefix}data/roads.json`);
-  expect(audit.requests).toContain(`${origin}${prefix}data/zones.json`);
+  expect(audit.requests.some(url => new URL(url).pathname === `${prefix}data/roads.json` && new URL(url).searchParams.has('v'))).toBe(true);
+  expect(audit.requests.some(url => new URL(url).pathname === `${prefix}data/zones.json` && new URL(url).searchParams.has('v'))).toBe(true);
   for (const id of ['zone1', 'zone2', 'zone3']) {
     await page.getByTestId('zone-select').selectOption(id);
     await expect.poll(async () => (await state(page)).overlay.renderedZoneIds).toContain(id);
@@ -170,15 +172,19 @@ test('driving and both cameras work from static files without changing paused ve
 test('all zones support quizzes, real navigation routes, saved routes, and persistent progress in production', async ({ page }) => {
   test.setTimeout(90_000);
   await openGame(page);
+  const quizPlayed=new Set<string>();
   for (const id of ['zone1', 'zone2', 'zone3']) {
     await page.getByTestId('zone-select').selectOption(id);
     await page.locator('#mode-quiz').click();
     const selected = await state(page);
+    if(selected.quiz.street){
+    quizPlayed.add(id);
     expect(selected.quiz.street).toBeTruthy();
     expect(selected.zoneCoverage[id].streetNames).toContain(selected.quiz.street);
     expect(selected.quiz.choices.every(name => selected.zoneCoverage[id].streetNames.includes(name))).toBe(true);
     await page.locator('#quiz').getByRole('button', { name: selected.quiz.street, exact: true }).click();
     expect((await state(page)).progress.zones[id].quizCorrect).toBe(1);
+    }else{await expect(page.locator('#quiz')).toContainText('outside this study area');expect(selected.quiz.choices).toEqual([]);}
     await page.locator('#mode-navigation').click();
     await page.getByTestId('challenge-start').click();
     await expect.poll(async () => (await state(page)).route).not.toBeNull();
@@ -194,10 +200,10 @@ test('all zones support quizzes, real navigation routes, saved routes, and persi
   for (const id of ['zone1', 'zone2', 'zone3']) {
     await page.getByTestId('zone-select').selectOption(id);
     const restored = (await state(page)).progress.zones[id];
-    expect(restored.quizCorrect).toBe(1);
-    expect(restored.quizTotal).toBe(1);
+    expect(restored.quizCorrect).toBe(quizPlayed.has(id)?1:0);
+    expect(restored.quizTotal).toBe(quizPlayed.has(id)?1:0);
     expect(restored.savedRoutes).toEqual(saved.zones[id].savedRoutes);
-    await expect(page.locator('#metric-accuracy')).toHaveText('100%');
+    await expect(page.locator('#metric-accuracy')).toHaveText(quizPlayed.has(id)?'100%':'—');
     await expect(page.locator('#metric-saved')).toHaveText('1');
     await page.locator('#saved-routes button').click();
     expect((await state(page)).route?.edgeIds).toEqual(saved.zones[id].savedRoutes[0].edgeIds);

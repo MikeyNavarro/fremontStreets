@@ -1,0 +1,794 @@
+{
+  "manifest": {
+    "bbox": [
+      -122.013,
+      37.516,
+      -121.908,
+      37.612
+    ],
+    "tiles": [
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.516,-121.999875,37.528",
+        "bbox": [
+          -122.013,
+          37.516,
+          -121.999875,
+          37.528
+        ],
+        "sha256": "401b6418bddcef9982d5754f77a84bc18293529bb638835df891dd48b2b39ffa",
+        "bytes": 2920638,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.516,-121.98675,37.528",
+        "bbox": [
+          -121.999875,
+          37.516,
+          -121.98675,
+          37.528
+        ],
+        "sha256": "3659a6b7b9ac63daea1abf196b3cc7a359d8e0084ddcc58d44e6ba5ca278e8ec",
+        "bytes": 3763355,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.516,-121.973625,37.528",
+        "bbox": [
+          -121.98675,
+          37.516,
+          -121.973625,
+          37.528
+        ],
+        "sha256": "b36e3bfac42aeef761cd3ac8f644d10687e5f956b5fb085ff76fa05c8f8a5bac",
+        "bytes": 4286458,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.516,-121.9605,37.528",
+        "bbox": [
+          -121.973625,
+          37.516,
+          -121.9605,
+          37.528
+        ],
+        "sha256": "7df02a99a7e626362e58bdfa97d0d1a23149460a0ea1fe9b138b1994a36e6f97",
+        "bytes": 4518057,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.516,-121.947375,37.528",
+        "bbox": [
+          -121.9605,
+          37.516,
+          -121.947375,
+          37.528
+        ],
+        "sha256": "6db53202a9e092e7c155e7a04d28a13e99f49d55b53ce462603f0fff133984ae",
+        "bytes": 4901441,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.516,-121.93425,37.528",
+        "bbox": [
+          -121.947375,
+          37.516,
+          -121.93425,
+          37.528
+        ],
+        "sha256": "23884289942fd583eebfb0aac59fc068f2d123056e016f5bf388587083504992",
+        "bytes": 1828679,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.516,-121.921125,37.528",
+        "bbox": [
+          -121.93425,
+          37.516,
+          -121.921125,
+          37.528
+        ],
+        "sha256": "485ad83b91743a0b7a9266587037d532314efbf6ec648c4dcb641c4a6082c70a",
+        "bytes": 3126272,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.516,-121.908,37.528",
+        "bbox": [
+          -121.921125,
+          37.516,
+          -121.908,
+          37.528
+        ],
+        "sha256": "dd962e9636b21f5a2f6ac9e647ac28c3b2fc7626e81affba47f84000ef462898",
+        "bytes": 3177486,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.528,-121.999875,37.54",
+        "bbox": [
+          -122.013,
+          37.528,
+          -121.999875,
+          37.54
+        ],
+        "sha256": "fa16b20e6a173dd1045d14823ef95d2f4a42f87346261503951ce079ce3978b8",
+        "bytes": 4358913,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.528,-121.98675,37.54",
+        "bbox": [
+          -121.999875,
+          37.528,
+          -121.98675,
+          37.54
+        ],
+        "sha256": "b63551226cd08fb174dd7853d048152bc868845c03569ab89ead50ff1d3d272d",
+        "bytes": 5023950,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.528,-121.973625,37.54",
+        "bbox": [
+          -121.98675,
+          37.528,
+          -121.973625,
+          37.54
+        ],
+        "sha256": "d4925ab74d8fba57ad083abc01b6b4013c4d529633b6e67f0db9bd4a574f2a04",
+        "bytes": 5155619,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.528,-121.9605,37.54",
+        "bbox": [
+          -121.973625,
+          37.528,
+          -121.9605,
+          37.54
+        ],
+        "sha256": "e44daaf3eda55648142e36c8921415a14d09244feb3929b37f0856cab7d49ee6",
+        "bytes": 5271815,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.528,-121.947375,37.54",
+        "bbox": [
+          -121.9605,
+          37.528,
+          -121.947375,
+          37.54
+        ],
+        "sha256": "6e4abca6f454a47139df03deb9428cd917cb7938d2abb748523d837189376a65",
+        "bytes": 5175988,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.528,-121.93425,37.54",
+        "bbox": [
+          -121.947375,
+          37.528,
+          -121.93425,
+          37.54
+        ],
+        "sha256": "4a73aef183363e87ba8a9ce71c72d5f26c42b5b24fbd03f535fa3c1e6d400179",
+        "bytes": 3732318,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.528,-121.921125,37.54",
+        "bbox": [
+          -121.93425,
+          37.528,
+          -121.921125,
+          37.54
+        ],
+        "sha256": "9929ac0042dc5f9581987823a1b7284a75a21d07b54f98661cc4dce9f046c5f4",
+        "bytes": 4921254,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.528,-121.908,37.54",
+        "bbox": [
+          -121.921125,
+          37.528,
+          -121.908,
+          37.54
+        ],
+        "sha256": "c471a3505af02a41263fa90deaab25fcfa7dd9ef030059831acfaf292470c353",
+        "bytes": 2308164,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.54,-121.999875,37.552",
+        "bbox": [
+          -122.013,
+          37.54,
+          -121.999875,
+          37.552
+        ],
+        "sha256": "07c11e42da800ad237037c1f9e0cb494c65cc1deae657a323b704e7809b7f536",
+        "bytes": 5249799,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.54,-121.98675,37.552",
+        "bbox": [
+          -121.999875,
+          37.54,
+          -121.98675,
+          37.552
+        ],
+        "sha256": "64e967681dcd2c47caf37baa42de6766d159503b5265bab5a2d09c595ca0ce04",
+        "bytes": 5179001,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.54,-121.973625,37.552",
+        "bbox": [
+          -121.98675,
+          37.54,
+          -121.973625,
+          37.552
+        ],
+        "sha256": "eef61d10a3168c87ead3fcb61c029cb6fde300c75b36aea9c9438997b272763e",
+        "bytes": 4561504,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.54,-121.9605,37.552",
+        "bbox": [
+          -121.973625,
+          37.54,
+          -121.9605,
+          37.552
+        ],
+        "sha256": "8e0259d91a66c74486f7ee4af7f68decff9bd37f89eb2df07dd3f7a8c02114d8",
+        "bytes": 3774979,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.54,-121.947375,37.552",
+        "bbox": [
+          -121.9605,
+          37.54,
+          -121.947375,
+          37.552
+        ],
+        "sha256": "ba5b7c6ba41fd781732d4655548c4a259e4e72ae9a7c28b9dc77c7b40b4b630e",
+        "bytes": 3355229,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.54,-121.93425,37.552",
+        "bbox": [
+          -121.947375,
+          37.54,
+          -121.93425,
+          37.552
+        ],
+        "sha256": "586f85dcf63013216be34353f31a7a3ea99e4e918cbef4bbe21474de44338d50",
+        "bytes": 4143032,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.54,-121.921125,37.552",
+        "bbox": [
+          -121.93425,
+          37.54,
+          -121.921125,
+          37.552
+        ],
+        "sha256": "2a50adaa11d5d8413b1a4d0ad35b9164e5d7930ad79565a42d3b0c290756ed4f",
+        "bytes": 2029542,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.54,-121.908,37.552",
+        "bbox": [
+          -121.921125,
+          37.54,
+          -121.908,
+          37.552
+        ],
+        "sha256": "3b0d0be9f2ca5efafcbfe8ae80a84b6d7a70fbf1a9fe2dd1cb0cfa6e24e304b9",
+        "bytes": 322298,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.552,-121.999875,37.564",
+        "bbox": [
+          -122.013,
+          37.552,
+          -121.999875,
+          37.564
+        ],
+        "sha256": "199e958280fc7331f0685ac7b229d9b75ed2804f123af5201265139f4848d8f8",
+        "bytes": 5700223,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.552,-121.98675,37.564",
+        "bbox": [
+          -121.999875,
+          37.552,
+          -121.98675,
+          37.564
+        ],
+        "sha256": "b5e913b2682d96fe5fe91fb589db69e1759028ba13a0db0540a1d8ccc51faff7",
+        "bytes": 5971197,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.552,-121.973625,37.564",
+        "bbox": [
+          -121.98675,
+          37.552,
+          -121.973625,
+          37.564
+        ],
+        "sha256": "257fd58cffdb9ee320331c0928826749485115bfa8eb823219057bc2cd79db96",
+        "bytes": 4898230,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.552,-121.9605,37.564",
+        "bbox": [
+          -121.973625,
+          37.552,
+          -121.9605,
+          37.564
+        ],
+        "sha256": "a1dc8806b10de0c4ce5a8f1fb0120eff1d9bfb734625aeafe9effca7671893b9",
+        "bytes": 3900002,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.552,-121.947375,37.564",
+        "bbox": [
+          -121.9605,
+          37.552,
+          -121.947375,
+          37.564
+        ],
+        "sha256": "6ad938bbabe5bf9063d59651a503d491b5043895265c8a8dfb7b8f2924f46ae5",
+        "bytes": 3205171,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.552,-121.93425,37.564",
+        "bbox": [
+          -121.947375,
+          37.552,
+          -121.93425,
+          37.564
+        ],
+        "sha256": "fc80d861e3cea5f78d04c77a289c760ac2adab988d8a4c3e7c028a3ec6cde0c3",
+        "bytes": 1647092,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.552,-121.921125,37.564",
+        "bbox": [
+          -121.93425,
+          37.552,
+          -121.921125,
+          37.564
+        ],
+        "sha256": "7f9f6eecc9bd9b0eb9d2c220f4bd5bf59f5923572e59e97a3f542ed8b74daa1f",
+        "bytes": 232502,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.552,-121.908,37.564",
+        "bbox": [
+          -121.921125,
+          37.552,
+          -121.908,
+          37.564
+        ],
+        "sha256": "765b61507afd00c8de666c3d6373cee1958449d6cc441cdcdf4a8a6a9707b269",
+        "bytes": 375307,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.564,-121.999875,37.576",
+        "bbox": [
+          -122.013,
+          37.564,
+          -121.999875,
+          37.576
+        ],
+        "sha256": "2640c368edf16e52e905f85a304d6bfae7cac668eada46bbc2d0e62fa19f9e03",
+        "bytes": 2420347,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.564,-121.98675,37.576",
+        "bbox": [
+          -121.999875,
+          37.564,
+          -121.98675,
+          37.576
+        ],
+        "sha256": "c898b13c9d285fb1d0d197d7d15df5f2759256adcd2cae1bd9d1aaedb2c30c9b",
+        "bytes": 2544069,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.564,-121.973625,37.576",
+        "bbox": [
+          -121.98675,
+          37.564,
+          -121.973625,
+          37.576
+        ],
+        "sha256": "435a47d8db1ac1d766c289058c8dbbff1165cc22ba6422db9b090967b7a487ba",
+        "bytes": 3634676,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.564,-121.9605,37.576",
+        "bbox": [
+          -121.973625,
+          37.564,
+          -121.9605,
+          37.576
+        ],
+        "sha256": "c15fb3392e6e1655ab0b4a83b4c180fc6d9fe60676cd3bc8451568062327a39a",
+        "bytes": 5176735,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.564,-121.947375,37.576",
+        "bbox": [
+          -121.9605,
+          37.564,
+          -121.947375,
+          37.576
+        ],
+        "sha256": "5b72b391c24f88318ac31d49214ed1235df94a240670d84d89f392229640aa41",
+        "bytes": 1653333,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.564,-121.93425,37.576",
+        "bbox": [
+          -121.947375,
+          37.564,
+          -121.93425,
+          37.576
+        ],
+        "sha256": "321f2a753492918573cce6d4c148d16de27cb41515ff3c332be54250d6dbfa42",
+        "bytes": 277379,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.564,-121.921125,37.576",
+        "bbox": [
+          -121.93425,
+          37.564,
+          -121.921125,
+          37.576
+        ],
+        "sha256": "ed2a1e00ef6d609b43ce87a99124927fb2d2a770366689960db13417b28038bd",
+        "bytes": 363394,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.564,-121.908,37.576",
+        "bbox": [
+          -121.921125,
+          37.564,
+          -121.908,
+          37.576
+        ],
+        "sha256": "d67d5cc867cdf050d9a29701eb78c420dd7a0b65bcf98ef49361b8450f78ec4c",
+        "bytes": 128453,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.576,-121.999875,37.588",
+        "bbox": [
+          -122.013,
+          37.576,
+          -121.999875,
+          37.588
+        ],
+        "sha256": "abd2d6c182dca66e60ac92969480dafb30001c6b90786d5247262923c1da04a6",
+        "bytes": 3211339,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.576,-121.98675,37.588",
+        "bbox": [
+          -121.999875,
+          37.576,
+          -121.98675,
+          37.588
+        ],
+        "sha256": "8183206fbe8fafa3366193676cc901b223e8a52389e8823195fab3a0555f1d54",
+        "bytes": 3988400,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.576,-121.973625,37.588",
+        "bbox": [
+          -121.98675,
+          37.576,
+          -121.973625,
+          37.588
+        ],
+        "sha256": "c420e925ab86975be48d153183e5c35972987ae275f5f10b97ff6a9332ed779d",
+        "bytes": 2271176,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.576,-121.9605,37.588",
+        "bbox": [
+          -121.973625,
+          37.576,
+          -121.9605,
+          37.588
+        ],
+        "sha256": "c06e5f21e2884412a4727ca6d6129d23079b76683e3753d0034a465e9153c115",
+        "bytes": 2563850,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.576,-121.947375,37.588",
+        "bbox": [
+          -121.9605,
+          37.576,
+          -121.947375,
+          37.588
+        ],
+        "sha256": "ab46f9bb16243bd8a85cf6b5b603e1fd8bd79e229ce28df8e91509b590983110",
+        "bytes": 585318,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.576,-121.93425,37.588",
+        "bbox": [
+          -121.947375,
+          37.576,
+          -121.93425,
+          37.588
+        ],
+        "sha256": "ce79ff9de72b6811f2dc59df2f20bc1b37ecaab288ab2f600e7712581a8d6b0b",
+        "bytes": 343855,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.576,-121.921125,37.588",
+        "bbox": [
+          -121.93425,
+          37.576,
+          -121.921125,
+          37.588
+        ],
+        "sha256": "265da657d24d00ced2613519aca3ef433c0fd7109571366fa38d743c49fe41ea",
+        "bytes": 204546,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.576,-121.908,37.588",
+        "bbox": [
+          -121.921125,
+          37.576,
+          -121.908,
+          37.588
+        ],
+        "sha256": "5f21af3923cf00c86113ec16f02b2ab563808de06a0a0e64bcbf4792cdd785d0",
+        "bytes": 186870,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.588,-121.999875,37.6",
+        "bbox": [
+          -122.013,
+          37.588,
+          -121.999875,
+          37.6
+        ],
+        "sha256": "3856ee97f648e11bd88f8d8d9226717b71b7a73cce4979d5b090d247a3120ab6",
+        "bytes": 3148745,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.588,-121.98675,37.6",
+        "bbox": [
+          -121.999875,
+          37.588,
+          -121.98675,
+          37.6
+        ],
+        "sha256": "7911105c4f7cfebce69962f69fc947e9c73e3c55417265bd5862ae165d7067b9",
+        "bytes": 832329,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.588,-121.973625,37.6",
+        "bbox": [
+          -121.98675,
+          37.588,
+          -121.973625,
+          37.6
+        ],
+        "sha256": "7bea78fb47cf5524a6ec4caf19a573f71b2aa29e1f3655adc498a6fde5e75611",
+        "bytes": 43653,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.588,-121.9605,37.6",
+        "bbox": [
+          -121.973625,
+          37.588,
+          -121.9605,
+          37.6
+        ],
+        "sha256": "00ffafdbefa0771b40514989f498b7043c41555bb7c516a34ae4ad76fd072ec5",
+        "bytes": 145178,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.588,-121.947375,37.6",
+        "bbox": [
+          -121.9605,
+          37.588,
+          -121.947375,
+          37.6
+        ],
+        "sha256": "1277a769773592caf67710dab0383dc55f3e8f200142dc0196afe0af59fcf009",
+        "bytes": 466939,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.588,-121.93425,37.6",
+        "bbox": [
+          -121.947375,
+          37.588,
+          -121.93425,
+          37.6
+        ],
+        "sha256": "356370d982dcfc2e7727c483dc1934a1b8b3c2050bbf15c7fe19a50ab9749a44",
+        "bytes": 471391,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.588,-121.921125,37.6",
+        "bbox": [
+          -121.93425,
+          37.588,
+          -121.921125,
+          37.6
+        ],
+        "sha256": "02c06576973da617fd8bbee991f78d017904e190fa1323fa855d938af652f51b",
+        "bytes": 556525,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.588,-121.908,37.6",
+        "bbox": [
+          -121.921125,
+          37.588,
+          -121.908,
+          37.6
+        ],
+        "sha256": "5b561722d2087631f60b03defa7aa36af3d38da7d678ecc82a1ee89d1494097f",
+        "bytes": 358446,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-122.013,37.6,-121.999875,37.612",
+        "bbox": [
+          -122.013,
+          37.6,
+          -121.999875,
+          37.612
+        ],
+        "sha256": "18c5cbeb7e5b7bf3102261c52ff2fdb17c969e626dff69f39de197743617c64b",
+        "bytes": 240541,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.999875,37.6,-121.98675,37.612",
+        "bbox": [
+          -121.999875,
+          37.6,
+          -121.98675,
+          37.612
+        ],
+        "sha256": "22b03399af3f7cf3370371c8e09f74b784c155150013b10e2259bb1c69625fdc",
+        "bytes": 169514,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.98675,37.6,-121.973625,37.612",
+        "bbox": [
+          -121.98675,
+          37.6,
+          -121.973625,
+          37.612
+        ],
+        "sha256": "01671b93aa240d1fa55a82988e85ba6a9872b9d806d5907be8809c5d1585abc7",
+        "bytes": 116587,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.973625,37.6,-121.9605,37.612",
+        "bbox": [
+          -121.973625,
+          37.6,
+          -121.9605,
+          37.612
+        ],
+        "sha256": "d0e40faa161650d6288ccb86d17402f9632756b681c9c5ea32ff255d3f7d44b8",
+        "bytes": 92810,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.9605,37.6,-121.947375,37.612",
+        "bbox": [
+          -121.9605,
+          37.6,
+          -121.947375,
+          37.612
+        ],
+        "sha256": "272f25a9e80a7a6b149f3c4557482d4f3436baabbbb527fa5ca3adfeeb0f5778",
+        "bytes": 172948,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.947375,37.6,-121.93425,37.612",
+        "bbox": [
+          -121.947375,
+          37.6,
+          -121.93425,
+          37.612
+        ],
+        "sha256": "a44d25035148b55f2b3645b1309083d29216805733fb110f98009314f5ebaa90",
+        "bytes": 329622,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.93425,37.6,-121.921125,37.612",
+        "bbox": [
+          -121.93425,
+          37.6,
+          -121.921125,
+          37.612
+        ],
+        "sha256": "6f7dd13d03f56ab4c14a6fe24b2fb2092915eed514ad99e2a6df15d884da29f1",
+        "bytes": 363084,
+        "dataTimestamp": null
+      },
+      {
+        "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-121.921125,37.6,-121.908,37.612",
+        "bbox": [
+          -121.921125,
+          37.6,
+          -121.908,
+          37.612
+        ],
+        "sha256": "a1f009c2c9aad33383b1d25543ae56e9290ff01654fa21d83787bb7ab14a348f",
+        "bytes": 267591,
+        "dataTimestamp": null
+      }
+    ],
+    "conflicts": [],
+    "coverage": "Complete buffered bounding-box retrieval; OSM correctness and official arterial classification remain independently unverified."
+  },
+  "report": {
+    "addedNodes": 15571,
+    "addedWays": 3783,
+    "addedRestrictions": 56,
+    "addedUnsupportedRestrictions": 27,
+    "skipped": {
+      "changedExistingWays": [],
+      "conflictingNodes": [],
+      "newWays": []
+    }
+  },
+  "previousFileSha256": "dda2ce105fc0a497a5ab5cf0df66cb15a10744f21912b7fe7402f22851dbdb1f"
+}

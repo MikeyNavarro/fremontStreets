@@ -42,6 +42,8 @@ export interface RoadEdge {
   length: number;
   heading: number;
   speedLimitMph: number | null;
+  /** Source motorcar/motor_vehicle/access tag, when supplied. */
+  access?: string;
 }
 export interface RoadGraph {
   nodes: Map<string, RoadNode>;

@@ -18,7 +18,7 @@ const canonical = value => Array.isArray(value) ? value.map(canonical) : value &
 export const contentDigest = value => sha(JSON.stringify(canonical(value)));
 const key = value => String(value.id);
 
-export function appendRoadExtract(base, extract, { baseFileSha256 = contentDigest(base), importedAt = new Date().toISOString() } = {}) {
+export function appendRoadExtract(base, extract, { baseFileSha256 = contentDigest(base), importedAt = new Date().toISOString(), versionPrefix = 'zone3-bounded', coverage = 'Bounded central Fremont plus an appended northern Irvington/Zone 3 study extract. Partial coverage in all three study zones; not full-city or complete zone coverage.' } = {}) {
   if (!base.nodes || !base.ways?.length || !extract.nodes || !extract.ways?.length) throw new Error('Expected existing and extension road datasets.');
   if (extract.metadata?.source !== 'OpenStreetMap' || !extract.metadata.sourceSha256 || !extract.metadata.sourceQuery || !extract.metadata.dataTimestamp) throw new Error('Extension must carry actual OSM import provenance.');
   if (contentDigest(base.metadata.projection) !== contentDigest(extract.metadata.projection)) throw new Error('The extension must use the existing citywide projection.');
@@ -79,7 +79,7 @@ export function appendRoadExtract(base, extract, { baseFileSha256 = contentDiges
   const restrictions = [...(base.restrictions ?? []), ...addedRestrictions];
   const unsupportedRestrictions = [...(base.unsupportedRestrictions ?? []), ...addedUnsupported];
   const extension = {
-    version: `zone3-bounded-${importedAt.slice(0, 10)}-v1`, importedAt,
+    version: `${versionPrefix}-${importedAt.slice(0, 10)}-v1`, importedAt,
     source: extract.metadata,
     addedIds: { nodes: Object.keys(addedNodes), ways: addedWays.map(key), restrictions: addedRestrictions.map(key), unsupportedRestrictions: addedUnsupported.map(key) },
     skipped,
@@ -89,7 +89,7 @@ export function appendRoadExtract(base, extract, { baseFileSha256 = contentDiges
     metadata: {
       ...base.metadata,
       baseSnapshot: snapshot, extensions: [...(base.metadata.extensions ?? []), extension],
-      coverage: 'Bounded central Fremont plus an appended northern Irvington/Zone 3 study extract. Partial coverage in all three study zones; not full-city or complete zone coverage.',
+      coverage,
       coverageBboxes: [...(base.metadata.coverageBboxes ?? [base.metadata.bbox]), extract.metadata.bbox],
       counts: { ...base.metadata.counts, nodes: Object.keys(nodes).length, ways: ways.length, namedStreets: new Set(ways.map(way => way.name).filter(Boolean)).size, restrictions: restrictions.length, unsupportedRestrictions: unsupportedRestrictions.length },
     }, nodes, ways, restrictions, unsupportedRestrictions,

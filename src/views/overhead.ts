@@ -1,7 +1,7 @@
 import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource, Map as LibreMap, Marker } from 'maplibre-gl';
 import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
-import type { FeatureCollection, LineString } from 'geojson';
+import type { FeatureCollection, LineString, Point } from 'geojson';
 import { showRendererFailure, type BoundaryGeometry, type BoundaryCollection, type LonLat, type RoadCollection, type TurnPreview, type VehicleSnapshot } from './types';
 
 const emptyLines = (): FeatureCollection<LineString> => ({ type: 'FeatureCollection', features: [] });
@@ -26,6 +26,11 @@ export class OverheadView {
   private followVehicle = true;
   private vertexMarkers: Marker[] = [];
   private stopVertexEditing: (() => void) | null = null;
+  private studyRoads = emptyLines();
+  private studyJunctions: FeatureCollection<Point> = {type:'FeatureCollection',features:[]};
+  private studyNames: Set<string> | null = null;
+  private stationMarker: Marker | null = null;
+  private destinationMarker: Marker | null = null;
 
   constructor(private container: HTMLElement, roads: RoadCollection, bounds?: [LonLat, LonLat]) {
     this.roads = roads;
@@ -50,12 +55,16 @@ export class OverheadView {
             turns: { type: 'geojson', data: this.turns },
             'study-zones': { type: 'geojson', data: this.boundaries },
             'classified-roads': { type: 'geojson', data: this.classifiedRoads },
+            'study-targets': { type: 'geojson', data: this.studyRoads },
+            'study-intersections': { type: 'geojson', data: this.studyJunctions },
           },
           layers: [
             { id: 'ground', type: 'background', paint: { 'background-color': '#dce6d7' } },
             { id: 'study-zone-fill', type: 'fill', source: 'study-zones', paint: { 'fill-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#899e92']], 'fill-opacity': ['case', ['boolean', ['get', 'selected'], false], 0.19, 0.09] } },
             { id: 'road-casing', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#a6b4a4', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 2.2, 16, 12, 20, 58] } },
             { id: 'roads', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['match', ['get', 'highway'], ['primary', 'secondary', 'trunk', 'motorway'], '#f4d8a1', '#fcfcf4'], 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.2, 16, 9, 20, 51] } },
+            { id:'study-target-lines',type:'line',source:'study-targets',paint:{'line-color':['case',['boolean',['get','selected'],false],'#087c65',['match',['get','group'],'ew','#2778bd','#c16c27']],'line-width':['interpolate',['linear'],['zoom'],11,2,16,5,20,18],'line-opacity':.95} },
+            { id:'study-intersection-points',type:'circle',source:'study-intersections',paint:{'circle-radius':['interpolate',['linear'],['zoom'],11,2,16,6],'circle-color':'#f1c34f','circle-stroke-color':'#31463c','circle-stroke-width':1.5} },
             { id: 'study-zone-border', type: 'line', source: 'study-zones', paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'id'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#60796b']], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 4, 2], 'line-dasharray': [3, 2] } },
             { id: 'classified-roads', type: 'line', source: 'classified-roads', filter: ['!=', ['get', 'uncertain'], true], paint: { 'line-color': ['coalesce', ['get', 'color'], ['match', ['get', 'zoneId'], 'zone1', '#5b8cff', 'zone2', '#ef86b5', 'zone3', '#f7a35c', '#597766']], 'line-width': 4 } },
             { id: 'uncertain-roads', type: 'line', source: 'classified-roads', filter: ['==', ['get', 'uncertain'], true], paint: { 'line-color': '#3b4442', 'line-width': 5, 'line-dasharray': [1, 1] } },
@@ -78,6 +87,7 @@ export class OverheadView {
         this.loaded = true;
         container.dataset.rendererReady = 'true';
         this.syncOverlays();
+        this.syncStudy();
         this.refreshLabels();
       });
       this.map.on('moveend', () => this.refreshLabels());
@@ -147,6 +157,34 @@ export class OverheadView {
     }
     this.followVehicle = enabled;
   }
+
+  setStation(position: LonLat): void {
+    if(!this.map)return;
+    const element=document.createElement('div');element.className='station-map-label';element.textContent='Police HQ';element.setAttribute('aria-label','Fremont Police Headquarters building reference');
+    this.stationMarker?.remove();this.stationMarker=new maplibregl.Marker({element,anchor:'bottom'}).setLngLat(position).addTo(this.map);
+  }
+
+  setStudyOverlay(roads: FeatureCollection<LineString>, junctions: FeatureCollection<Point>, names: string[] | null): void {
+    this.studyRoads=roads;this.studyJunctions=junctions;this.studyNames=names?new Set(names):null;this.syncStudy();this.lastLabelRefresh=0;this.refreshLabels();
+  }
+
+  private syncStudy(): void {
+    if(!this.loaded||!this.map)return;
+    (this.map.getSource('study-targets') as GeoJSONSource)?.setData(this.studyRoads);
+    (this.map.getSource('study-intersections') as GeoJSONSource)?.setData(this.studyJunctions);
+    this.map.setPaintProperty('roads','line-opacity',this.studyNames?.size ? .38 : 1);
+    this.map.setPaintProperty('road-casing','line-opacity',this.studyNames?.size ? .35 : 1);
+    this.container.dataset.studyTargetCount=String(this.studyRoads.features.length);
+    this.container.dataset.studyIntersectionCount=String(this.studyJunctions.features.length);
+  }
+
+  focusPosition(position: LonLat, label?: string): void {
+    if(!this.map)return;this.followVehicle=false;this.map.stop();this.map.jumpTo({center:position,zoom:16.5});
+    this.destinationMarker?.remove();this.destinationMarker=null;
+    if(label){const element=document.createElement('div');element.className='destination-map-label';element.textContent=label;this.destinationMarker=new maplibregl.Marker({element,anchor:'bottom'}).setLngLat(position).addTo(this.map);}
+  }
+
+  clearStudyDestination(): void { this.destinationMarker?.remove();this.destinationMarker=null; }
 
   /** Diagnostics are derived from the MapLibre style/source, never a UI mirror. */
   getZoneDiagnostics() {
@@ -283,6 +321,7 @@ export class OverheadView {
     for (const feature of this.roads.features) {
       const name = feature.properties?.name;
       if (typeof name !== 'string' || seen.has(name)) continue;
+      if(this.studyNames&&!this.studyNames.has(name))continue;
       const lines = feature.geometry.type === 'MultiLineString' ? feature.geometry.coordinates : [feature.geometry.coordinates];
       for (const line of lines) {
         if (line.length < 2) continue;

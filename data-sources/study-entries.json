@@ -1,0 +1,325 @@
+{
+  "source": "User-provided transcription: 21 east-west and 17 north-south handwritten study entries. Original photographs were not attached with this upload.",
+  "entries": [
+    {
+      "id": "ew01",
+      "group": "ew",
+      "originalLabel": "Lake Arrowhead",
+      "names": [
+        "Lake Arrowhead Avenue"
+      ],
+      "needsConfirmation": false,
+      "note": "User confirmed Lake Arrowhead Avenue, not Lake Arrowhead Court. City GIS and OSM identities remain separately recorded.",
+      "resolutionSource": "User confirmation in this conversation",
+      "confirmedDateLocal": "2026-10-18"
+    },
+    {
+      "id": "ew02",
+      "group": "ew",
+      "originalLabel": "Decoto Road / Highway 84",
+      "names": [
+        "Decoto Road"
+      ],
+      "note": "Target Decoto Road by name. CA 84 reference tags describe only their sourced segments; Decoto Road is not interchangeable with the entire highway."
+    },
+    {
+      "id": "ew03",
+      "group": "ew",
+      "originalLabel": "Nicolet Avenue",
+      "names": [
+        "Nicolet Avenue"
+      ]
+    },
+    {
+      "id": "ew04",
+      "group": "ew",
+      "originalLabel": "Alder Avenue",
+      "names": [
+        "Alder Avenue"
+      ]
+    },
+    {
+      "id": "ew05",
+      "group": "ew",
+      "originalLabel": "Thornton Avenue",
+      "names": [
+        "Thornton Avenue"
+      ]
+    },
+    {
+      "id": "ew06",
+      "group": "ew",
+      "originalLabel": "Peralta Boulevard",
+      "names": [
+        "Peralta Boulevard"
+      ]
+    },
+    {
+      "id": "ew07",
+      "group": "ew",
+      "originalLabel": "Central Avenue",
+      "names": [
+        "Central Avenue"
+      ]
+    },
+    {
+      "id": "ew08",
+      "group": "ew",
+      "originalLabel": "Eggers Drive",
+      "names": [
+        "Eggers Drive"
+      ]
+    },
+    {
+      "id": "ew09",
+      "group": "ew",
+      "originalLabel": "Niles Canyon",
+      "names": [
+        "Niles Canyon Road"
+      ],
+      "note": "Mapped Niles Canyon Road; retain CA 84 references where present, without treating the entire highway as this road."
+    },
+    {
+      "id": "ew10",
+      "group": "ew",
+      "originalLabel": "Mowry Avenue",
+      "names": [
+        "Mowry Avenue"
+      ]
+    },
+    {
+      "id": "ew11",
+      "group": "ew",
+      "originalLabel": "Walnut Avenue",
+      "names": [
+        "Walnut Avenue"
+      ]
+    },
+    {
+      "id": "ew12",
+      "group": "ew",
+      "originalLabel": "Sundale Drive",
+      "names": [
+        "Sundale Drive"
+      ]
+    },
+    {
+      "id": "ew13",
+      "group": "ew",
+      "originalLabel": "Stevenson Boulevard",
+      "names": [
+        "Stevenson Boulevard"
+      ]
+    },
+    {
+      "id": "ew14",
+      "group": "ew",
+      "originalLabel": "Driscoll Road",
+      "names": [
+        "Driscoll Road"
+      ]
+    },
+    {
+      "id": "ew15",
+      "group": "ew",
+      "originalLabel": "Washington Boulevard",
+      "names": [
+        "Washington Boulevard"
+      ]
+    },
+    {
+      "id": "ew16",
+      "group": "ew",
+      "originalLabel": "Delaware Drive",
+      "names": [
+        "Delaware Drive"
+      ]
+    },
+    {
+      "id": "ew17",
+      "group": "ew",
+      "originalLabel": "Auto Mall Parkway / Durham Road",
+      "names": [
+        "Auto Mall Parkway",
+        "Durham Road"
+      ],
+      "note": "One study entry with two separately named roads. Their actual connections are established from shared graph nodes."
+    },
+    {
+      "id": "ew18",
+      "group": "ew",
+      "originalLabel": "Brown Road",
+      "names": [
+        "Brown Road"
+      ]
+    },
+    {
+      "id": "ew19",
+      "group": "ew",
+      "originalLabel": "Warren Avenue",
+      "names": [
+        "Warren Avenue",
+        "East Warren Avenue",
+        "West Warren Avenue"
+      ]
+    },
+    {
+      "id": "ew20",
+      "group": "ew",
+      "originalLabel": "Gable Drive",
+      "names": [
+        "Gable Drive"
+      ]
+    },
+    {
+      "id": "ew21",
+      "group": "ew",
+      "originalLabel": "Scott Creek Road",
+      "names": [
+        "Scott Creek Road"
+      ]
+    },
+    {
+      "id": "ns01",
+      "group": "ns",
+      "originalLabel": "Interstate 880 (I-880)",
+      "names": [
+        "I-880"
+      ],
+      "ref": "I 880"
+    },
+    {
+      "id": "ns02",
+      "group": "ns",
+      "originalLabel": "Interstate 680 (I-680)",
+      "names": [
+        "I-680"
+      ],
+      "ref": "I 680"
+    },
+    {
+      "id": "ns03",
+      "group": "ns",
+      "originalLabel": "Fremont Boulevard",
+      "names": [
+        "Fremont Boulevard"
+      ]
+    },
+    {
+      "id": "ns04",
+      "group": "ns",
+      "originalLabel": "Paseo Padre Parkway",
+      "names": [
+        "Paseo Padre Parkway"
+      ]
+    },
+    {
+      "id": "ns05",
+      "group": "ns",
+      "originalLabel": "Blacow Road",
+      "names": [
+        "Blacow Road"
+      ]
+    },
+    {
+      "id": "ns06",
+      "group": "ns",
+      "originalLabel": "Mission Boulevard",
+      "names": [
+        "Mission Boulevard"
+      ]
+    },
+    {
+      "id": "ns07",
+      "group": "ns",
+      "originalLabel": "Niles Boulevard",
+      "names": [
+        "Niles Boulevard"
+      ]
+    },
+    {
+      "id": "ns08",
+      "group": "ns",
+      "originalLabel": "Grimmer Boulevard",
+      "names": [
+        "Grimmer Boulevard",
+        "South Grimmer Boulevard"
+      ],
+      "note": "User confirmed both Grimmer Boulevard and South Grimmer Boulevard under this single original study entry. Separate source geometries and names are retained; no 39th target was added.",
+      "resolutionSource": "User confirmation in this conversation",
+      "confirmedDateLocal": "2026-10-18"
+    },
+    {
+      "id": "ns09",
+      "group": "ns",
+      "originalLabel": "Osgood Road",
+      "names": [
+        "Osgood Road"
+      ]
+    },
+    {
+      "id": "ns10",
+      "group": "ns",
+      "originalLabel": "Albrae Street",
+      "names": [
+        "Albrae Street"
+      ]
+    },
+    {
+      "id": "ns11",
+      "group": "ns",
+      "originalLabel": "Pacific Commons Boulevard",
+      "names": [
+        "Pacific Commons Boulevard"
+      ]
+    },
+    {
+      "id": "ns12",
+      "group": "ns",
+      "originalLabel": "Cushing Parkway",
+      "names": [
+        "Cushing Parkway"
+      ]
+    },
+    {
+      "id": "ns13",
+      "group": "ns",
+      "originalLabel": "Warm Springs Boulevard",
+      "names": [
+        "Warm Springs Boulevard"
+      ]
+    },
+    {
+      "id": "ns14",
+      "group": "ns",
+      "originalLabel": "Kato Road",
+      "names": [
+        "Kato Road"
+      ]
+    },
+    {
+      "id": "ns15",
+      "group": "ns",
+      "originalLabel": "Logan Drive",
+      "names": [
+        "Logan Drive"
+      ]
+    },
+    {
+      "id": "ns16",
+      "group": "ns",
+      "originalLabel": "Cabrillo Drive",
+      "names": [
+        "Cabrillo Drive"
+      ]
+    },
+    {
+      "id": "ns17",
+      "group": "ns",
+      "originalLabel": "Farwell Drive",
+      "names": [
+        "Farwell Drive"
+      ]
+    }
+  ]
+}

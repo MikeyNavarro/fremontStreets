@@ -1,0 +1,11 @@
+{
+  "commit": "bbf78132fe31b937e3b1d1a792d0be314f87eb19",
+  "nodes": "b60080424d61ef1d8b88bb3e02114f20caa72c2cfbb5740d09b4c356c82bdfde",
+  "ways": "fff7a917f4484d805a10d4f498973c0d588d24178bb8aa1177cb3b8fa95687a8",
+  "restrictions": "8f563580e0aa55e7e8c0ccfb01fd657821c8c686451ea937d13c0b7f4f09c382",
+  "unsupportedRestrictions": "87bb742f2e8dd09bd1c8cabbe0cf700d516c541bc6beb2656ba64ee0255f97e7",
+  "counts": {
+    "nodes": 19523,
+    "ways": 5839
+  }
+}

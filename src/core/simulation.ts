@@ -4,7 +4,7 @@ import type { AccelerationProfile, CameraMode, DrivingInput, GameState, RoadEdge
 
 export const MPH_TO_MPS = 0.44704;
 export const DEFAULT_PROFILE: AccelerationProfile = 'QUICK';
-export const MAX_VEHICLE_SPEED_MPH = 55;
+export const MAX_VEHICLE_SPEED_MPH = 100;
 export const ACCELERATION_PROFILES: Record<AccelerationProfile, { low: number; middle: number; high: number }> = {
   NORMAL: { low: 3.3, middle: 2.2, high: 1.7 },
   QUICK: { low: 30 * MPH_TO_MPS / 2.5, middle: 15 * MPH_TO_MPS / 2, high: 2.5 },

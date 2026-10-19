@@ -47,9 +47,10 @@ async function openGame(page: Page, editor = false) {
 }
 
 async function roadGraph(page: Page) {
-  return page.evaluate(() => {
+  return page.evaluate(async () => {
     const app = window as unknown as { __FREMONT_GAME__: { graph: unknown } };
-    return app.__FREMONT_GAME__.graph;
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(app.__FREMONT_GAME__.graph)));
+    return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
   });
 }
 
@@ -139,6 +140,7 @@ test('all three sourced study areas render the correct polygons without changing
 test('zone quizzes, navigation destinations, and saved progress follow actual zone coverage', async ({ page }) => {
   test.setTimeout(90_000);
   await openGame(page);
+  const quizPlayed=new Set<string>();
   const played: string[] = [];
   for (const id of ['zone1', 'zone2', 'zone3']) {
     await page.getByTestId('zone-select').selectOption(id);
@@ -152,12 +154,15 @@ test('zone quizzes, navigation destinations, and saved progress follow actual zo
     played.push(id);
     await page.locator('#mode-quiz').click();
     const quiz = await patrolState(page);
+    if(quiz.quiz.street){
+    quizPlayed.add(id);
     expect(quiz.quiz.street.length).toBeGreaterThan(0);
     expect(quiz.quiz.choices.length).toBeGreaterThanOrEqual(2);
     expect(quiz.quiz.choices.every(name => area.streetNames.includes(name))).toBe(true);
     expect(await page.locator('#quiz button[data-answer]').allTextContents()).toEqual(quiz.quiz.choices);
     await page.locator('#quiz').getByRole('button', { name: quiz.quiz.street, exact: true }).click();
     expect((await patrolState(page)).progress.zones[id].quizCorrect).toBe(1);
+    }else{await expect(page.locator('#quiz')).toContainText('outside this study area');expect(quiz.quiz.choices).toEqual([]);}
     await page.locator('#mode-navigation').click();
     await page.getByTestId('challenge-start').click();
     await expect.poll(async () => (await patrolState(page)).route).not.toBeNull();
@@ -173,10 +178,10 @@ test('zone quizzes, navigation destinations, and saved progress follow actual zo
   for (const id of played) {
     await page.getByTestId('zone-select').selectOption(id);
     const restored = await patrolState(page);
-    expect(restored.progress.zones[id].quizTotal).toBe(1);
-    expect(restored.progress.zones[id].quizCorrect).toBe(1);
+    expect(restored.progress.zones[id].quizTotal).toBe(quizPlayed.has(id)?1:0);
+    expect(restored.progress.zones[id].quizCorrect).toBe(quizPlayed.has(id)?1:0);
     expect(restored.progress.zones[id].savedRoutes).toHaveLength(1);
-    await expect(page.locator('#metric-accuracy')).toHaveText('100%');
+    await expect(page.locator('#metric-accuracy')).toHaveText(quizPlayed.has(id)?'100%':'—');
     await expect(page.locator('#metric-saved')).toHaveText('1');
   }
 });

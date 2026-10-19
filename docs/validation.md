@@ -1,3 +1,5 @@
+> Historical patrol-release validation. Current personalized training, expanded roads and headquarters behavior are documented in [personalized geography](personalized-geography.md) and [personalized validation](personalized-validation.md). Counts and interior-zone spawns below describe the earlier release.
+
 # Patrol-zone update: validation and scope
 
 The playable game was preserved in commit `70223c0` before patrol development and pushed to GitHub `main`. The patrol implementation is separate from that baseline. No force-push or unrelated repository changes were used.

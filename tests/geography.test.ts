@@ -24,8 +24,8 @@ test('bundled geography is a bounded attributed Fremont OSM network with intact 
     for (const id of way.nodes) {
       const point = data.nodes[id];
       assert.ok(point, `missing source node ${id}`);
-      assert.ok(point[0] > -122.1 && point[0] < -121.8);
-      assert.ok(point[1] > 37.45 && point[1] < 37.65);
+      assert.ok(point[0] > -122.20 && point[0] < -121.75, 'Whole source ways and buffered corridor approaches remain in the Fremont vicinity.');
+      assert.ok(point[1] > 37.40 && point[1] < 37.70, 'Bounded Fremont study corridors can extend into neighboring approach areas.');
     }
   }
   assert.deepEqual(data.metadata.projection.origin, [-121.9886, 37.5485]);

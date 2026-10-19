@@ -71,7 +71,7 @@ test('starts with actual Fremont roads and selectable patrol study areas', async
   expect(snapshot.vehicle.position[1]).toBeLessThan(37.7);
   await expect(page.getByTestId('coverage')).toBeVisible();
   await expect(page.getByTestId('zone-select')).toHaveCount(1);
-  await expect(page.getByTestId('zone-select')).toHaveValue('all');
+  await expect(page.getByTestId('zone-select')).toHaveValue('zone1');
   await expect(page.getByTestId('zone-select').locator('option')).toHaveCount(4);
   for (const zone of ['zone1', 'zone2', 'zone3']) {
     await expect(page.getByTestId('zone-select').locator(`option[value="${zone}"]`)).toBeEnabled();
@@ -133,17 +133,17 @@ test('navigation creates a real route and exploration progress survives reload',
   await page.keyboard.up('ArrowUp');
   await page.getByTestId('pause-toggle').click();
   const before = await state(page);
-  expect(before.progress.zones.all.streetNames.length).toBeGreaterThan(0);
-  expect(before.progress.zones.all.savedRoutes).toHaveLength(1);
+  expect(before.progress.zones.zone1.streetNames.length).toBeGreaterThan(0);
+  expect(before.progress.zones.zone1.savedRoutes).toHaveLength(1);
   await page.reload();
   await page.waitForFunction(() => Boolean((window as unknown as { __FREMONT_GAME__?: unknown }).__FREMONT_GAME__));
-  const restored = (await state(page)).progress.zones.all;
-  expect(restored.streetNames).toEqual(expect.arrayContaining(before.progress.zones.all.streetNames));
-  expect(restored.intersectionIds).toEqual(before.progress.zones.all.intersectionIds);
-  expect(restored.savedRoutes).toEqual(before.progress.zones.all.savedRoutes);
-  expect(restored.challengesCompleted).toBe(before.progress.zones.all.challengesCompleted);
+  const restored = (await state(page)).progress.zones.zone1;
+  expect(restored.streetNames).toEqual(expect.arrayContaining(before.progress.zones.zone1.streetNames));
+  expect(restored.intersectionIds).toEqual(before.progress.zones.zone1.intersectionIds);
+  expect(restored.savedRoutes).toEqual(before.progress.zones.zone1.savedRoutes);
+  expect(restored.challengesCompleted).toBe(before.progress.zones.zone1.challengesCompleted);
   await page.locator('#saved-routes button').click();
-  expect((await state(page)).route?.edgeIds).toEqual(before.progress.zones.all.savedRoutes[0].edgeIds);
+  expect((await state(page)).route?.edgeIds).toEqual(before.progress.zones.zone1.savedRoutes[0].edgeIds);
   await page.locator('#mode-free').click();
   expect((await state(page)).route).toBeNull();
   expect((await state(page)).challenge).toBeNull();

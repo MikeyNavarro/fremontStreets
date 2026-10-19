@@ -49,13 +49,14 @@ test('QUICK immediate throttle measures 0–30 in 2.5 s and 0–45 in 4–5 s', 
   assert.ok(advanceSpeed(0, { throttle: true, brake: false }, 0.01) > 0);
 });
 
-test('NORMAL, QUICK, SPORT differ; configured cap never exceeds 55 mph', () => {
+test('NORMAL, QUICK, SPORT differ; configured cap defaults to 100 mph and cannot exceed it', () => {
   const input = { throttle: true, brake: false };
   const normal = advanceSpeed(0, input, 1, { profile: 'NORMAL' });
   const quick = advanceSpeed(0, input, 1, { profile: 'QUICK' });
   const sport = advanceSpeed(0, input, 1, { profile: 'SPORT' });
   assert.ok(normal < quick && quick < sport);
-  assert.ok(Math.abs(advanceSpeed(0, input, 30, { maxSpeedMph: 100 }) / MPH_TO_MPS - 55) < 1e-6);
+  assert.ok(Math.abs(advanceSpeed(0, input, 30) / MPH_TO_MPS - 100) < 1e-6);
+  assert.ok(Math.abs(advanceSpeed(0, input, 30, { maxSpeedMph: 150 }) / MPH_TO_MPS - 100) < 1e-6);
   assert.ok(Math.abs(advanceSpeed(0, input, 30, { maxSpeedMph: 35 }) / MPH_TO_MPS - 35) < 1e-6);
 });
 

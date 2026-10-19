@@ -68,7 +68,8 @@ export function buildGraph(data: RoadData): RoadGraph {
       if (length < 0.01) continue;
       const addEdge = (from: typeof a, to: typeof a, suffix: string) => {
         const id = `${way.id}:${i}:${suffix}`;
-        const edge: RoadEdge = { id, from: from.id, to: to.id, wayId: String(way.id), name, highway, length, heading: Math.atan2(to.x - from.x, to.y - from.y), speedLimitMph };
+        const access=tags.motorcar??tags.motor_vehicle??tags.vehicle??tags.access;
+        const edge: RoadEdge = { id, from: from.id, to: to.id, wayId: String(way.id), name, highway, length, heading: Math.atan2(to.x - from.x, to.y - from.y), speedLimitMph, ...(access?{access}: {}) };
         graph.edges.set(id, edge);
         graph.outgoing.get(from.id)!.push(id);
         graph.incoming.get(to.id)!.push(id);

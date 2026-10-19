@@ -71,6 +71,9 @@ const server = createServer(async (request, response) => {
   }
 });
 
+// Large geographic-asset checks must not race the client's idle connection.
+server.keepAliveTimeout = 60_000;
+server.headersTimeout = 65_000;
 server.listen(port, '127.0.0.1', () => {
   console.log(`Built static game: http://127.0.0.1:${port}${mount}`);
 });
