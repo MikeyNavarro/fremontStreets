@@ -4,6 +4,8 @@ import type {LonLat, RoadData, RoadWay} from '../core/types';
 /** Curriculum associations are metadata, never display names or invented geometry. */
 export interface LabelCurriculumEntry {id: string; sourceWayIds: readonly string[]}
 export interface RoadLabelProperties {
+  /** Promoted native feature identity; vector tiles cannot encode string IDs directly. */
+  labelId: string;
   name: string;
   sourceName: string;
   ref: string;
@@ -165,7 +167,7 @@ export function prepareRoadLabels(data: RoadData, curriculum: readonly LabelCurr
     const featureId = `road-label:${sourceSegments.map(segment => `${segment.wayId}:${segment.index}`).sort(compare)[0]}`;
     const feature: Feature<LineString, RoadLabelProperties> = {
       type: 'Feature', id: featureId,
-      properties: {name: info.name, sourceName: info.name, ref: info.ref, label: info.label, compactLabel: compactRoadLabel(info.label), highway: info.highway, sourceWayIds, curriculumIds, isStudy: curriculumIds.length > 0, basePriority, priority: basePriority},
+      properties: {labelId: featureId, name: info.name, sourceName: info.name, ref: info.ref, label: info.label, compactLabel: compactRoadLabel(info.label), highway: info.highway, sourceWayIds, curriculumIds, isStudy: curriculumIds.length > 0, basePriority, priority: basePriority},
       geometry: {type: 'LineString', coordinates: nodeIds.map(nodeId => [...data.nodes[nodeId]])},
     };
     result.collection.features.push(feature);

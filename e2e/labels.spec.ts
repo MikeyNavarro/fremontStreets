@@ -74,6 +74,9 @@ test('native road labels provide usable city and intermediate views at both view
         }).map((feature: any) => feature.name)).size;
       }).toBeGreaterThanOrEqual(level === 10 ? 1 : 3);
       const actual = await symbols(page);
+      // MapLibre's tile feature IDs must round-trip to prepared chain IDs;
+      // unpromoted string GeoJSON IDs were previously exposed as numeric zero.
+      expect(actual.rendered.every((feature: any) => typeof feature.id === 'string' && feature.id.startsWith('road-label:'))).toBe(true);
       expect(actual.rendered.some((feature: any) => {
         const ids = typeof feature.curriculumIds === 'string' ? JSON.parse(feature.curriculumIds) : feature.curriculumIds;
         return ids?.length > 0;
@@ -121,6 +124,7 @@ test('Auto Mall Parkway and Durham Road render their separate source names at th
 test('native symbols survive actual following, heading rotation and repeated camera returns', async ({ page }) => {
   test.setTimeout(120_000);
   await expect.poll(() => names(page)).toContain('Stevenson Boulevard');
+  await expect.poll(async () => (await symbols(page)).rendered.some((feature: any) => feature.name === 'Stevenson Boulevard' && feature.priority === 1)).toBe(true);
   const builds = (await mapState(page)).labels.geometryBuilds;
   await openPanel(page, 'settings');
   await page.locator('#map-orientation').selectOption('heading');
@@ -133,6 +137,7 @@ test('native symbols survive actual following, heading rotation and repeated cam
   } finally { await page.keyboard.up('w'); }
   await page.getByTestId('pause-toggle').click();
   await expect.poll(() => names(page)).toContain('Stevenson Boulevard');
+  await expect.poll(async () => (await symbols(page)).rendered.some((feature: any) => feature.name === 'Stevenson Boulevard' && feature.priority === 1)).toBe(true);
   await drag(page, 130, 60);
   const pose = await mapState(page);
   for (let iteration = 0; iteration < 2; iteration++) {

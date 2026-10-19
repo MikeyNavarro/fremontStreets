@@ -4,7 +4,7 @@
 
 This extends the existing Fremont Streets application. The reviewed published baseline is **`a416cdd`**. The geographic evidence and reproducible audit are preserved in commit **`339c1c2`** (`Audit Fremont study connections with scoped City and bridge evidence`).
 
-**This is a recoverable implementation checkpoint, not a deployment-success announcement.** Native labels and their visual comparison are implemented and inspected. The complete development-browser suite, the complete production-browser suite, GitHub Actions and publication verification are pending at this checkpoint. They must be completed and recorded before claiming that the live game contains this upgrade.
+**This is a recoverable implementation checkpoint, not a deployment-success announcement.** Geographic audit commit `339c1c2` and native-label commit `9e2ad3c` preserve the work separately. Native labels and their visual comparison passed, followed by all 23 development and 31 production browser tests at `9e2ad3c`. A subsequent diagnostic correction promotes each immutable label-chain ID into native MapLibre features, so rendered labels resolve to their exact source records. The 118 Node tests and production build passed again after that correction. Five targeted development and five targeted production browser checks also passed after the correction. All 18 after screenshots were then regenerated with zero rendered-ID/source-provenance lookup failures and zero page errors. GitHub Actions and publication verification remain pending at this pre-deployment checkpoint. Publication must be verified before claiming that the live game contains this upgrade.
 
 The existing website is <https://mikeynavarro.github.io/fremontStreets/>. Its existence does not establish that these changes have been deployed.
 
@@ -61,7 +61,7 @@ The upgrade uses a dedicated GeoJSON line-label source and native MapLibre symbo
 
 Auto Mall Parkway and Durham Road retain their actual mapped names on their own geometry. Curriculum grouping labels are never substituted for physical road names. Freeway references come from source records. Compact suffix abbreviations at wide zoom are display text only; curriculum identities and matching keys are unchanged.
 
-MapLibre handles local line alignment, upright text, curve limits, collisions and repeated anchors. Zoom-dependent typography and spacing replace the one-label-per-name and global 45-label limits. Six priority tiers favor selected/destination roads, the current road, curriculum roads, route connectors, major background roads and local roads. Geometry preparation occurs once; subsequent priority changes update relevant feature properties. Native source tiling and symbol placement still occur inside MapLibre.
+MapLibre handles local line alignment, upright text, curve limits, collisions and repeated anchors. Zoom-dependent typography and spacing replace the one-label-per-name and global 45-label limits. Six priority tiers favor selected/destination roads, the current road, curriculum roads, route connectors, major background roads and local roads. Geometry preparation occurs once; subsequent priority changes update relevant feature properties. Native source tiling and symbol placement still occur inside MapLibre. Each feature also carries its immutable `labelId` as a promoted native identity; this prevents string IDs being lost during vector-tile encoding and keeps rendered-label inspection, source provenance and priority updates consistent.
 
 The prepared GeoJSON retains every original coordinate across 6,359 presentation chains and 47,812 source segments. MapLibre uses its ordinary 0.375-pixel tiling tolerance, also used by the road-rendering source. This subpixel display tessellation avoids quantized vertex zigzags suppressing otherwise valid label anchors; it does not edit source geography or the driving graph. Compact street-type suffixes and constant 11-pixel text at zooms 10–11 let more actual names fit. Full names return at zoom 12.
 
@@ -95,8 +95,9 @@ The existing assistance policy remains explicit: hidden-answer recognition quest
 | Common secret-pattern scan of generated files | No matches; a bounded scan, not a guarantee covering every possible credential format. |
 | Final screenshots and manual visual acceptance | Passed: 18 after captures at 1440 × 1000 and 1920 × 1080, no captured page/renderer errors, compared with 18 baseline captures. |
 | Focused native-label browser suite | **5 passed in 2.2 minutes**, including widened surface-road assertions, panning, following, camera returns and answer hiding. |
-| Complete final development-browser suite | **Pending.** |
-| Complete final production-browser suite | **Pending.** |
+| Complete development-browser suite at `9e2ad3c` | **23 passed in 9.1 minutes**, including actual navigation completion, both cameras, exploration, recognition, persistence, patrol boundaries and boundary editing. |
+| Complete production-browser suite at `9e2ad3c` | **31 passed in 16.4 minutes**, including Stevenson continuity, actual road-to-road / return-to-HQ / intersection driving, no-GPS study and wrong-turn recovery. |
+| Native source-ID correction | **118 Node tests and build passed again; 5 targeted development browser tests passed in 2.2 minutes and 5 targeted production tests passed in 2.1 minutes.** All 18 screenshots were recaptured with zero source-provenance lookup failures and zero page errors. |
 | GitHub Actions deployment and live-site verification | **Pending. Do not claim this upgrade is published.** |
 
 The inspected output contains 11 runtime files plus `.nojekyll`, with no source maps. Static asset checks establish packaging correctness; they do not replace browser gameplay, actual native-symbol rendering or live deployment checks. Rerun the build and relevant tests after any later implementation changes.
@@ -137,10 +138,10 @@ The two geographic commands use committed source snapshots and do not repeat dow
 
 ## Remaining work and exact resumption order
 
-1. Preserve the completed before/after screenshot comparison. Finish the interactive native-label checks for panning, rotation, camera returns and assistance visibility.
-2. Run the complete development and production browser suites without concurrent builds or source changes. Investigate genuine failures; do not bypass tests or silently loosen assertions.
-3. Update this report and the visual report with actual results. Commit the label upgrade separately from geographic commit `339c1c2`.
-4. Push verified changes to the authorized branch, monitor the existing Pages workflow, then inspect the live application and compare deployed assets with the tested build. Until this succeeds, report deployment as pending or blocked.
+1. Preserve the native source-ID correction, strengthened tests, all 18 recaptured after images and updated reports as a separate Git checkpoint. Full local browser suites passed at `9e2ad3c`; the correction then passed all 118 Node tests, the build and five targeted browser tests in each environment.
+2. Push verified commits to the authorized `main` branch without overwriting unrelated work.
+3. Monitor the existing complete GitHub Actions pipeline against the final artifact; do not bypass tests or silently loosen assertions.
+4. After deployment succeeds, inspect the live application and compare deployed assets with the tested build. Until this succeeds, report deployment as pending or blocked.
 5. Continue geographic verification with the highest-use HQ junctions: **Stevenson Boulevard / Paseo Padre Parkway** first, followed by **Fremont Boulevard / Stevenson Boulevard** and the applicable connecting approaches. City points support the first named location; the protected-intersection inventory adds physical at-grade evidence for the second. Both still require applicable individual approach, access, direction and turn evidence.
 
 Geographic work remains blocked on independent, applicable maneuver and access evidence; 232 unsupported OSM restriction records; the 11 inaccessible sampled approaches; and incomplete corroboration/coverage on 20 curriculum entries. Current construction, closures, signals, lane configurations and every legal movement are not independently established. A conservative graph exclusion is not proof that the real-world road is physically disconnected.

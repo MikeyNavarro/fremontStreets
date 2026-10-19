@@ -55,6 +55,12 @@ try {
       const record = await page.evaluate(({ name }) => {
         const game = window.__FREMONT_GAME__, debug = window.__FREMONT_LABEL_DEBUG__;
         const native = game.mapLabels, map = game.presentation.map;
+        const sourceLookupFailures = [];
+        for (const feature of native.rendered) {
+          const chain = typeof feature.id === 'string' ? debug.source(feature.id) : null;
+          const wayIds = typeof feature.sourceWayIds === 'string' ? JSON.parse(feature.sourceWayIds) : feature.sourceWayIds;
+          if (!chain || chain.feature.id !== feature.id || JSON.stringify(chain.feature.properties.sourceWayIds) !== JSON.stringify(wayIds)) sourceLookupFailures.push(feature.id);
+        }
         const hits = [];
         if (name.startsWith('fremont-')) {
           // Each small box queries actual placed-symbol collision bounds. Boxes
@@ -75,13 +81,15 @@ try {
           fremontSymbolHitBoxes: hits,
           fremontWidelySeparatedHitBoxes: separated,
           sourceDiagnostics: debug.stats(),
+          sourceLookupFailures,
         };
       }, { name });
       const filename = `${prefix}-${name}-${width}.png`;
       await page.screenshot({ path: resolve(output, filename) });
       observations.push({ name, width, height, center, zoom, filename, ...record, errors: [...errors] });
-      console.log(JSON.stringify({ filename, distinctNames: record.distinctNames.length, separatedFremontSymbolBoxes: record.fremontWidelySeparatedHitBoxes.length, errors }));
+      console.log(JSON.stringify({ filename, distinctNames: record.distinctNames.length, separatedFremontSymbolBoxes: record.fremontWidelySeparatedHitBoxes.length, sourceLookupFailures: record.sourceLookupFailures.length, errors }));
       if (errors.length || record.rendererError) throw new Error(`Rendering failed in ${filename}: ${[...errors, record.rendererError].filter(Boolean).join('; ')}`);
+      if (record.sourceLookupFailures.length) throw new Error(`Native label provenance did not round-trip in ${filename}.`);
     }
     await page.close();
   }

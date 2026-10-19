@@ -132,10 +132,12 @@ test('priority updates use indexes, restore baseline, and never rebuild label ge
   ]);
   const labels = prepareRoadLabels(source,[{id:'study',sourceWayIds:['1','2','3']}]);
   const geometry = labels.collection.features.map(feature=>feature.geometry);
+  const nativeIds = labels.collection.features.map(feature=>feature.properties.labelId);
   const sourceSnapshot = structuredClone(source);
   const priorities = new RoadLabelPriorityController(labels);
   let diff = priorities.update({currentWayId:'1',selectedWayIds:['3'],connectorWayIds:['4']});
   assert.equal(diff.update.length, 4, 'current exact identity is prioritized across separate source-way sections');
+  for (const update of diff.update) assert.ok(nativeIds.includes(update.id), 'priority diffs address promoted native IDs');
   assert.deepEqual(labels.collection.features.map(feature=>feature.properties.priority), [1,1,0,3]);
   assert.equal(priorities.update({currentWayId:'1',selectedWayIds:['3'],connectorWayIds:['4']}).update.length, 0, 'unchanged interaction causes no source update');
   diff = priorities.update({selectedCurriculumIds:['study'],currentWayId:'1'});
@@ -144,6 +146,7 @@ test('priority updates use indexes, restore baseline, and never rebuild label ge
   priorities.update({});
   assert.deepEqual(labels.collection.features.map(feature=>feature.properties.priority), [2,2,2,5]);
   assert.deepEqual(labels.collection.features.map(feature=>feature.geometry), geometry);
+  assert.deepEqual(labels.collection.features.map(feature=>feature.properties.labelId), nativeIds, 'priority changes preserve native identity');
   labels.collection.features.forEach((feature,index)=>assert.equal(feature.geometry,geometry[index]));
   assert.deepEqual(source, sourceSnapshot);
 });
@@ -152,6 +155,12 @@ test('bundled Fremont label chains conserve real source segments and all 38 stud
   const source = JSON.parse(readFileSync(new URL('../public/data/roads.json',import.meta.url),'utf8')) as RoadData;
   const network = JSON.parse(readFileSync(new URL('../public/data/study-network.json',import.meta.url),'utf8'));
   const labels = prepareRoadLabels(source,network.entries);
+  const nativeIds = labels.collection.features.map(feature=>feature.properties.labelId);
+  assert.equal(new Set(nativeIds).size, nativeIds.length, 'native label IDs are unique');
+  for (const feature of labels.collection.features) {
+    assert.equal(feature.properties.labelId, feature.id);
+    assert.equal(labels.byId.get(feature.properties.labelId)?.feature, feature, 'native ID resolves to exact source provenance');
+  }
   assert.equal(labels.byCurriculumId.size, 38);
   for (const [id,features] of labels.byCurriculumId) assert.ok(features.length, `missing curriculum label association ${id}`);
   assert.deepEqual(labels.diagnostics.duplicateWayIds, []);

@@ -68,7 +68,7 @@ export class OverheadView {
             // Native subpixel tessellation avoids quantized vertex zigzags
             // rejecting line-label anchors. This is the road layer's ordinary
             // renderer tolerance; all source and graph coordinates stay intact.
-            [ROAD_LABEL_SOURCE]:{type:'geojson',data:labelData.collection,tolerance:0.375,buffer:128,maxzoom:18},
+            [ROAD_LABEL_SOURCE]:{type:'geojson',data:labelData.collection,promoteId:'labelId',tolerance:0.375,buffer:128,maxzoom:18},
             roads: { type: 'geojson', data: roads, attribution: '© OpenStreetMap contributors · ODbL' },
             route: { type: 'geojson', data: this.route },
             turns: { type: 'geojson', data: this.turns },
