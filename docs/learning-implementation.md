@@ -125,3 +125,25 @@ no longer closes a working IndexedDB connection. The browser test confirms both
 independent-storage persistence and session-only export/continued driving. Its
 initial harness raced the asynchronously opened startup menu; it now waits for
 the visible startup dialog before closing it, with no application timeout increase.
+
+## Release regression investigation
+
+The first full production run executed 25 cases: 23 passed and two failed. The
+learning evidence-gap case encountered the same startup-menu race described
+above; the current harness waits for the actual visible menu before closing it.
+The long road-to-road test exhausted its original route-based budget while
+several independent software-rendered browser checks were also running. Its
+trace contained 2,134 state samples and 60 segment transitions: every sampled
+edge remained on the intended 2,183 m route, with 1,903 m traveled at expiration.
+There was no sampled off-route edge or disconnected jump. The application caps
+catch-up after long frames; concurrent software rendering can slow simulated
+travel relative to wall time.
+
+The identical route/HQ-return/source-junction test then passed in 6.7 minutes
+with competing browser jobs stopped. No controls, simulation speed, assertions,
+route geometry, or timeout were changed. Run these real-time browser suites
+serially on software-rendered hosts. A clean full 26-case production rerun and
+final GitHub Actions remain required; an isolated passing retry alone is not a
+full release result. Workflow 39219293619 was deliberately canceled during this
+investigation, before deployment. Check the subsequent final workflow and live
+site for publication status.
