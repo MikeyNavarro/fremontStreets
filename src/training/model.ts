@@ -24,12 +24,13 @@ export function streetProgress(id:string,state:LearningState,registry:Verificati
  const blocked=!navigationEligible(evidence)||!hasIntersection;
  const navigable=recognized&&!blocked&&nav.length>=2&&new Set(nav.map(a=>a.sessionId)).size>=2&&intersection;
  let mastered=false;
- if(navigable)for(let n=10;n<=unaided.length;n++){
-   const prior=unaided.slice(0,n),success=prior.filter(a=>a.outcome==='correct'),recent=prior.slice(-10);
-   if(recent.filter(a=>a.outcome==='correct').length<8)continue;
-   if(new Set(success.map(a=>a.sessionId)).size<3||Date.parse(success.at(-1)!.at)-Date.parse(success[0].at)<7*DAY)continue;
-   if(success.filter(a=>a.category==='navigation').length<2)continue;
-   mastered=true;break;
+ // Evaluate prerequisites at the same historical instant as the 80% window.
+ // A later recognition success must not retroactively validate an earlier window.
+ if(navigable){const identities=new Set<string>(),sessions=new Set<string>(),navSessions=new Set<string>();let firstSuccess:number|null=null,lastSuccess=0,navSuccesses=0,intersectionSuccess=false;const window:boolean[]=[];
+  for(const a of unaided){const success=a.outcome==='correct';window.push(success);if(window.length>10)window.shift();
+   if(success){sessions.add(a.sessionId);firstSuccess??=Date.parse(a.at);lastSuccess=Date.parse(a.at);if(a.category==='recognition'&&['identify','locate','location'].includes(a.kind))identities.add(a.questionId);if(a.category==='navigation'){navSuccesses++;navSessions.add(a.sessionId);}if(a.category==='intersection')intersectionSuccess=true;}
+   if(window.length===10&&window.filter(Boolean).length>=8&&identities.size>=2&&navSuccesses>=2&&navSessions.size>=2&&intersectionSuccess&&sessions.size>=3&&firstSuccess!==null&&lastSuccess-firstSuccess>=7*DAY){mastered=true;break;}
+  }
  }
  const recent=unaided.slice(-10),accuracy=recent.length?recent.filter(a=>a.outcome==='correct').length/recent.length:null;
  // Review confidence can fall while an earned level remains. Overdue time alone never changes it.

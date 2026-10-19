@@ -131,6 +131,7 @@ test('static production game loads real Fremont roads, its MapLibre worker, and 
   expect(audit.requests.some(url => new URL(url).pathname === `${prefix}data/zones.json` && new URL(url).searchParams.has('v'))).toBe(true);
   for (const id of ['zone1', 'zone2', 'zone3']) {
     await selectZone(page,id);
+    await page.locator('#inspect-zone').click();
     await expect.poll(async () => (await state(page)).overlay.renderedZoneIds).toContain(id);
     const selected = await state(page);
     expect(selected.zoneId).toBe(id);

@@ -117,6 +117,7 @@ test('all three sourced study areas render the correct polygons without changing
   await expect(page.getByTestId('zone-notice')).toHaveText("Patrol-zone boundaries are approximate study areas based on the Fremont Police Department's published map. They are not verified official GIS boundaries.");
   for (const id of ['zone1', 'zone2', 'zone3'] as const) {
     await selectZone(page,id);
+    await page.locator('#inspect-zone').click();
     await expect.poll(async () => (await patrolState(page)).overlay.renderedZoneIds).toContain(id);
     const selected = await patrolState(page);
     expect(selected.zoneId).toBe(id);

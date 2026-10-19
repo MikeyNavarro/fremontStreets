@@ -69,3 +69,10 @@ test('direction tasks require both corroborated reference points and cannot subs
  assert.equal(taskEligible(task,fixture),true);assert.equal(taskEligible({...task,referenceEdgeId:'missing'},fixture),false);
  const state={...EMPTY_LEARNING(),attempts:[attempt(0,{kind:'direction'}),attempt(1,{kind:'direction'})]};assert.equal(streetProgress(entry.id,state,fixture).level,'Unfamiliar');
 });
+
+test('later recognition cannot retroactively turn an earlier navigation-only streak into mastery',()=>{
+ const earlier=Array.from({length:10},(_,i)=>attempt(i,{category:i===0?'intersection':'navigation',kind:i===0?'intersection':'navigate'}));
+ const errors=Array.from({length:10},(_,i)=>attempt(i+10,{category:'recognition',kind:'identify',outcome:'incorrect'}));
+ const lateRecognition=[attempt(20,{category:'recognition',kind:'identify'}),attempt(21,{category:'recognition',kind:'locate'})];
+ const state={...EMPTY_LEARNING(),attempts:[...earlier,...errors,...lateRecognition]};assert.equal(streetProgress(entry.id,state,fixture).level,'Navigable');assert.equal(streetProgress(entry.id,state,fixture).accuracy,.2);
+});

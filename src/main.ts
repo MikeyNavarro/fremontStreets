@@ -80,6 +80,7 @@ async function boot() {
       <section class="panel source-details"><div class="eyebrow">Grounded in geography</div><h2>Know the limits</h2><p>${esc(partialLabel)}</p><p>Source: ${esc(source.attribution ?? '© OpenStreetMap contributors')}<br>Data date: ${esc(String(source.fetchedAt ?? source.importedAt ?? 'See geographic provenance').slice(0,10))}</p><details><summary>Simulation & data notes</summary><p>Movement follows connected road nodes and known one-way restrictions. Traffic signals, lanes, and incomplete turn restrictions are unverified. Generic 3D scenery and road widths are visual approximations. No traffic waiting is simulated. This is a learning aid, not driving or emergency-navigation advice.</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap attribution & ODbL ↗</a></p></details></section></aside>
     </main><footer class="footer"><span>FREMONT STREETS <span style="margin:0 9px">/</span> A city learned one intersection at a time.</span><span>Local road data · local progress · no accounts required</span></footer>`;
 
+  $('zone-select').insertAdjacentHTML('afterend','<button id="inspect-zone">Inspect selected boundary on map</button>');
   const ui=new DrivingShell(app);
   let graphicsQuality:'low'|'balanced'|'high'='balanced';
   const roadsGeo = roadPresentation(data,graph);
@@ -102,6 +103,7 @@ async function boot() {
     $('zone-coverage-description').textContent=id==='all'?'Partial city coverage. Selecting a zone starts a new practice drive on an existing road; progress is preserved.':coverage?.available?'Partial road coverage only. The colored polygon is an approximate study area. You can drive across its boundary.':'Boundary study only: the existing road extract has no usable streets in this zone. Driving and questions require a source-backed road import; no streets have been created.';
     $('progress-area').textContent=zone?`${zone.name} · ${coverage?.available?'partial roads':'no current road coverage'}`:'All Fremont · loaded roads only';
     overhead.setBoundaries(study.boundaries(),id==='all'?undefined:id,id==='all');
+    $('inspect-zone').toggleAttribute('disabled',!zone?.geometry);
     // Zone changes update the boundary without taking ownership of the camera.
     $('mode-navigation').toggleAttribute('disabled',!areaHasRoads());$('mode-quiz').toggleAttribute('disabled',!areaHasRoads());
     for(const control of ['throttle','brake','turn-left','turn-right','turn-straight','turn-uturn'])$(control).toggleAttribute('disabled',!areaHasRoads());
@@ -169,6 +171,7 @@ async function boot() {
   }
   function reset(){if(editorActive)return;learning?.cancel();training?.cancel();keys.clear();pendingTurn=undefined;game.vehicle=stationDeparture(graph);progress=study.record(progress,game.vehicle);route=null;game.activeRoute=null;challenge=null;showRoute();$('save-route').setAttribute('disabled','');renderMission();say('Back at police headquarters. Your saved progress is preserved.');}
 
+  $('inspect-zone').onclick=()=>{const zone=study.zone(game.zoneId);if(!editorActive&&zone?.geometry){switchCamera('overhead');overhead.focusBoundary(zone.geometry);ui.close();}};
   $('zone-select').onchange=()=>selectArea(($('zone-select') as HTMLSelectElement).value);
   $('follow-car').onclick=()=>{if(!editorActive)overhead.centerOnVehicle(game.vehicle.position);};
   $('camera-overhead').onclick=()=>switchCamera('overhead');$('camera-driver').onclick=()=>switchCamera('driver');
