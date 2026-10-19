@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === 'build' || isPreview ? '/fremontStreets/' : '/',
   build: {
     rolldownOptions: {
       output: {
@@ -13,4 +14,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

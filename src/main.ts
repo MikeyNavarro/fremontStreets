@@ -14,7 +14,7 @@ const app = $('app');
 app.innerHTML = '<div class="loading"><h1>FREMONT STREETS</h1><p>Loading the local road network…</p></div>';
 
 async function boot() {
-  const [roadsResponse, zonesResponse] = await Promise.all([fetch('/data/roads.json'), fetch('/data/zones.json')]);
+  const [roadsResponse, zonesResponse] = await Promise.all([fetch(`${import.meta.env.BASE_URL}data/roads.json`), fetch(`${import.meta.env.BASE_URL}data/zones.json`)]);
   if (!roadsResponse.ok) throw new Error('The real Fremont road dataset is missing. Run the documented geographic import before playing.');
   const data = await roadsResponse.json() as RoadData;
   const zones = (zonesResponse.ok ? await zonesResponse.json() : {metadata:{sourceUrl:'',boundaryVersion:null},zones:[]}) as ZoneDocument;

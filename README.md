@@ -2,6 +2,12 @@
 
 A playable driving and street-learning game for Fremont, California. Follow real road geometry, practice navigation, and switch between a MapLibre overhead map and a Three.js driver's-seat view without changing the simulation.
 
+## GitHub Pages
+
+The deployment target is **https://mikeynavarro.github.io/fremontStreets/**. It becomes playable only after the GitHub Pages deployment succeeds; the URL alone is not proof of publication.
+
+The repository workflow tests the existing game, builds its static production files with the `/fremontStreets/` base path, checks the built site without Vite, and deploys the tested artifact on pushes to `main`. No game API key or private cloud service is required. See [deployment instructions](docs/deployment.md) for the exact GitHub Pages settings and run-status checks.
+
 ## Run locally
 
 Requires Node.js 22.12+ (tested with Node 24) and a browser with WebGL enabled.
@@ -53,6 +59,7 @@ Both cameras share geographic centerlines and one authoritative vehicle state. T
 npm test            # simulation, routing, camera, progress, geography tests
 npm run build       # strict TypeScript check and production build
 npm run test:e2e    # actual Chromium browser driving and interface checks
+npm run test:production # built static game at the GitHub Pages subdirectory
 ```
 
 Playwright uses an installed Chromium when available, or its managed browser. Install the managed browser with `npx playwright install chromium` if needed. `PLAYWRIGHT_CHROMIUM_EXECUTABLE` can select a system executable.
