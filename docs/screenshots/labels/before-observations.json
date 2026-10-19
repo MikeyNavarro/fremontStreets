@@ -1,0 +1,645 @@
+[
+  {
+    "phase": "before",
+    "name": "wide-z10",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.974,
+      37.545
+    ],
+    "zoom": 10,
+    "pose": {
+      "headingUp": false,
+      "zoom": 10,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.974,
+        37.545
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "wide-z11",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.974,
+      37.545
+    ],
+    "zoom": 11,
+    "pose": {
+      "headingUp": false,
+      "zoom": 11,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.974,
+        37.545
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "wide-z12",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.974,
+      37.545
+    ],
+    "zoom": 12,
+    "pose": {
+      "headingUp": false,
+      "zoom": 12,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.974,
+        37.545
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "central-z13",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.977,
+      37.55
+    ],
+    "zoom": 13,
+    "pose": {
+      "headingUp": false,
+      "zoom": 13,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.977,
+        37.55
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "automall-durham-z17",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.9394,
+      37.51475
+    ],
+    "zoom": 17,
+    "pose": {
+      "headingUp": false,
+      "zoom": 17,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9394,
+        37.51475
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [
+      "Auto Mall Parkway",
+      "Osgood Road",
+      "Durham Road"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "automall-durham-z19",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.9394,
+      37.51475
+    ],
+    "zoom": 19,
+    "pose": {
+      "headingUp": false,
+      "zoom": 19,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9394,
+        37.51475
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [
+      "Auto Mall Parkway",
+      "Durham Road"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "wide-z10",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.974,
+      37.545
+    ],
+    "zoom": 10,
+    "pose": {
+      "headingUp": false,
+      "zoom": 10,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.974,
+        37.545
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "wide-z11",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.974,
+      37.545
+    ],
+    "zoom": 11,
+    "pose": {
+      "headingUp": false,
+      "zoom": 11,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.974,
+        37.545
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "wide-z12",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.974,
+      37.545
+    ],
+    "zoom": 12,
+    "pose": {
+      "headingUp": false,
+      "zoom": 12,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.974,
+        37.545
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "central-z13",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.977,
+      37.55
+    ],
+    "zoom": 13,
+    "pose": {
+      "headingUp": false,
+      "zoom": 13,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.977,
+        37.55
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "automall-durham-z17",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.9394,
+      37.51475
+    ],
+    "zoom": 17,
+    "pose": {
+      "headingUp": false,
+      "zoom": 17,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9394,
+        37.51475
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [
+      "Auto Mall Parkway",
+      "Osgood Road",
+      "Durham Road"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "automall-durham-z19",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.9394,
+      37.51475
+    ],
+    "zoom": 19,
+    "pose": {
+      "headingUp": false,
+      "zoom": 19,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9394,
+        37.51475
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [
+      "Auto Mall Parkway",
+      "Durham Road"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "fremont-z15",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.9867167,
+      37.5476736
+    ],
+    "zoom": 15,
+    "pose": {
+      "headingUp": false,
+      "zoom": 15,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9867167,
+        37.5476736
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [
+      "Fremont Boulevard",
+      "Mowry Avenue",
+      "Stevenson Boulevard",
+      "Paseo Padre Parkway",
+      "Walnut Avenue",
+      "Logan Drive",
+      "Sundale Drive"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "fremont-z17",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.9867167,
+      37.5476736
+    ],
+    "zoom": 17,
+    "pose": {
+      "headingUp": false,
+      "zoom": 17,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9867167,
+        37.5476736
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [
+      "Mowry Avenue",
+      "Fremont Boulevard"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "stevenson-z16",
+    "width": 1440,
+    "height": 1000,
+    "center": [
+      -121.9724171,
+      37.5495328
+    ],
+    "zoom": 16,
+    "pose": {
+      "headingUp": false,
+      "zoom": 16,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9724171,
+        37.5495328
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1440,
+      "height": 932
+    },
+    "domLabels": [
+      "Stevenson Boulevard",
+      "Paseo Padre Parkway",
+      "Walnut Avenue",
+      "Sundale Drive"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "fremont-z15",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.9867167,
+      37.5476736
+    ],
+    "zoom": 15,
+    "pose": {
+      "headingUp": false,
+      "zoom": 15,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9867167,
+        37.5476736
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [
+      "Stevenson Boulevard",
+      "Fremont Boulevard",
+      "Mowry Avenue",
+      "Paseo Padre Parkway",
+      "Walnut Avenue",
+      "Central Avenue",
+      "Logan Drive",
+      "Sundale Drive",
+      "Eggers Drive"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "fremont-z17",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.9867167,
+      37.5476736
+    ],
+    "zoom": 17,
+    "pose": {
+      "headingUp": false,
+      "zoom": 17,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9867167,
+        37.5476736
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [
+      "Mowry Avenue",
+      "Fremont Boulevard",
+      "Walnut Avenue"
+    ],
+    "labels": null,
+    "errors": []
+  },
+  {
+    "phase": "before",
+    "name": "stevenson-z16",
+    "width": 1920,
+    "height": 1080,
+    "center": [
+      -121.9724171,
+      37.5495328
+    ],
+    "zoom": 16,
+    "pose": {
+      "headingUp": false,
+      "zoom": 16,
+      "bearing": 0,
+      "followVehicle": false,
+      "center": [
+        -121.9724171,
+        37.5495328
+      ],
+      "pitch": 0,
+      "unavailableRoads": 243,
+      "unavailableLineDasharray": [
+        2,
+        2
+      ],
+      "pixelRatio": 1,
+      "width": 1920,
+      "height": 1012
+    },
+    "domLabels": [
+      "Stevenson Boulevard",
+      "Paseo Padre Parkway",
+      "Walnut Avenue",
+      "Sundale Drive"
+    ],
+    "labels": null,
+    "errors": []
+  }
+]

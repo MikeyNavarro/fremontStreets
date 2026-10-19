@@ -104,7 +104,7 @@ export class StudyMode {
 
   private overlay(){
     const graph=this.options.graph,entries=this.entries().filter(entry=>!entry.needsConfirmation);
-    const roads:FeatureCollection<LineString>={type:'FeatureCollection',features:entries.flatMap(entry=>(this.group==='zone1'?entry.zone1EdgeIds:entry.edgeIds).filter(id=>!id.endsWith(':r')||!graph.edges.has(id.replace(/:r$/,':f'))).map(id=>{const edge=graph.edges.get(id)!;return {type:'Feature' as const,properties:{group:entry.group,selected:entry.id===this.selected,name:edge.name||entry.originalLabel},geometry:{type:'LineString' as const,coordinates:[graph.nodes.get(edge.from)!.position,graph.nodes.get(edge.to)!.position]}};}))};
+    const roads:FeatureCollection<LineString>={type:'FeatureCollection',features:entries.flatMap(entry=>(this.group==='zone1'?entry.zone1EdgeIds:entry.edgeIds).filter(id=>!id.endsWith(':r')||!graph.edges.has(id.replace(/:r$/,':f'))).map(id=>{const edge=graph.edges.get(id)!;return {type:'Feature' as const,properties:{group:entry.group,selected:entry.id===this.selected,name:edge.name||entry.originalLabel,wayId:edge.wayId},geometry:{type:'LineString' as const,coordinates:[graph.nodes.get(edge.from)!.position,graph.nodes.get(edge.to)!.position]}};}))};
     const ids=new Set(entries.map(entry=>entry.id));
     const junctions:FeatureCollection<Point>={type:'FeatureCollection',features:this.options.network.intersections.filter(junction=>(this.group!=='zone1'||junction.inZone1Study)&&junction.entryIds.some(id=>ids.has(id))).map(junction=>({type:'Feature',properties:{id:junction.id},geometry:{type:'Point',coordinates:junction.position}}))};
     this.options.overhead.setStudyOverlay(roads,junctions,entries.flatMap(entry=>entry.mappedNames));

@@ -1,3 +1,6 @@
+import {RoadLabels} from './road-labels';
+import {roadLabelLayers, ROAD_LABEL_SOURCE} from './road-label-style';
+import type {PreparedRoadLabels} from './road-label-geometry';
 import {CameraController} from './camera-controller';
 import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource, Map as LibreMap, Marker } from 'maplibre-gl';
@@ -11,18 +14,16 @@ const emptyLines = (): FeatureCollection<LineString> => ({ type: 'FeatureCollect
 export class OverheadView {
   private map: LibreMap | null = null;
   private marker: Marker | null = null;
-  private labels: Marker[] = [];
+  private roadLabels:RoadLabels|null=null;
   private loaded = false;
   private active = true;
   private lastFollow = 0;
   private headingUp=false;
   private preferredZoom=16.5;
   private readonly reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  private lastLabelRefresh = 0;
   private lastSnapshot: VehicleSnapshot | null = null;
   private route = emptyLines();
   private turns = emptyLines();
-  private roads: RoadCollection;
   private readonly unavailableRoadCount:number;
   private observer: ResizeObserver | null = null;
   private turnsKey = '';
@@ -43,9 +44,7 @@ export class OverheadView {
   private stationMarker: Marker | null = null;
   private destinationMarker: Marker | null = null;
 
-  constructor(private container: HTMLElement, roads: RoadCollection, bounds?: [LonLat, LonLat]) {
-    const rank:Record<string,number>={primary:0,motorway:1,trunk:1,secondary:2,tertiary:3,residential:4};
-    this.roads={...roads,features:[...roads.features].sort((a,b)=>(rank[String(a.properties?.highway)]??5)-(rank[String(b.properties?.highway)]??5))};
+  constructor(private container: HTMLElement, roads: RoadCollection, private labelData:PreparedRoadLabels) {
     this.unavailableRoadCount=roads.features.filter(feature=>feature.properties?.playable===false).length;
     container.dataset.renderer = 'overhead';
     try {
@@ -66,6 +65,10 @@ export class OverheadView {
         style: {
           version: 8,
           sources: {
+            // Native subpixel tessellation avoids quantized vertex zigzags
+            // rejecting line-label anchors. This is the road layer's ordinary
+            // renderer tolerance; all source and graph coordinates stay intact.
+            [ROAD_LABEL_SOURCE]:{type:'geojson',data:labelData.collection,tolerance:0.375,buffer:128,maxzoom:18},
             roads: { type: 'geojson', data: roads, attribution: '© OpenStreetMap contributors · ODbL' },
             route: { type: 'geojson', data: this.route },
             turns: { type: 'geojson', data: this.turns },
@@ -93,10 +96,14 @@ export class OverheadView {
             {id:'qa-nodes',type:'circle',source:'qa-nodes',paint:{'circle-radius':4,'circle-color':'#f7b76a','circle-stroke-color':'#10212c','circle-stroke-width':1}},
             {id:'inspection-lines',type:'line',source:'inspection',paint:{'line-color':'#f4dc9d','line-width':7,'line-opacity':.95}},
             { id: 'turns', type: 'line', source: 'turns', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['case', ['boolean', ['get', 'selected'], false], '#e6bb80', '#668b98'], 'line-width': ['case', ['boolean', ['get', 'selected'], false], 8, 4], 'line-opacity': 0.95 } },
+            ...roadLabelLayers(),
           ],
         },
       });
       const map=this.map;
+      this.roadLabels=new RoadLabels(map,labelData);
+      // Apply pending quiz visibility before source tiles first become visible.
+      map.on('style.load',()=>this.roadLabels?.loaded());
       this.camera=new CameraController({stop:()=>map.stop(),read:()=>({center:map.getCenter().toArray() as LonLat,zoom:map.getZoom(),bearing:map.getBearing(),pitch:map.getPitch()}),move:(pose,animate)=>{if(animate&&!this.reducedMotion)map.easeTo({...pose,duration:110,easing:t=>t});else map.jumpTo(pose);}},follow=>{this.container.dataset.cameraMode=follow?'Follow':'Explore';const status=document.getElementById('camera-mode');if(status)status.textContent=follow?'Follow vehicle':'Explore freely';const control=document.getElementById('map-follow') as HTMLInputElement|null;if(control)control.checked=follow;});
       this.container.dataset.cameraMode='Follow';
       // MapLibre easeTo stops gesture handlers. Hold follow updates from pointer
@@ -137,15 +144,16 @@ export class OverheadView {
         container.dataset.rendererReady = 'true';
         this.syncOverlays();
         this.syncStudy();
-        this.refreshLabels();
       });
-      this.map.on('moveend', () => this.refreshLabels());
-      this.map.on('zoomend', () => this.refreshLabels());
       this.map.on('error', (event) => {
         container.dataset.rendererError = String(event.error);
       });
       this.observer = new ResizeObserver(() => this.resize());
       this.observer.observe(container);
+      if(import.meta.env.DEV&&new URLSearchParams(location.search).get('labelDebug')==='1'){
+        const debug={ready:()=>map.loaded()&&map.areTilesLoaded()&&!map.isMoving(),inspect:(box?:maplibregl.PointLike|[maplibregl.PointLike,maplibregl.PointLike])=>this.roadLabels?.inspect(box),source:(id:string)=>structuredClone(this.labelData.byId.get(id)??null),project:(position:LonLat)=>map.project(position),setView:(pose:{center?:LonLat;zoom?:number;bearing?:number;pitch?:number})=>{this.camera?.explore();map.jumpTo(pose);},stats:()=>({...this.labelData.diagnostics,...this.roadLabels?.presentation()})};
+        Object.defineProperty(window,'__FREMONT_LABEL_DEBUG__',{value:debug,configurable:true});
+      }
     } catch (error) {
       showRendererFailure(container, 'Overhead map', error);
     }
@@ -163,7 +171,9 @@ export class OverheadView {
     }
   }
 
-  setRoute(coordinates: LonLat[]): void {
+  setRoute(coordinates: LonLat[],wayIds:string[]=[]): void {
+    // Guidance-off practice retains ordinary names without destination emphasis.
+    this.roadLabels?.setRoute(wayIds);
     this.route = {
       type: 'FeatureCollection',
       features: coordinates.length > 1 ? [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates } }] : [],
@@ -186,6 +196,7 @@ export class OverheadView {
     if(active===this.active)return;
     if(active)this.camera?.resume();else this.camera?.suspend();
     this.active = active;
+    this.roadLabels?.setActive(active);
     if (active) {
       this.resize();
       this.syncOverlays();
@@ -208,9 +219,12 @@ export class OverheadView {
   setFollowVehicle(enabled: boolean): void {if(!enabled)this.camera?.explore();}
   centerOnVehicle(position:LonLat):void {this.camera?.centerOnVehicle(position);}
   isFollowing():boolean{return this.camera?.follow??true;}
-  setLabelsVisible(visible:boolean):void {this.labelsVisible=visible;this.lastLabelRefresh=0;this.refreshLabels();}
-  setAssistanceHidden(hidden:boolean):void {this.assistanceHidden=hidden;this.container.classList.toggle('assistance-hidden',hidden);this.lastLabelRefresh=0;this.refreshLabels();}
-  setInspection(lines:FeatureCollection<LineString>):void {this.selection=lines;this.syncSource('inspection',lines);}
+  setLabelsVisible(visible:boolean):void {this.labelsVisible=visible;this.syncLabelVisibility();}
+  setAssistanceHidden(hidden:boolean):void {this.assistanceHidden=hidden;this.container.classList.toggle('assistance-hidden',hidden);this.syncLabelVisibility();}
+  private syncLabelVisibility(){this.roadLabels?.setVisible(this.labelsVisible&&!this.assistanceHidden);}
+  setCurrentRoad(wayId:string):void{this.roadLabels?.setCurrentRoad(wayId);}
+  getLabelDiagnostics(){return this.roadLabels?.inspect()??null;}
+  setInspection(lines:FeatureCollection<LineString>):void {this.selection=lines;this.syncSource('inspection',lines);this.roadLabels?.setInspection(lines.features.map(f=>String(f.properties?.wayId??'')).filter(Boolean));}
   setQANodes(nodes:Array<{id:string;position:LonLat}>):void{this.syncSource('qa-nodes',{type:'FeatureCollection',features:nodes.map(n=>({type:'Feature',properties:{nodeId:n.id,status:'Unresolved'},geometry:{type:'Point',coordinates:n.position}}))});}
   focusRoad(coordinates:LonLat[]):void {if(!this.map||!coordinates.length)return;this.camera?.explore();const bounds=new maplibregl.LngLatBounds();coordinates.forEach(p=>bounds.extend(p));this.map.fitBounds(bounds,{padding:100,maxZoom:17,duration:this.reducedMotion?0:250});}
 
@@ -221,7 +235,7 @@ export class OverheadView {
   }
 
   setStudyOverlay(roads: FeatureCollection<LineString>, junctions: FeatureCollection<Point>, names: string[] | null): void {
-    this.studyRoads=roads;this.studyJunctions=junctions;this.studyNames=names?new Set(names):null;this.syncStudy();this.lastLabelRefresh=0;this.refreshLabels();
+    this.studyRoads=roads;this.studyJunctions=junctions;this.studyNames=names?new Set(names):null;this.syncStudy();this.roadLabels?.setStudyRoads(roads.features.filter(f=>f.properties?.selected).map(f=>String(f.properties?.wayId??'')).filter(Boolean));
   }
 
   private syncStudy(): void {
@@ -339,18 +353,18 @@ export class OverheadView {
   setHeadingUp(enabled:boolean):void {this.headingUp=enabled;if(this.map)this.map.jumpTo({bearing:enabled&&this.lastSnapshot?this.lastSnapshot.heading*180/Math.PI:0});}
   setZoom(zoom:number):void {this.preferredZoom=Math.max(10,Math.min(20,zoom));this.map?.jumpTo({zoom:this.preferredZoom});}
   setQuality(quality:'low'|'balanced'|'high'):void {this.map?.setPixelRatio(Math.min(window.devicePixelRatio||1,quality==='low'?.65:quality==='balanced'?1.25:2));}
-  presentation(){return {headingUp:this.headingUp,zoom:this.map?.getZoom(),bearing:this.map?.getBearing(),followVehicle:this.camera?.follow??true,center:this.map?.getCenter().toArray(),pitch:this.map?.getPitch(),unavailableRoads:this.unavailableRoadCount,unavailableLineDasharray:this.loaded?this.map?.getPaintProperty('unavailable-roads','line-dasharray'):null,pixelRatio:this.map?.getPixelRatio(),width:this.container.clientWidth,height:this.container.clientHeight};}
+  presentation(){return {headingUp:this.headingUp,zoom:this.map?.getZoom(),bearing:this.map?.getBearing(),followVehicle:this.camera?.follow??true,center:this.map?.getCenter().toArray(),pitch:this.map?.getPitch(),unavailableRoads:this.unavailableRoadCount,unavailableLineDasharray:this.loaded?this.map?.getPaintProperty('unavailable-roads','line-dasharray'):null,pixelRatio:this.map?.getPixelRatio(),labels:this.roadLabels?.presentation()??null,width:this.container.clientWidth,height:this.container.clientHeight};}
 
   resize(): void {
     if (this.active && !this.container.hidden && this.container.clientWidth && this.container.clientHeight) this.map?.resize();
   }
 
   dispose(): void {
+    if(import.meta.env.DEV)Reflect.deleteProperty(window,'__FREMONT_LABEL_DEBUG__');
     this.observer?.disconnect();
     this.stopPointerInteraction?.();
     this.stopVertexEditing?.();
     this.clearVertexMarkers();
-    this.labels.forEach((label) => label.remove());
     this.marker?.remove();
     this.map?.remove();
     this.map = null;
@@ -372,43 +386,4 @@ export class OverheadView {
     this.vertexMarkers = [];
   }
 
-  private refreshLabels(): void {
-    if (!this.map || !this.loaded || !this.active) return;
-    const now = performance.now();
-    // Markers already track map movement. Refresh only the visible label selection,
-    // rather than rebuilding DOM labels on every vehicle follow frame.
-    if (now - this.lastLabelRefresh < 1_000 && this.labels.length) return;
-    this.lastLabelRefresh = now;
-    this.labels.forEach((label) => label.remove());
-    this.labels = [];
-    if (!this.labelsVisible || this.assistanceHidden || this.map.getZoom() < 13.5) return;
-    const bounds = this.map.getBounds();
-    const seen = new Set<string>();
-    const points: { point: maplibregl.Point; name: string }[] = [];
-    for (const feature of this.roads.features) {
-      const name = feature.properties?.name;
-      if (typeof name !== 'string' || seen.has(name)) continue;
-      if(this.studyNames&&!this.studyNames.has(name))continue;
-      const lines = feature.geometry.type === 'MultiLineString' ? feature.geometry.coordinates : [feature.geometry.coordinates];
-      for (const line of lines) {
-        if (line.length < 2) continue;
-        const coordinate = line[Math.floor(line.length / 2)] as LonLat;
-        if (!bounds.contains(coordinate)) continue;
-        const point = this.map.project(coordinate);
-        const car=this.lastSnapshot?this.map.project(this.lastSnapshot.position):null;if(car&&Math.hypot(point.x-car.x,point.y-car.y)<55)continue;
-        if(point.x<30||point.x>this.container.clientWidth-40||point.y<135||point.y>this.container.clientHeight-100)continue;
-        if (points.some((item) => Math.abs(item.point.x - point.x) < 155 && Math.abs(item.point.y - point.y) < 42)) continue;
-        const element = document.createElement('span');
-        element.className = 'map-street-label';if(/^(primary|secondary|trunk|motorway)$/.test(String(feature.properties?.highway)))element.classList.add('major-label');
-        element.textContent = name;
-        const first=this.map.project(line[0] as LonLat),last=this.map.project(line.at(-1)! as LonLat);let angle=Math.atan2(last.y-first.y,last.x-first.x)*180/Math.PI;if(angle>90)angle-=180;if(angle< -90)angle+=180;
-        element.style.rotate=angle+'deg';
-        this.labels.push(new maplibregl.Marker({ element }).setLngLat(coordinate).addTo(this.map));
-        points.push({ point, name });
-        seen.add(name);
-        break;
-      }
-      if (this.labels.length >= 45) break;
-    }
-  }
 }

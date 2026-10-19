@@ -67,6 +67,41 @@ These records corroborate named physical sites and grade separation within their
 documented scope; they do not establish individual turning permissions. Reproduce
 the audit from the committed snapshots with `npm run data:verify && npm run data:audit`.
 
+## Road labels and map inspection
+
+Ordinary road names use MapLibre's native line symbols: names follow the mapped
+road, remain upright, participate in native collision handling and can repeat
+along long visible stretches. Selected destinations, the current road and the
+38 curriculum entries receive priority over route connectors and background
+roads. **Explore streets → Street labels** controls visibility. No-GPS practice
+keeps street names available while hiding route guidance; hidden-answer quizzes
+suppress all road-name symbol layers and answer-revealing HUD/search content.
+
+Label preparation is separate from driving and routing. It produces **6,359
+presentation chains** while retaining all **47,812 original source segments**
+from the 11,177 named or reference-bearing ways. Coordinates and source IDs remain
+traceable; cartographic chains stop at incompatible attributes, branches and
+sharp reversals instead of joining unrelated road pieces. The exact 38 curriculum
+entries remain unchanged. Grouped entries do not replace real names: **Auto Mall
+Parkway** and **Durham Road** label their own source geometry. These labels report
+source road identities, not verified permission to turn. Local native-font glyph
+generation needs no remote font service or API key.
+
+At city overview zooms, compact conventional suffixes keep priority street names
+readable; closer views show their full mapped names. All label layers share one
+GeoJSON source with MapLibre's standard 0.375-pixel tiling tolerance. This changes
+rendering tessellation only; prepared coordinates and routing geometry stay intact.
+
+For developer inspection, append **`?labelDebug=1`** to a development-server URL.
+`window.__FREMONT_LABEL_DEBUG__` provides source provenance, symbol queries,
+readiness diagnostics and camera positioning in Explore mode; it does not edit
+the road graph. This control API is omitted from production. Reproduce the fixed
+visual cases by starting `npm run dev -- --port 4182 --strictPort`, then running
+`node scripts/capture-labels.mjs` in another terminal. See the [label architecture
+and visual report](docs/label-visual-report.md) for screenshots, executed checks
+and verification limits. The presence of these tools does not imply
+that the latest changes have been deployed.
+
 ## Driving-first interface
 
 The full-viewport dark driving screen keeps the road central. Open **Menu** for training, zones, progress, saved routes and help; **Settings** controls map orientation/zoom, following, HUD visibility and graphics resolution as well as the existing driving preferences. Panels suspend movement without resetting the vehicle, route or camera. **Escape** opens or dismisses the menu.
@@ -153,6 +188,7 @@ All original vertices remain in the data and precision selector; map handles are
 
 - `src/core/`: pure road graph, fixed projection, vehicle physics, legal turn selection, routing, learning and persistence.
 - `src/views/`: MapLibre and Three.js presentation of the same simulation state.
+- `src/views/road-label-geometry.ts`, `road-label-style.ts`, `road-labels.ts`: source-preserving cartographic chains, native symbol styles, and label priority/visibility; no routing mutations.
 - `src/main.ts`: authoritative game wiring, keyboard/touch controls, patrol challenges and saved routes.
 - `src/study-mode.ts`, `src/study-network.ts`: the exact 38-entry curriculum, exercises, source-backed arrivals and separate personal progress.
 - `src/departure.ts`: verified source reference and approximate headquarters public-road departure.
