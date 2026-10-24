@@ -47,12 +47,17 @@ async function boot(){
     view.setJunctions([...activeJunctions.map(row=>row.junction),...(selectedId?entryCrossings(data,selectedId,{...options(),sectionId:sectionId||undefined}):[])],showIntersections&&!question);
     view.setPriorities(scope,[selectedId,comparisonId].filter((id):id is string=>!!id),connector?.wayIds);
     if(!selectedIntersectionId){view.focusJunction(null,false);view.setConnections([]);}
+    if(!question&&!selectedIntersectionId){
+      if(selectedId&&comparisonId)status(`Comparing ${entries.get(selectedId)!.label} and ${entries.get(comparisonId)!.label} · source-mapped road relationships`);
+      else if(selectedId)status(`${entries.get(selectedId)!.label} · ${effectiveFull()?'available mapped extent':'Zone 1 portions'}${sectionId?' · selected section':''} · drag to explore`);
+      else if(connector)status(`${connector.label} · connector inspection; curriculum unchanged`);
+    }
     if(move&&selected.features.length)view.focusGeometry({type:'FeatureCollection',features:[...selected.features,...comparison.features]});
   }
   function renderLibrary(){
     const list=studyEntries(data,scope),summary=history.summary();
     $('boundary-toggle').nextElementSibling!.textContent=scope==='zone1'?'Approximate Zone 1 boundary':'Approximate patrol-zone boundaries';
-    $('map-notice').textContent=`Historical ${scope==='zone1'?'Zone 1 boundary':'patrol-zone boundaries'} · Approximate study areas · Imported road coverage is partial`;
+    $('map-notice').innerHTML=`<span class="notice-full">Historical ${scope==='zone1'?'Zone 1 boundary':'patrol-zone boundaries'} · Approximate study areas · Imported road coverage is partial</span><span class="notice-compact">Approximate historical ${scope==='zone1'?'Zone 1 boundary':'zone boundaries'} · Partial coverage</span>`;
     $('study-count').textContent=`${list.length} assigned streets · ${scope==='zone1'?'Zone 1':'All assigned areas'}`;
     $('road-list').innerHTML=list.map((entry,i)=>`<button type="button" class="road-item" data-study-entry="${entry.id}" aria-pressed="${entry.id===selectedId}"><span class="road-number">${String(i+1).padStart(2,'0')}</span><span><span class="road-name">${esc(entry.label)}</span><span class="road-meta">${entry.group==='ew'?'East–west group':'North–south group'}${summary.studiedIds.includes(entry.id)?' · Viewed':''}${summary.identifiedIds.includes(entry.id)?' · Identified':''}</span></span></button>`).join('');
     $('road-details').innerHTML=`<details class="source-details"><summary>Your study history</summary><p>${summary.studiedIds.length} of 38 entries viewed · ${summary.identifiedIds.length} identified unaided. Viewing is not mastery.</p><div class="panel-actions"><button type="button" id="export-history">Export backup</button><label class="backup-import">Import backup<input id="import-history" type="file" accept="application/json"/></label></div><p>Previous driving progress is preserved separately.</p></details>`;

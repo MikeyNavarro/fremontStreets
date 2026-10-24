@@ -65,6 +65,6 @@ export function mountStudyShell(container: HTMLElement): void {
 
       <div id="storage-warning" data-testid="storage-warning" class="storage-warning" role="status" hidden></div>
       <div id="map-status" data-testid="map-status" class="map-status" role="status" aria-live="polite" aria-atomic="true">Explore freely · Drag to pan · Scroll to zoom</div>
-      <p id="map-notice" class="map-notice">Historical Zone 1 boundary · Approximate study area · Imported road coverage is partial</p>
+      <p id="map-notice" class="map-notice"><span class="notice-full">Historical Zone 1 boundary · Approximate study area · Imported road coverage is partial</span><span class="notice-compact">Approximate study boundaries · Partial road coverage</span></p>
     </main>`;
 }

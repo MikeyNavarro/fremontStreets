@@ -210,10 +210,18 @@ test('source junction inspection and ordered walkthrough preserve actual compone
 
 test('comparison distinguishes direct source junctions from grade-separated visual crossings',async({page})=>{
   await select(page,'ew13');
+  await page.locator('[data-junction-id]').filter({hasText:'Mission Boulevard'}).first().click();await settled(page);
+  await expect(page.locator('#map-status')).toContainText('Mission Boulevard');
+  await page.locator('#close-intersection').click();
+  await expect(page.locator('#map-status')).toContainText('Stevenson Boulevard');
+  await expect(page.locator('#map-status')).not.toContainText('Mission Boulevard');
   await page.locator('#compare-road').selectOption('ns03');await settled(page);
   expect((await state(page)).comparisonId).toBe('ns03');
   expect((await state(page)).comparisonColor).toBe('#4DA6FF');
   await expect.poll(async()=>(await state(page)).renderedComparisonCount).toBeGreaterThan(0);
+  await expect(page.locator('#map-status')).toContainText('Stevenson Boulevard');
+  await expect(page.locator('#map-status')).toContainText('Fremont Boulevard');
+  await expect(page.locator('#map-status')).not.toContainText('Mission Boulevard');
   await expect(page.locator('#selection-panel')).toContainText(/shared|direct|junction/i);
   await page.locator('#study-mode').selectOption('all');
   await select(page,'ew17');await page.locator('#compare-road').selectOption('ns02');await settled(page);
@@ -326,6 +334,11 @@ test('narrow layout keeps the map usable and storage denial produces a warning w
   const mobileZoom=(await state(page)).camera.zoom;
   await page.locator('.maplibregl-ctrl-zoom-in').click();await settled(page);
   expect((await state(page)).camera.zoom).toBeGreaterThan(mobileZoom);
+  const credits=page.locator('.maplibregl-ctrl-attrib-inner'),info=page.locator('.maplibregl-ctrl-attrib-button');
+  await info.click();if(!await credits.isVisible())await info.click();
+  await expect(credits).toBeVisible();await expect(credits).toContainText('OpenStreetMap');
+  const notice=(await page.locator('#map-notice').boundingBox())!,attribution=(await page.locator('.maplibregl-ctrl-attrib').boundingBox())!;
+  expect(notice.y+notice.height<=attribution.y||attribution.y+attribution.height<=notice.y||notice.x+notice.width<=attribution.x||attribution.x+attribution.width<=notice.x,'boundary notice and attribution must not overlap').toBe(true);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   const context=await page.context().browser()!.newContext({viewport:{width:1440,height:1000}});
   await context.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Storage unavailable','QuotaExceededError');};});
