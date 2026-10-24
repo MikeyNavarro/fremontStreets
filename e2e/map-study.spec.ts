@@ -38,23 +38,27 @@ async function drag(page:Page,dx=180,dy=70){
   await page.waitForTimeout(200);await page.mouse.up();await settled(page);
 }
 function sectionPoints(sections:MapRoadSection[],verified=false):number[][]{
-  const candidates:number[][]=[];
+  const candidates:{position:number[];length:number}[]=[];
   for(const section of sections){
     const lines=verified?section.verifiedInside.coordinates:section.inside.coordinates;
-    for(const line of lines)for(let i=1;i<line.length;i++)candidates.push([(line[i-1][0]+line[i][0])/2,(line[i-1][1]+line[i][1])/2]);
+    for(const line of lines)for(let i=1;i<line.length;i++)candidates.push({position:[(line[i-1][0]+line[i][0])/2,(line[i-1][1]+line[i][1])/2],length:Math.hypot((line[i][0]-line[i-1][0])*88000,(line[i][1]-line[i-1][1])*111000)});
   }
-  return candidates;
+  // Interior points of long original primitives avoid testing a tiny median
+  // segment immediately beside a different named road at every zoom level.
+  if(verified)candidates.sort((a,b)=>b.length-a.length);
+  return candidates.map(candidate=>candidate.position);
 }
 async function clickRoad(page:Page,id:string,verified=false){
   const model=data(),points=sectionPoints(model.sections.filter(s=>s.entryId===id),verified);
-  await closeLibrary(page);
-  const target=await page.evaluate(points=>{
+  await closeLibrary(page);await settled(page);
+  const target=await page.evaluate(({points,verified})=>{
     const g=(window as any).__FREMONT_MAP_STUDY__,canvas=document.querySelector('.maplibregl-canvas')!,box=canvas.getBoundingClientRect();
-    return points.map(position=>{const p=g.project(position);return{x:box.x+p.x,y:box.y+p.y};})
+    return points.map((position,index)=>{const p=g.project(position);return{x:box.x+p.x,y:box.y+p.y,position,index};})
       .filter(p=>p.x>box.x+35&&p.x<box.right-35&&p.y>box.y+65&&p.y<box.bottom-90&&document.elementFromPoint(p.x,p.y)===canvas)
-      .sort((a,b)=>Math.hypot(a.x-box.x-box.width/2,a.y-box.y-box.height/2)-Math.hypot(b.x-box.x-box.width/2,b.y-box.y-box.height/2))[0];
-  },points);
+      .sort((a,b)=>verified?a.index-b.index:Math.hypot(a.x-box.x-box.width/2,a.y-box.y-box.height/2)-Math.hypot(b.x-box.x-box.width/2,b.y-box.y-box.height/2))[0];
+  },{points,verified});
   expect(target,`a visible sourced section of ${id} must be clickable`).toBeTruthy();
+  await test.info().attach(`source-click-${id}`,{body:JSON.stringify({id,verified,...target}),contentType:'application/json'});
   await page.mouse.click(target.x,target.y);
   if(await page.locator('#disambiguation').isVisible()){
     const label=model.entries.find(e=>e.id===id)!.label;

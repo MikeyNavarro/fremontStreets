@@ -53,6 +53,18 @@ export function searchRoads(data:MapStudyData,query:string,limit=30):RoadSearchR
 }
 export type ScopedMapJunction=MapJunction&{displayNodeId:string;displaySectionId:string;displayQuizPairs:MapJunctionPair[]};
 export interface OrderedJunction {junction:ScopedMapJunction;sectionId:string;sectionName:string;distanceMetres:number;sectionIndex:number}
+function scopedJunction(junction:MapJunction,component:MapJunction["components"][number],entryId:string,sectionId:string,pairFilter:(pair:MapJunctionPair)=>boolean=()=>true):ScopedMapJunction{
+  const displayQuizPairs=junction.quizPairs.filter(pair=>pair.nodeIds.includes(component.nodeId)&&pair.roadIds.some(roadId=>junction.roads.some(road=>road.id===roadId&&road.entryIds.includes(entryId)))&&pairFilter(pair));
+  const scopedFact=(dimension:'topology'|'grade'):MapJunctionFact=>{
+    const original=junction.evidence[dimension];if(original.status==='Conflicted')return original;
+    const claimDimension=dimension==='grade'?'gradeSeparation':'topology';
+    return {status:displayQuizPairs.length?'Verified':'Unresolved',scope:`Specific named physical relationships at selected source node ${component.nodeId}; not every movement or road in the logical group.`,note:displayQuizPairs.length?`Applicable independent physical evidence: ${displayQuizPairs.map(pair=>`${pair.roadA} / ${pair.roadB}`).join('; ')}. Individual legal turns remain unverified.`:'No independently corroborated named physical pair applies to this selected road/component. Other components of this logical junction may have separately supported facts.',sourceIds:[...new Set(displayQuizPairs.flatMap(pair=>pair.sourceIds))],claimIds:[...new Set(displayQuizPairs.flatMap(pair=>pair.claimIds.filter(claim=>claim.includes(`-${claimDimension}-`)&&claim.endsWith(`-osm-node-${component.nodeId}`))))]};
+  };
+  const evidence={...junction.evidence,topology:scopedFact('topology'),grade:scopedFact('grade')};
+  const conflicted=junction.statusLabel.startsWith('Conflicting')||Object.values(evidence).some(fact=>fact.status==='Conflicted');
+  const statusLabel=conflicted?'Conflicting evidence — exploratory only':displayQuizPairs.length?'Named relationship at the selected source node independently corroborated':evidence.location.sourceIds.length?'City-corroborated named location; selected relationship source-mapped only':'Source-mapped junction; independent corroboration unresolved';
+  return {...junction,position:[...component.position],displayNodeId:component.nodeId,displaySectionId:sectionId,displayQuizPairs,evidence,statusLabel};
+}
 /** Order follows each source-preserving chain's coordinate sequence. Separate
  * branches/carriageways remain explicit; no global north/south order is invented. */
 export function entryJunctions(data:MapStudyData,entryId:string,options:GeometryOptions={}):OrderedJunction[]{
@@ -76,16 +88,7 @@ export function entryJunctions(data:MapStudyData,entryId:string,options:Geometry
       // The dataset's global logical-site representative can be on the other
       // carriageway or outside the clipped study area. Display an actual node
       // on this selected source chain instead; retain all evidence/components.
-      const displayQuizPairs=junction.quizPairs.filter(pair=>pair.nodeIds.includes(component.nodeId)&&pair.roadIds.some(roadId=>junction.roads.some(road=>road.id===roadId&&road.entryIds.includes(entryId))));
-      const scopedFact=(dimension:'topology'|'grade'):MapJunctionFact=>{
-        const original=junction.evidence[dimension];if(original.status==='Conflicted')return original;
-        const claimDimension=dimension==='grade'?'gradeSeparation':'topology';
-        return {status:displayQuizPairs.length?'Verified':'Unresolved',scope:`Specific named physical relationships at selected source node ${component.nodeId}; not every movement or road in the logical group.`,note:displayQuizPairs.length?`Applicable independent physical evidence: ${displayQuizPairs.map(pair=>`${pair.roadA} / ${pair.roadB}`).join('; ')}. Individual legal turns remain unverified.`:'No independently corroborated named physical pair applies to this selected road/component. Other components of this logical junction may have separately supported facts.',sourceIds:[...new Set(displayQuizPairs.flatMap(pair=>pair.sourceIds))],claimIds:[...new Set(displayQuizPairs.flatMap(pair=>pair.claimIds.filter(claim=>claim.includes(`-${claimDimension}-`)&&claim.endsWith(`-osm-node-${component.nodeId}`))))]};
-      };
-      const evidence={...junction.evidence,topology:scopedFact('topology'),grade:scopedFact('grade')};
-      const conflicted=junction.statusLabel.startsWith('Conflicting')||Object.values(evidence).some(fact=>fact.status==='Conflicted');
-      const statusLabel=conflicted?'Conflicting evidence — exploratory only':displayQuizPairs.length?'Named relationship at the selected source node independently corroborated':evidence.location.sourceIds.length?'City-corroborated named location; selected relationship source-mapped only':'Source-mapped junction; independent corroboration unresolved';
-      const scoped:ScopedMapJunction={...junction,position:[...component.position],displayNodeId:component.nodeId,displaySectionId:id,displayQuizPairs,evidence,statusLabel};
+      const scoped=scopedJunction(junction,component,entryId,id);
       seen.add(junction.id);sectionRows.push({junction:scoped,sectionId:id,sectionName:section.name,distanceMetres:distances.get(component.nodeId)!,sectionIndex});
     }
     sectionRows.sort((a,b)=>a.distanceMetres-b.distanceMetres||a.junction.id.localeCompare(b.junction.id));
@@ -110,10 +113,28 @@ export function entryCrossings(data:MapStudyData,entryId:string,options:Geometry
   };
   return data.junctions.filter(j=>j.kind==='nonconnecting-crossing'&&j.entryIds.includes(entryId)&&(options.fullRoad||options.zone1===false||!zone||pointInZone(j.position,zone))&&(!section||j.sourceWayIds.some(id=>section.sourceWayIds.includes(id)))&&onSection(j.position));
 }
-export function compareEntries(data:MapStudyData,roadA:string,roadB:string,options:GeometryOptions={}):{junctions:MapJunction[];crossings:MapJunction[];message:string}{
+export function compareEntries(data:MapStudyData,roadA:string,roadB:string,options:GeometryOptions={}):{junctions:ScopedMapJunction[];crossings:MapJunction[];message:string}{
   if(roadA===roadB)return {junctions:[],crossings:[],message:'Choose two different study roads to compare.'};
-  const visible=new Set(entryJunctions(data,roadA,options).map(row=>row.junction.id));
-  const junctions=data.junctions.filter(j=>j.kind==='junction'&&visible.has(j.id)&&j.entryIds.includes(roadB)&&j.mappedPairs.some(pair=>pair.roadIds.some(id=>j.roads.find(r=>r.id===id)?.entryIds.includes(roadA))&&pair.roadIds.some(id=>j.roads.find(r=>r.id===id)?.entryIds.includes(roadB))));
+  const cached=index(data),a=cached.entries.get(roadA),b=cached.entries.get(roadB);
+  const zone=data.zones.zones.find(z=>z.id==='zone1')?.geometry;
+  const aWays=new Set(a?.sourceWayIds),bWays=new Set(b?.sourceWayIds),seen=new Set<string>(),junctions:ScopedMapJunction[]=[];
+  for(const sectionId of a?.sectionIds??[]){
+    if(options.sectionId&&sectionId!==options.sectionId)continue;
+    const section=cached.sections.get(sectionId)!;
+    const nodeOrder=new Map(section.sourceNodeIds.map((node,i)=>[node,i]));
+    for(const ordered of section.junctionOrder){
+      const junction=cached.junctions.get(ordered.junctionId);if(!junction||junction.kind!=='junction'||seen.has(junction.id)||!junction.entryIds.includes(roadB))continue;
+      const isPair=(pair:MapJunctionPair)=>pair.roadIds.some(id=>junction.roads.some(road=>road.id===id&&road.entryIds.includes(roadA)))&&pair.roadIds.some(id=>junction.roads.some(road=>road.id===id&&road.entryIds.includes(roadB)));
+      const pairNodes=new Set(junction.mappedPairs.filter(isPair).flatMap(pair=>pair.nodeIds));
+      // A visible logical group can contain unrelated source nodes on another
+      // carriageway. Only the compared pair's actual shared node establishes a
+      // connection in the selected section/zone; the group ID alone cannot.
+      const components=junction.components.filter(component=>pairNodes.has(component.nodeId)&&nodeOrder.has(component.nodeId)&&component.sourceWayIds.some(id=>aWays.has(id))&&component.sourceWayIds.some(id=>bWays.has(id))&&(options.fullRoad||options.zone1===false||!zone||pointInZone(component.position,zone)));
+      components.sort((left,right)=>nodeOrder.get(left.nodeId)!-nodeOrder.get(right.nodeId)!);
+      const component=components[0];if(!component)continue;
+      junctions.push(scopedJunction(junction,component,roadA,sectionId,isPair));seen.add(junction.id);
+    }
+  }
   const crossings=entryCrossings(data,roadA,options).filter(j=>j.entryIds.includes(roadB));
   return {junctions,crossings,message:junctions.length?`${junctions.length} source-mapped connecting junction${junctions.length===1?'':'s'} in this view. Individual legal turns remain separately unverified.`:'No direct source-mapped junction found in the selected available sections. This does not prove the complete real-world roads never connect.'};
 }

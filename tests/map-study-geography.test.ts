@@ -179,3 +179,47 @@ test('a selected carriageway section only displays nonconnections on its own rea
   assert.deepEqual(seen,new Set(all.map(c=>c.id)),'actual available sections still account for every recorded crossing');
   assert.equal(entryCrossings(data,'ew17',{fullRoad:true,sectionId:data.sections.find(s=>s.entryId==='ew13')!.id}).length,0);
 });
+
+test('comparison does not borrow a different carriageway component from the same logical junction',()=>{
+  const cases=[
+    ['ew13','ns10','map-junction-1666844095','ew13:road-label:1047229688:0'],
+    ['ew15','ew14','map-junction-1676005285','ew15:road-label:1043463197:0'],
+    ['ew17','ns12','map-junction-350562785','ew17:road-label:1051475103:0'],
+    ['ew17','ns12','map-junction-350562785','ew17:road-label:516683152:0'],
+    ['ns06','ns07','map-junction-53068020','ns06:road-label:1098456712:0'],
+    ['ns06','ns07','map-junction-53068020','ns06:road-label:30914929:0'],
+    ['ns06','ns08','map-junction-364262209','ns06:road-label:1049382509:0'],
+    ['ns08','ns13','map-junction-1316955658','ns08:road-label:1032843091:0'],
+    ['ns13','ew21','map-junction-1695636899','ns13:road-label:1027034681:0'],
+    ['ns13','ns14','map-junction-1695636899','ns13:road-label:1027034683:0'],
+  ];
+  for(const [a,b,junctionId,sectionId]of cases){
+    assert.ok(entryJunctions(data,a,{fullRoad:true,sectionId}).some(row=>row.junction.id===junctionId),'logical group itself is visible');
+    assert.ok(compareEntries(data,a,b,{fullRoad:true}).junctions.some(j=>j.id===junctionId),'other source sections retain the real pair connection');
+    assert.equal(compareEntries(data,a,b,{fullRoad:true,sectionId}).junctions.some(j=>j.id===junctionId),false,`${a}/${b} has no pair node on ${sectionId}`);
+  }
+});
+
+test('every comparison marker belongs to the exact compared pair, selected source section and visible zone',()=>{
+  const zone=data.zones.zones.find(z=>z.id==='zone1')!.geometry!;
+  const globalBefore=JSON.stringify(data.junctions);
+  let count=0;
+  for(const a of data.entries)for(const b of data.entries){
+    if(a.id===b.id)continue;
+    for(const fullRoad of [false,true])for(const j of compareEntries(data,a.id,b.id,{fullRoad}).junctions){
+      count++;
+      const section=data.sections.find(s=>s.id===j.displaySectionId)!;
+      const component=j.components.find(c=>c.nodeId===j.displayNodeId)!;
+      const isPair=(pair:typeof j.mappedPairs[number])=>pair.nodeIds.includes(j.displayNodeId)&&pair.roadIds.some(id=>j.roads.some(road=>road.id===id&&road.entryIds.includes(a.id)))&&pair.roadIds.some(id=>j.roads.some(road=>road.id===id&&road.entryIds.includes(b.id)));
+      assert.equal(section.entryId,a.id);assert.ok(section.sourceNodeIds.includes(j.displayNodeId));
+      assert.deepEqual(j.position,roads.nodes[j.displayNodeId]);assert.deepEqual(j.position,component.position);
+      assert.ok(component.sourceWayIds.some(id=>a.sourceWayIds.includes(id)));
+      assert.ok(component.sourceWayIds.some(id=>b.sourceWayIds.includes(id)));
+      assert.ok(j.mappedPairs.some(isPair));assert.ok(j.displayQuizPairs.every(isPair));
+      if(!fullRoad)assert.ok(pointInZone(j.position,zone));
+      assert.ok(compareEntries(data,a.id,b.id,{fullRoad,sectionId:section.id}).junctions.some(other=>other.id===j.id));
+    }
+  }
+  assert.ok(count>100,'the source-backed full and clipped catalogs exercise both scopes');
+  assert.equal(JSON.stringify(data.junctions),globalBefore,'comparison never mutates original geometry or evidence');
+});
