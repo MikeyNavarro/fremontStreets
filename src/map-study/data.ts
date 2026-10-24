@@ -1,0 +1,126 @@
+import type {FeatureCollection,LineString,MultiLineString} from 'geojson';
+import type {LonLat} from '../core/types';
+import type {MapJunction,MapJunctionFact,MapJunctionPair} from './junctions';
+import {canonicalRoadName} from '../study-network';
+import {project} from '../core/projection';
+import type {GeometryOptions,MapScope,MapStudyData,MapStudyEntry,RoadSearchResult,SelectionGeometry} from './types';
+import {pointInZone,boundsOfGeometry,geometryLength,lineLength} from './geometry';
+export {boundsOfGeometry,geometryLength} from './geometry';
+export {ZONE1_ENTRY_IDS} from './types';
+
+interface DataIndex {entries:Map<string,MapStudyEntry>;sections:Map<string,MapStudyData['sections'][number]>;junctions:Map<string,MapJunction>;ways:Map<string,MapStudyData['roads']['features'][number]>;connectors:RoadSearchResult[]}
+const indexes=new WeakMap<MapStudyData,DataIndex>();
+function index(data:MapStudyData):DataIndex{
+  const existing=indexes.get(data);if(existing)return existing;
+  const connectors=new Map<string,RoadSearchResult>();
+  for(const feature of data.roads.features){
+    const p=feature.properties;if(p.entryIds.length||!(p.name||p.ref))continue;
+    let result=connectors.get(p.roadId);
+    if(!result){result={id:p.roadId,kind:'connector',label:p.name||p.ref,wayIds:[],names:[p.name||p.ref],defaultZone1:false,distinctSections:1};connectors.set(p.roadId,result);}
+    result.wayIds.push(p.wayId);
+  }
+  const value:DataIndex={entries:new Map(data.entries.map(e=>[e.id,e])),sections:new Map(data.sections.map(s=>[s.id,s])),junctions:new Map(data.junctions.map(j=>[j.id,j])),ways:new Map(data.roads.features.map(f=>[f.properties.wayId,f])),connectors:[...connectors.values()]};indexes.set(data,value);return value;
+}
+export function studyEntries(data:MapStudyData,scope:MapScope='zone1'):MapStudyEntry[]{
+  const entries=index(data).entries;
+  return scope==='zone1'?data.zone1EntryIds.map(id=>entries.get(id)!).filter(Boolean):data.entries;
+}
+export function entryGeometry(data:MapStudyData,entryId:string,options:GeometryOptions={}):SelectionGeometry{
+  const cached=index(data),entry=cached.entries.get(entryId),features:SelectionGeometry['features']=[];
+  for(const id of entry?.sectionIds??[]){
+    if(options.sectionId&&id!==options.sectionId)continue;
+    const section=cached.sections.get(id)!;
+    const full=options.fullRoad||options.zone1===false;
+    let geometry:LineString|MultiLineString;
+    if(options.outsideOnly)geometry=section.outside;
+    else if(options.verifiedOnly)geometry=full?section.verified:section.verifiedInside;
+    else geometry=full?section.geometry:section.inside;
+    if(!geometry.coordinates.length)continue;
+    features.push({type:'Feature',id:section.id,properties:{entryId,sectionId:section.id,name:section.name,sourceWayIds:section.sourceWayIds,outside:!!options.outsideOnly,clipped:!full||!!options.outsideOnly},geometry});
+  }
+  return {type:'FeatureCollection',features};
+}
+export function connectorGeometry(data:MapStudyData,wayIds:readonly string[]):MapStudyData['roads']{
+  const ways=index(data).ways;return {type:'FeatureCollection',features:wayIds.map(id=>ways.get(id)).filter((f):f is MapStudyData['roads']['features'][number]=>!!f)};
+}
+const searchKey=(s:string)=>canonicalRoadName(s.normalize('NFKD'));
+export function searchRoads(data:MapStudyData,query:string,limit=30):RoadSearchResult[]{
+  const needle=searchKey(query),tokens=needle.split(' ').filter(Boolean),matches=(values:string[])=>tokens.every(token=>values.some(value=>searchKey(value).includes(token)));
+  const entries=data.entries.filter(entry=>matches([entry.label,entry.originalLabel,...entry.names,...entry.mappedNames])).map(entry=>({id:entry.id,kind:'study' as const,label:entry.label,entryId:entry.id,wayIds:entry.sourceWayIds,names:entry.mappedNames,defaultZone1:entry.defaultZone1,distinctSections:entry.sectionIds.length}));
+  entries.sort((a,b)=>Number(b.defaultZone1)-Number(a.defaultZone1)||Number(searchKey(b.label)===needle)-Number(searchKey(a.label)===needle)||a.label.localeCompare(b.label));
+  const connectors=needle?index(data).connectors.filter(road=>matches(road.names)).sort((a,b)=>a.label.localeCompare(b.label)||a.id.localeCompare(b.id)):[];
+  return [...entries,...connectors].slice(0,limit);
+}
+export type ScopedMapJunction=MapJunction&{displayNodeId:string;displaySectionId:string;displayQuizPairs:MapJunctionPair[]};
+export interface OrderedJunction {junction:ScopedMapJunction;sectionId:string;sectionName:string;distanceMetres:number;sectionIndex:number}
+/** Order follows each source-preserving chain's coordinate sequence. Separate
+ * branches/carriageways remain explicit; no global north/south order is invented. */
+export function entryJunctions(data:MapStudyData,entryId:string,options:GeometryOptions={}):OrderedJunction[]{
+  const cached=index(data),entry=cached.entries.get(entryId),result:OrderedJunction[]=[];
+  const zone=data.zones.zones.find(z=>z.id==='zone1')?.geometry;
+  const seen=new Set<string>();
+  for(const [sectionIndex,id]of(entry?.sectionIds??[]).entries()){
+    if(options.sectionId&&id!==options.sectionId)continue;
+    const section=cached.sections.get(id)!;
+    const distances=new Map<string,number>();let distance=0;
+    section.sourceNodeIds.forEach((node,i)=>{
+      if(i)distance+=lineLength([section.geometry.coordinates[i-1] as LonLat,section.geometry.coordinates[i] as LonLat]);
+      if(!distances.has(node))distances.set(node,distance);
+    });
+    const sectionRows:OrderedJunction[]=[];
+    for(const ordered of section.junctionOrder){
+      const junction=cached.junctions.get(ordered.junctionId);if(!junction||junction.kind!=='junction'||seen.has(junction.id))continue;
+      const components=junction.components.filter(component=>distances.has(component.nodeId)&&(options.fullRoad||options.zone1===false||!zone||pointInZone(component.position,zone)));
+      components.sort((a,b)=>distances.get(a.nodeId)!-distances.get(b.nodeId)!||a.nodeId.localeCompare(b.nodeId));
+      const component=components[0];if(!component)continue;
+      // The dataset's global logical-site representative can be on the other
+      // carriageway or outside the clipped study area. Display an actual node
+      // on this selected source chain instead; retain all evidence/components.
+      const displayQuizPairs=junction.quizPairs.filter(pair=>pair.nodeIds.includes(component.nodeId)&&pair.roadIds.some(roadId=>junction.roads.some(road=>road.id===roadId&&road.entryIds.includes(entryId))));
+      const scopedFact=(dimension:'topology'|'grade'):MapJunctionFact=>{
+        const original=junction.evidence[dimension];if(original.status==='Conflicted')return original;
+        const claimDimension=dimension==='grade'?'gradeSeparation':'topology';
+        return {status:displayQuizPairs.length?'Verified':'Unresolved',scope:`Specific named physical relationships at selected source node ${component.nodeId}; not every movement or road in the logical group.`,note:displayQuizPairs.length?`Applicable independent physical evidence: ${displayQuizPairs.map(pair=>`${pair.roadA} / ${pair.roadB}`).join('; ')}. Individual legal turns remain unverified.`:'No independently corroborated named physical pair applies to this selected road/component. Other components of this logical junction may have separately supported facts.',sourceIds:[...new Set(displayQuizPairs.flatMap(pair=>pair.sourceIds))],claimIds:[...new Set(displayQuizPairs.flatMap(pair=>pair.claimIds.filter(claim=>claim.includes(`-${claimDimension}-`)&&claim.endsWith(`-osm-node-${component.nodeId}`))))]};
+      };
+      const evidence={...junction.evidence,topology:scopedFact('topology'),grade:scopedFact('grade')};
+      const conflicted=junction.statusLabel.startsWith('Conflicting')||Object.values(evidence).some(fact=>fact.status==='Conflicted');
+      const statusLabel=conflicted?'Conflicting evidence — exploratory only':displayQuizPairs.length?'Named relationship at the selected source node independently corroborated':evidence.location.sourceIds.length?'City-corroborated named location; selected relationship source-mapped only':'Source-mapped junction; independent corroboration unresolved';
+      const scoped:ScopedMapJunction={...junction,position:[...component.position],displayNodeId:component.nodeId,displaySectionId:id,displayQuizPairs,evidence,statusLabel};
+      seen.add(junction.id);sectionRows.push({junction:scoped,sectionId:id,sectionName:section.name,distanceMetres:distances.get(component.nodeId)!,sectionIndex});
+    }
+    sectionRows.sort((a,b)=>a.distanceMetres-b.distanceMetres||a.junction.id.localeCompare(b.junction.id));
+    result.push(...sectionRows);
+  }
+  return result;
+}
+export function entryCrossings(data:MapStudyData,entryId:string,options:GeometryOptions={}):MapJunction[]{
+  const zone=data.zones.zones.find(z=>z.id==='zone1')?.geometry;
+  const section=options.sectionId?index(data).sections.get(options.sectionId):null;
+  if(options.sectionId&&(!section||section.entryId!==entryId))return [];
+  const onSection=(position:LonLat):boolean=>{
+    if(!section)return true;
+    const p=project(position),coordinates=section.geometry.coordinates as LonLat[];
+    for(let i=1;i<coordinates.length;i++){
+      const a=project(coordinates[i-1]),b=project(coordinates[i]),dx=b.x-a.x,dy=b.y-a.y;
+      const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy||1)));
+      // Existing crossing coordinates may be rounded. This sub-metre matching
+      // tolerance only filters displayed nonconnections; it creates no edges.
+      if(Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy)<=.5)return true;
+    }return false;
+  };
+  return data.junctions.filter(j=>j.kind==='nonconnecting-crossing'&&j.entryIds.includes(entryId)&&(options.fullRoad||options.zone1===false||!zone||pointInZone(j.position,zone))&&(!section||j.sourceWayIds.some(id=>section.sourceWayIds.includes(id)))&&onSection(j.position));
+}
+export function compareEntries(data:MapStudyData,roadA:string,roadB:string,options:GeometryOptions={}):{junctions:MapJunction[];crossings:MapJunction[];message:string}{
+  if(roadA===roadB)return {junctions:[],crossings:[],message:'Choose two different study roads to compare.'};
+  const visible=new Set(entryJunctions(data,roadA,options).map(row=>row.junction.id));
+  const junctions=data.junctions.filter(j=>j.kind==='junction'&&visible.has(j.id)&&j.entryIds.includes(roadB)&&j.mappedPairs.some(pair=>pair.roadIds.some(id=>j.roads.find(r=>r.id===id)?.entryIds.includes(roadA))&&pair.roadIds.some(id=>j.roads.find(r=>r.id===id)?.entryIds.includes(roadB))));
+  const crossings=entryCrossings(data,roadA,options).filter(j=>j.entryIds.includes(roadB));
+  return {junctions,crossings,message:junctions.length?`${junctions.length} source-mapped connecting junction${junctions.length===1?'':'s'} in this view. Individual legal turns remain separately unverified.`:'No direct source-mapped junction found in the selected available sections. This does not prove the complete real-world roads never connect.'};
+}
+export function roadAtWay(data:MapStudyData,wayId:string):RoadSearchResult[]{
+  const cached=index(data),feature=cached.ways.get(wayId);if(!feature)return [];
+  const p=feature.properties;
+  if(p.entryIds.length)return p.entryIds.map(id=>cached.entries.get(id)!).filter(Boolean).map(entry=>({id:entry.id,kind:'study',label:entry.label,entryId:entry.id,wayIds:entry.sourceWayIds,names:entry.mappedNames,defaultZone1:entry.defaultZone1,distinctSections:entry.sectionIds.length}));
+  const component=cached.connectors.find(c=>c.id===p.roadId);
+  return component?[component]:[];
+}
