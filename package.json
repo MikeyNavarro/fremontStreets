@@ -5,15 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run data:map && tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "npm run data:map && tsx --test tests/map-study-*.test.ts tests/geography.test.ts tests/zones.test.ts tests/verification.test.ts tests/geographic-audit.test.ts tests/road-label-*.test.ts tests/continuity.test.ts tests/road-extension.test.ts",
     "test:e2e": "playwright test",
     "data:import": "node scripts/import-roads.mjs",
     "test:production": "playwright test --config playwright.production.config.ts",
     "data:study": "tsx scripts/analyze-study.ts && python3 scripts/render-study-reports.py",
     "data:verify": "tsx scripts/verify-learning.ts",
-    "data:audit": "tsx scripts/audit-geography.ts"
+    "data:audit": "tsx scripts/audit-geography.ts",
+    "data:map": "tsx scripts/build-map-study.ts",
+    "predev": "npm run data:map",
+    "test:legacy": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "maplibre-gl": "^6.15.0",

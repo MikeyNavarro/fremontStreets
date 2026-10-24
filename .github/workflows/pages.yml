@@ -19,8 +19,8 @@ jobs:
   build:
     name: Test and build
     runs-on: ubuntu-latest
-    # The original full suite takes ~19 minutes in CI; added learning tests run
-    # in both development and production. Individual assertion budgets remain.
+    # Run the map's full browser suite in development and at the Pages base path.
+    # Preserve individual assertion budgets and retain evidence on failure.
     timeout-minutes: 35
     permissions:
       contents: read
@@ -42,7 +42,7 @@ jobs:
       - name: Install Chromium and browser dependencies
         run: npx playwright install --with-deps chromium
 
-      - name: Run simulation, geography, and game-state tests
+      - name: Run geography, map, and learning tests
         run: npm test
 
       - name: Run complete browser regression suite
