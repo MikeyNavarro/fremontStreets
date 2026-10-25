@@ -3,7 +3,7 @@ import type {LonLat} from '../core/types';
 import {project} from '../core/projection';
 import type {MapJunction, MapJunctionComponent, MapJunctionPair} from './junctions';
 import type {MapRoadSection, MapScope, MapStudyData, MapStudyEntry} from './types';
-import {pointInZone} from './geometry';
+import {assignedPairComponents,studyEntries} from './data';
 
 export type QuizKind = 'identify'|'find'|'intersection';
 export interface QuizChoice {id:string;label:string}
@@ -65,10 +65,7 @@ function usableEntries(data:MapStudyData,mode:MapScope):MapStudyEntry[]{
  * A quiz is scoped to an independently supported pair's actual shared node. */
 function scopedPairComponents(data:MapStudyData,junction:MapJunction,pair:MapJunctionPair,mode:MapScope):MapJunctionComponent[]{
   if(!eligibleIntersectionPair(junction,pair))return [];
-  const zone=data.zones.zones.find(value=>value.id==='zone1')?.geometry;
-  return junction.components.filter(component=>pair.nodeIds.includes(component.nodeId)
-    &&pair.roadIds.every(id=>component.roadIds.includes(id))
-    &&(mode==='all'||!!zone&&pointInZone(component.position,zone)));
+  return assignedPairComponents(data,junction,pair,mode);
 }
 export function createQuiz(data:MapStudyData,options:QuizOptions):QuizQuestion|null {
   const random=options.random??Math.random;
@@ -92,8 +89,9 @@ export function createQuiz(data:MapStudyData,options:QuizOptions):QuizQuestion|n
     const component=pick(chosen.components,random)!;
     const optionsByName=new Map<string,QuizChoice>();
     const localNames=new Set(junction.roads.map(road=>road.name.toLowerCase()));
+    const active=new Set(studyEntries(data,options.mode).map(value=>value.id));
     for(const other of data.junctions)for(const road of other.roads){
-      if(road.name&&!localNames.has(road.name.toLowerCase()))optionsByName.set(road.name.toLowerCase(),{id:road.id,label:road.name});
+      if(road.name&&road.entryIds.some(id=>active.has(id))&&!localNames.has(road.name.toLowerCase()))optionsByName.set(road.name.toLowerCase(),{id:road.id,label:road.name});
     }
     const distractors=shuffle([...optionsByName.values()],random).slice(0,3);
     if(!distractors.length)return null;

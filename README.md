@@ -9,11 +9,14 @@ The redesign is published only after the main-branch GitHub Actions build, tests
 ## Use the map
 
 - Start with the **18 assigned Zone 1 entries**. Switch to **All Assigned Streets — 38 Entries** for the complete original curriculum.
-- Choose a road from **Street list**, search, or click its actual mapped geometry. Your selection is **orange**. Overlapping road hits offer an explicit identity choice.
-- Press **↓ Down Arrow** to highlight and frame the next street in the current list; **↑ Up Arrow** goes back. The list wraps at either end. Shortcuts pause while using search or form fields, choosing an ambiguous road, or practicing a quiz; holding a key does not skip through streets.
+- Choose a road from **Street list**, search, or click its actual mapped geometry. Your selection is **orange**, and your map center, zoom, tilt and rotation stay put. Overlapping road hits offer an explicit identity choice.
+- Press **↓ Down Arrow** to highlight the next street in the current list; **↑ Up Arrow** goes back. The list wraps at either end without moving the camera. Shortcuts pause while using search or form fields, choosing an ambiguous road, or practicing a quiz; holding a key does not skip through streets.
+- **Zone 1 Overview** fits the complete approximate boundary around open panels. **2D View** and **Angled View** fit that same zone with a flat or modest 30° tilt. **Map layers → Map rotation / Reset North** controls orientation. Drag, rotate, tilt and zoom freely afterward.
+- **View selected road** explicitly brings the selected road and any comparison into view. Opening panels, selecting another section, comparing roads, and toggling **Show Full Road** preserve your camera.
 - Zone 1 mode highlights actual line/polygon-clipped sections. **Show Full Road** displays the complete *available imported* extent; pale dashes identify out-of-zone sections. Separate carriageways contribute separately to reported centerline length.
 - Drag and zoom freely. There is no vehicle, automatic follow mode, physics loop, speedometer, driving HUD or driver's-seat renderer in the active application.
-- Inspect junction markers, their source evidence and connecting streets. **Previous / Next** follows source geometry within explicit mapped sections; it is not a guaranteed complete real-world itinerary.
+- Intersection markers and lists show direct source-node connections between two different entries in the active **18- or 38-road curriculum**. In Zone 1 mode, the connection must lie inside the approximate boundary, even with **Show Full Road** enabled. Background streets remain on the map. Overpasses, indirect ramp connections and unrelated residential junctions are excluded from this study list. Source-backed road-name transitions are explicitly labeled and remain separate from scored intersection facts.
+- **Previous / Next** browses qualifying intersections without moving your camera. Click a listed intersection or **View intersection** for a close-up. Evidence and source IDs remain available in expandable details; source-mapped connections do not establish verified legal turns.
 - Compare a second road in **blue**. The map distinguishes direct source-node connections from nonconnecting crossings; it does not invent an intersection or assert every legal turn.
 - Use **Map layers → Find Police Headquarters** for the retained building reference at 2000 Stevenson Boulevard. This is a landmark, not the former approximate vehicle departure or a verified driveway.
 - **Practice** offers highlighted-road identification, finding a road by clicking it, and eligible physical-intersection recognition. Hidden-name questions suppress the map labels and answer-revealing interface together. Explicit hints count as assisted.
@@ -84,4 +87,4 @@ The tag contains its original source, dependencies, tests and deployment configu
 
 GitHub Pages retains the repository path **`/fremontStreets/`**. The existing main-branch workflow installs locked dependencies, runs relevant unit and map browser tests, builds, tests the static production subdirectory and deploys only after those checks pass. Do not force-push, bypass failed tests or claim a published update before checking the actual run and live assets.
 
-The [redesign verification report](docs/map-redesign.md) records executed browser checks, screenshots, limitations and the archive reference.
+The [zone overview and connection report](docs/zone-overview.md) records the current camera behavior, assigned-road counts, evidence limits and verification. The [original redesign report](docs/map-redesign.md) preserves the initial map release checks and driving archive reference.

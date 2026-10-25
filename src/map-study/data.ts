@@ -1,6 +1,6 @@
 import type {FeatureCollection,LineString,MultiLineString} from 'geojson';
 import type {LonLat} from '../core/types';
-import type {MapJunction,MapJunctionFact,MapJunctionPair} from './junctions';
+import type {MapJunction,MapJunctionComponent,MapJunctionFact,MapJunctionPair} from './junctions';
 import {canonicalRoadName} from '../study-network';
 import {project} from '../core/projection';
 import type {GeometryOptions,MapScope,MapStudyData,MapStudyEntry,RoadSearchResult,SelectionGeometry} from './types';
@@ -51,7 +51,7 @@ export function searchRoads(data:MapStudyData,query:string,limit=30):RoadSearchR
   const connectors=needle?index(data).connectors.filter(road=>matches(road.names)).sort((a,b)=>a.label.localeCompare(b.label)||a.id.localeCompare(b.id)):[];
   return [...entries,...connectors].slice(0,limit);
 }
-export type ScopedMapJunction=MapJunction&{displayNodeId:string;displaySectionId:string;displayQuizPairs:MapJunctionPair[]};
+export type ScopedMapJunction=MapJunction&{displayNodeId:string;displaySectionId:string;displayQuizPairs:MapJunctionPair[];sourceJunctionId?:string};
 export interface OrderedJunction {junction:ScopedMapJunction;sectionId:string;sectionName:string;distanceMetres:number;sectionIndex:number}
 function scopedJunction(junction:MapJunction,component:MapJunction["components"][number],entryId:string,sectionId:string,pairFilter:(pair:MapJunctionPair)=>boolean=()=>true):ScopedMapJunction{
   const displayQuizPairs=junction.quizPairs.filter(pair=>pair.nodeIds.includes(component.nodeId)&&pair.roadIds.some(roadId=>junction.roads.some(road=>road.id===roadId&&road.entryIds.includes(entryId)))&&pairFilter(pair));
@@ -95,6 +95,102 @@ export function entryJunctions(data:MapStudyData,entryId:string,options:Geometry
     result.push(...sectionRows);
   }
   return result;
+}
+
+/** A node belongs to an entry only through an actual adjacent source segment.
+ * A logical site's aggregate road names or a nearby line cannot establish this. */
+function assignedWaysAtNode(data:MapStudyData,entryId:string,nodeId:string,position:LonLat):Set<string>{
+  const cached=index(data),ways=new Set<string>();
+  for(const id of cached.entries.get(entryId)?.sectionIds??[]){
+    const section=cached.sections.get(id);if(!section)continue;
+    for(let i=0;i<section.sourceNodeIds.length;i++){
+      const coordinate=section.geometry.coordinates[i];
+      if(section.sourceNodeIds[i]!==nodeId||coordinate?.[0]!==position[0]||coordinate?.[1]!==position[1])continue;
+      for(const segment of [section.sourceSegments[i-1],section.sourceSegments[i]]){
+        if(!segment)continue;const way=cached.ways.get(segment.wayId);
+        // Interchanges and ramps remain on the background map. They are not
+        // ordinary direct intersections between the assigned surface corridors.
+        if(way&&way.properties.entryIds.includes(entryId)&&section.sourceWayIds.includes(segment.wayId)
+          &&way.properties.highway!=='motorway'&&!way.properties.highway.endsWith('_link'))ways.add(segment.wayId);
+      }
+    }
+  }
+  return ways;
+}
+
+/** Actual components connecting TWO DISTINCT active curriculum entries.
+ * Zone 1 membership is a curriculum constraint even when full-road display is on. */
+export function assignedPairComponents(data:MapStudyData,junction:MapJunction,pair:MapJunctionPair,scope:MapScope):MapJunctionComponent[]{
+  if(junction.kind!=='junction'||!['shared-node','name-change'].includes(junction.connectionType)||pair.roadIds[0]===pair.roadIds[1])return [];
+  const active=new Set(studyEntries(data,scope).map(entry=>entry.id));
+  const roads=pair.roadIds.map(id=>junction.roads.find(road=>road.id===id));if(roads.some(road=>!road))return [];
+  const zone=data.zones.zones.find(value=>value.id==='zone1')?.geometry;
+  return junction.components.filter(component=>{
+    if(!pair.nodeIds.includes(component.nodeId)||!pair.roadIds.every(id=>component.roadIds.includes(id))
+      ||scope==='zone1'&&(!zone||!pointInZone(component.position,zone)))return false;
+    if(!junction.mappedPairs.some(mapped=>pair.roadIds.every(id=>mapped.roadIds.includes(id))&&mapped.nodeIds.includes(component.nodeId)))return false;
+    const identities=roads.map(road=>road!.entryIds.filter(id=>active.has(id)&&[...assignedWaysAtNode(data,id,component.nodeId,component.position)]
+      .some(wayId=>road!.sourceWayIds.includes(wayId)&&component.sourceWayIds.includes(wayId))));
+    return identities[0].some(a=>identities[1].some(b=>a!==b));
+  });
+}
+
+/** Focused study walkthrough. Each visible name/pair belongs to its actual
+ * selected source node. Repeated carriageway nodes are grouped by retained
+ * logical identity; distinct physical pair components never borrow that marker. */
+export function assignedEntryJunctions(data:MapStudyData,entryId:string,scope:MapScope,options:GeometryOptions={}):OrderedJunction[]{
+  const cached=index(data),entry=cached.entries.get(entryId),active=new Set(studyEntries(data,scope).map(value=>value.id));
+  if(!entry||!active.has(entryId))return [];
+  const rows:OrderedJunction[]=[];
+  const candidates=new Map<string,Array<{junction:MapJunction;component:MapJunctionComponent;pairs:MapJunctionPair[];sectionId:string;sectionName:string;sectionIndex:number;distanceMetres:number}>>();
+  for(const [sectionIndex,sectionId]of entry.sectionIds.entries()){
+    if(options.sectionId&&sectionId!==options.sectionId)continue;
+    const section=cached.sections.get(sectionId);if(!section)continue;
+    const distances=new Map<string,number>();let distance=0;
+    section.sourceNodeIds.forEach((node,i)=>{if(i)distance+=lineLength([section.geometry.coordinates[i-1] as LonLat,section.geometry.coordinates[i] as LonLat]);if(!distances.has(node))distances.set(node,distance);});
+    for(const ordered of section.junctionOrder){
+      const junction=cached.junctions.get(ordered.junctionId);if(!junction||junction.kind!=='junction')continue;
+      const atNode=new Map<string,MapJunctionPair[]>();
+      for(const pair of junction.mappedPairs){
+        if(!pair.roadIds.some(id=>junction.roads.some(road=>road.id===id&&road.entryIds.includes(entryId))))continue;
+        for(const component of assignedPairComponents(data,junction,pair,scope)){
+          if(!distances.has(component.nodeId))continue;
+          // The selected source chain must itself supply the selected entry's
+          // way at this component, not a different branch elsewhere in the group.
+          const i=section.sourceNodeIds.indexOf(component.nodeId),selectedWays=[section.sourceSegments[i-1]?.wayId,section.sourceSegments[i]?.wayId].filter((id):id is string=>!!id);
+          const selectedOrdinaryWays=assignedWaysAtNode(data,entryId,component.nodeId,component.position);
+          if(!pair.roadIds.some(id=>junction.roads.some(road=>road.id===id&&road.entryIds.includes(entryId)&&road.sourceWayIds.some(way=>selectedWays.includes(way)&&selectedOrdinaryWays.has(way)&&component.sourceWayIds.includes(way)))))continue;
+          atNode.set(component.nodeId,[...(atNode.get(component.nodeId)??[]),pair]);
+        }
+      }
+      for(const [nodeId,pairs]of atNode){const component=junction.components.find(value=>value.nodeId===nodeId)!;
+        const candidate={junction,component,pairs,sectionId,sectionName:section.name,sectionIndex,distanceMetres:distances.get(nodeId)!};
+        candidates.set(junction.id,[...(candidates.get(junction.id)??[]),candidate]);
+      }
+    }
+  }
+  const pairKey=(pair:MapJunctionPair)=>[...pair.roadIds].sort().join('|');
+  for(const choices of candidates.values()){
+    const covered=new Set<string>();let emitted=0;
+    while(true){
+      choices.sort((a,b)=>b.pairs.filter(pair=>!covered.has(pairKey(pair))).length-a.pairs.filter(pair=>!covered.has(pairKey(pair))).length||a.sectionIndex-b.sectionIndex||a.distanceMetres-b.distanceMetres||a.component.nodeId.localeCompare(b.component.nodeId));
+      const chosen=choices[0],pairs=chosen.pairs.filter(pair=>!covered.has(pairKey(pair)));if(!pairs.length)break;
+      const pairIds=new Set(pairs.map(pairKey)),roadIds=new Set(pairs.flatMap(pair=>pair.roadIds));
+      const scoped=scopedJunction(chosen.junction,chosen.component,entryId,chosen.sectionId,pair=>pairIds.has(pairKey(pair)));
+      const roads=scoped.roads.filter(road=>roadIds.has(road.id)).map(road=>{
+        const applicable=new Map(road.entryIds.filter(id=>active.has(id)).map(id=>[id,[...assignedWaysAtNode(data,id,chosen.component.nodeId,chosen.component.position)].filter(way=>road.sourceWayIds.includes(way)&&chosen.component.sourceWayIds.includes(way))]));
+        return {...road,entryIds:[...applicable].filter(([,ways])=>ways.length).map(([id])=>id),sourceWayIds:[...new Set([...applicable.values()].flat())]};
+      });
+      const sourceWayIds=[...new Set(roads.flatMap(road=>road.sourceWayIds))];
+      const nodePairs=pairs.map(pair=>({...pair,nodeIds:[chosen.component.nodeId]}));
+      const junction:ScopedMapJunction={...scoped,id:emitted?`${scoped.id}:assigned:${chosen.component.nodeId}`:scoped.id,sourceJunctionId:scoped.id,
+        roads,roadNames:roads.map(road=>road.name),entryIds:[...new Set(roads.flatMap(road=>road.entryIds))],sourceWayIds,nodeIds:[chosen.component.nodeId],
+        components:[{...chosen.component,roadNames:roads.map(road=>road.name),roadIds:[...roadIds],sourceWayIds}],mappedPairs:nodePairs,quizPairs:scoped.displayQuizPairs};
+      rows.push({junction,sectionId:chosen.sectionId,sectionName:chosen.sectionName,sectionIndex:chosen.sectionIndex,distanceMetres:chosen.distanceMetres});
+      pairs.forEach(pair=>covered.add(pairKey(pair)));emitted++;
+    }
+  }
+  return rows.sort((a,b)=>a.sectionIndex-b.sectionIndex||a.distanceMetres-b.distanceMetres||a.junction.id.localeCompare(b.junction.id));
 }
 export function entryCrossings(data:MapStudyData,entryId:string,options:GeometryOptions={}):MapJunction[]{
   const zone=data.zones.zones.find(z=>z.id==='zone1')?.geometry;

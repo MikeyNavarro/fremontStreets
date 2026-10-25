@@ -45,9 +45,18 @@ export function mountStudyShell(container: HTMLElement): void {
 
       <div class="map-tools" aria-label="Map display controls">
         <button id="map-home" type="button" class="map-tool" aria-label="Show Zone 1 overview">${icon('compass')}<span>Zone 1 overview</span></button>
+        <div class="perspective-controls" role="group" aria-label="Map perspective">
+          <button id="perspective-flat" type="button" aria-pressed="true">2D View</button>
+          <button id="perspective-angled" type="button" aria-pressed="false">Angled View</button>
+        </div>
         <details id="map-options" class="map-options">
           <summary aria-label="Map layers and reference controls">${icon('layers')}<span>Map layers</span></summary>
           <div class="map-options-content">
+            <span class="eyebrow">MAP ROTATION</span>
+            <label class="bearing-control" for="map-bearing">Bearing <output id="map-bearing-value" for="map-bearing">0°</output></label>
+            <input id="map-bearing" type="range" min="-180" max="180" step="5" value="0" aria-label="Map bearing in degrees"/>
+            <button id="reset-north" type="button">Reset North</button>
+            <p class="source-note">Right-drag to rotate or tilt freely. Perspective buttons return to the whole Zone 1 overview.</p>
             <span class="eyebrow">DISPLAY</span>
             <label class="toggle-row"><input id="labels-toggle" type="checkbox" checked/><span>Street names</span></label>
             <label class="toggle-row"><input id="boundary-toggle" type="checkbox" checked/><span>Approximate Zone 1 boundary</span></label>

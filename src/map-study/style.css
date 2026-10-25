@@ -104,6 +104,13 @@ p { line-height: 1.6; }
 .map-tools > * { pointer-events: auto; }
 .map-tool, .map-options { background: #132b36f2; border: 1px solid #405f6d; box-shadow: 0 4px 20px #0003; }
 .map-tool { font-size: 11px; }
+.perspective-controls { display: flex; gap: 0; border: 1px solid #405f6d; border-radius: 10px; overflow: hidden; background: #132b36f2; box-shadow: 0 4px 20px #0003; }
+.perspective-controls button { min-height: 41px; border: 0; border-radius: 0; background: transparent; font-size: 11px; }
+.perspective-controls button + button { border-left: 1px solid #405f6d; }
+.perspective-controls button[aria-pressed=true] { color: #b8f5e5; background: #224d43; }
+.perspective-controls button:focus-visible { outline-offset: -3px; }
+.bearing-control { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: #c6dbe4; }
+#map-bearing { width: 100%; margin: 12px 0; accent-color: var(--teal); cursor: pointer; }
 .map-options { position: relative; border-radius: 10px; }
 .map-options summary { min-height: 41px; padding: 10px 13px; display: flex; align-items: center; gap: 8px; list-style: none; border-radius: 10px; font-size: 11px; font-weight: 600; }
 .map-options summary::-webkit-details-marker { display: none; }
@@ -252,7 +259,7 @@ p { line-height: 1.6; }
   .study-topbar-actions button { min-width: 42px; min-height: 42px; padding: 10px; }
   .study-topbar-actions .action-label { display: none; }
   .search-results { position: fixed; left: 13px; right: 13px; top: 117px; max-height: 45dvh; }
-  .road-drawer { top: auto; left: 10px; right: 10px; bottom: 84px; width: auto; max-height: 49dvh; border-radius: 16px; }
+  .road-drawer { top: auto; left: 10px; right: 10px; bottom: 84px; width: auto; max-height: 32dvh; border-radius: 16px; }
   .drawer-heading { padding: 16px 16px 0; }
   .drawer-heading h1 { font-size: 18px; }
   .drawer-intro { padding: 7px 16px 12px; }
@@ -263,12 +270,15 @@ p { line-height: 1.6; }
   .drawer-footer { padding: 10px 16px; }
   .road-details { max-height: 35%; padding: 12px 16px; }
   .map-tools { top: 12px; right: 12px; left: 12px; justify-content: flex-end; }
+  .map-tools { flex-wrap: wrap; }
+  .perspective-controls { order: 3; margin-left: 50%; }
+  .perspective-controls button { min-height: 34px; padding: 7px 10px; font-size: 10px; }
   .map-tool, .map-options summary { min-height: 38px; font-size: 10px; padding: 8px 10px; }
   .map-tools .icon { width: 16px; height: 16px; }
   .map-options-content { max-height: calc(100dvh - 220px); overflow-y: auto; width: 270px; }
   .floating-panel { top: auto; right: 10px; left: 10px; bottom: 84px; width: auto; max-height: 47dvh; padding: 17px; }
   .floating-panel h2 { font-size: 19px; }
-  .selection-panel { z-index: 7; }
+  .selection-panel { z-index: 7; max-height: 32dvh; }
   .quiz-panel { z-index: 9; }
   .intersection-list { max-height: 150px; }
   .disambiguation { top: 65px; bottom: auto; max-height: 45dvh; z-index: 10; }

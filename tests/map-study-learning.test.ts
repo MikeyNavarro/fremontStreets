@@ -15,6 +15,12 @@ function fixture():MapStudyData {
   // Only the first half of A is independently corroborated, despite the full source line.
   sections[0].verified.coordinates=[[[-121.99,37.55],[-121.985,37.55]]];
   sections[0].verifiedInside=structuredClone(sections[0].verified);
+  // Physical-pair fixtures must also share the exact source node in both
+  // assigned road sections; an aggregate junction assertion alone is not proof.
+  sections[0].sourceNodeIds=['a-start','shared-ab','a-end'];
+  sections[0].geometry.coordinates=[[-121.99,37.55],[-121.985,37.55],[-121.98,37.55]];
+  sections[1].sourceNodeIds.push('shared-ab');sections[1].geometry.coordinates.push([-121.985,37.55]);
+  for(const section of sections.slice(0,2))section.sourceSegments.push({wayId:section.sourceWayIds[0],index:1,reversed:false});
   const jfact=(status:'Verified'|'Unresolved'|'Conflicted')=>({status,scope:'Synthetic junction fact',note:'Fixture only',sourceIds:['official-physical-source'],claimIds:['physical-ab']});
   const pair={roadA:'Road A',roadB:'Road B',roadIds:['road-a','road-b'] as [string,string],nodeIds:['shared-ab'],sourceIds:['official-physical-source'],claimIds:['physical-ab']};
   const junction:MapJunction={id:'junction-ab',kind:'junction',connectionType:'shared-node',position:[-121.985,37.55],nodeIds:['shared-ab'],sourceWayIds:['way-a','way-b'],entryIds:['a','b'],roadNames:['Road A','Road B'],roads:[{id:'road-a',name:'Road A',sourceWayIds:['way-a'],entryIds:['a']},{id:'road-b',name:'Road B',sourceWayIds:['way-b'],entryIds:['b']}],components:[{nodeId:'shared-ab',position:[-121.985,37.55],sourceWayIds:['way-a','way-b'],roadNames:['Road A','Road B'],roadIds:['road-a','road-b']}],evidence:{location:jfact('Verified'),topology:jfact('Unresolved'),grade:jfact('Unresolved'),maneuvers:jfact('Unresolved')},statusLabel:'Pair-specific independent physical evidence; other group facts unresolved',grouping:'Source group',mappedPairs:[pair],quizPairs:[pair],inZone1:true};
@@ -106,6 +112,8 @@ test('intersection quiz markers and revalidation use the exact eligible pair nod
   junction.components[0].position=[-121.985,37.6];
   assert.equal(answerQuiz(task,task.answerId,data).outcome,'withdrawn');
   assert.equal(createQuiz(data,{kind:'intersection',mode:'zone1',entryId:'a'}),null,'Logical inZone1=true does not qualify an out-of-zone physical pair');
+  assert.equal(createQuiz(data,{kind:'intersection',mode:'all',entryId:'a'}),null,'Moving only the junction assertion cannot move the underlying source roads');
+  for(const section of data.sections){const at=section.sourceNodeIds.indexOf('shared-ab');if(at>=0)section.geometry.coordinates[at]=[-121.985,37.6];}
   assert.ok(createQuiz(data,{kind:'intersection',mode:'all',entryId:'a'}),'The physical relationship remains available in All Assigned Streets');
 });
 

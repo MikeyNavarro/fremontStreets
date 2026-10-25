@@ -21,9 +21,32 @@ const symbols=(page:Page)=>page.evaluate(()=>{
 async function settled(page:Page){await expect.poll(()=>page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.ready)).toBe(true);}
 async function openLibrary(page:Page){if(!await page.locator('#road-drawer').isVisible())await page.locator('#toggle-library').click();}
 async function closeLibrary(page:Page){if(await page.locator('#road-drawer').isVisible())await page.locator('#close-library').click();}
-async function select(page:Page,id:string){
+async function select(page:Page,id:string,closeUp=true){
   await openLibrary(page);await page.locator(`[data-study-entry="${id}"]`).click();
   await expect.poll(async()=>(await state(page)).selectedId).toBe(id);await settled(page);
+  // Older interaction cases intentionally inspect a close-up. The new default
+  // selection must not move the camera; only this explicit user action does.
+  if(closeUp){await page.locator('#view-selected').click();await settled(page);}
+}
+async function zoneFits(page:Page){
+  const zone=data().zones.zones.find(zone=>zone.id==='zone1')!.geometry!;
+  const coordinates=zone.type==='Polygon'?zone.coordinates.flat():zone.coordinates.flat(2);
+  const projection=await page.evaluate(coordinates=>{
+    const g=(window as any).__FREMONT_MAP_STUDY__,points=coordinates.map(point=>g.project(point));
+    const canvas=document.querySelector('.maplibregl-canvas')!.getBoundingClientRect();
+    const panels=['road-drawer','selection-panel','quiz-panel'].map(id=>document.getElementById(id)!)
+      .filter(element=>!element.hidden&&element.getBoundingClientRect().width>0).map(element=>{const box=element.getBoundingClientRect();
+        return {id:element.id,left:box.left-canvas.left,right:box.right-canvas.left,top:box.top-canvas.top,bottom:box.bottom-canvas.top};});
+    return {points,viewport:g.viewport,panels};
+  },coordinates);
+  expect(projection.viewport,'read-only usable viewport diagnostic').toBeTruthy();
+  const {left,top,right,bottom}=projection.viewport;
+  expect(right-left).toBeGreaterThan(50);expect(bottom-top).toBeGreaterThan(50);
+  for(const point of projection.points){
+    expect(point.x).toBeGreaterThanOrEqual(left-1);expect(point.x).toBeLessThanOrEqual(right+1);
+    expect(point.y).toBeGreaterThanOrEqual(top-1);expect(point.y).toBeLessThanOrEqual(bottom+1);
+    for(const panel of projection.panels)expect(point.x<panel.left||point.x>panel.right||point.y<panel.top||point.y>panel.bottom,`zone boundary remains outside ${panel.id}`).toBe(true);
+  }
 }
 async function drag(page:Page,dx=180,dy=70){
   await closeLibrary(page);
@@ -101,6 +124,78 @@ test('opens directly into the exact Zone 1 map curriculum with no active driving
   expect((await state(page)).visibleEntryIds.slice().sort()).toEqual([...zone1Ids].sort());
 });
 
+test('road selections, arrows, comparisons and panels preserve the chosen overview camera',async({page})=>{
+  await zoneFits(page);
+  await closeLibrary(page);const overview=(await state(page)).camera;
+  await openLibrary(page);expect((await state(page)).camera).toEqual(overview);
+  await select(page,'ew13',false);expect((await state(page)).camera).toEqual(overview);
+  await expect.poll(async()=>(await state(page)).renderedSelectedCount).toBeGreaterThan(0);
+  await page.locator('#show-full-road').check();await settled(page);
+  expect((await state(page)).camera).toEqual(overview);
+  await page.locator('#compare-road').selectOption('ns03');await settled(page);
+  expect((await state(page)).camera).toEqual(overview);
+  expect((await state(page)).comparisonColor).toBe('#4DA6FF');
+  await page.locator('#section-select').selectOption({index:1});await settled(page);
+  expect((await state(page)).camera).toEqual(overview);
+  await page.locator('#selection-panel').focus();await page.keyboard.press('ArrowDown');await settled(page);
+  expect((await state(page)).selectedId).toBe('ew15');expect((await state(page)).camera).toEqual(overview);
+  await page.keyboard.press('ArrowUp');await settled(page);
+  expect((await state(page)).selectedId).toBe('ew13');expect((await state(page)).camera).toEqual(overview);
+  await page.locator('#map-search').fill('Fremont');
+  await page.locator('#search-results').getByRole('button',{name:/Fremont Boulevard/}).click();await settled(page);
+  expect((await state(page)).selectedId).toBe('ns03');expect((await state(page)).camera).toEqual(overview);
+  await page.locator('#view-selected').click();await settled(page);
+  expect((await state(page)).camera).not.toEqual(overview);
+  await page.locator('#map-home').click();await settled(page);await zoneFits(page);
+  expect((await state(page)).selectedId).toBe('ns03');
+  expect((await state(page)).selectionColor).toBe('#FF8C00');
+  await expect.poll(async()=>(await state(page)).renderedSelectedCount).toBeGreaterThan(0);
+});
+
+test('flat and angled zone overviews fit the complete boundary with bearing controls and unchanged source geometry',async({page})=>{
+  await zoneFits(page);
+  await select(page,'ew13',false);
+  const geometry=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.selectedGeometry);
+  await page.locator('#perspective-angled').click();await settled(page);
+  expect((await state(page)).camera.pitch).toBeCloseTo(30);await zoneFits(page);
+  await expect.poll(async()=>(await symbols(page)).rendered.length).toBeGreaterThan(0);
+  expect((await symbols(page)).layers.every((layer:any)=>layer.placement==='line')).toBe(true);
+  const angled=(await state(page)).camera;
+  await select(page,'ns03',false);expect((await state(page)).camera).toEqual(angled);
+  await page.locator('#map-options summary').click();
+  await page.locator('#map-bearing').focus();await page.keyboard.press('End');await page.keyboard.press('ArrowLeft');await settled(page);
+  expect(Math.abs((await state(page)).camera.bearing)).toBeGreaterThan(1);
+  await page.locator('#map-options summary').click();await page.locator('#map-home').click();await settled(page);await zoneFits(page);
+  const rotated=(await state(page)).camera;
+  await select(page,'ew13',false);expect((await state(page)).camera).toEqual(rotated);
+  expect(await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.selectedGeometry)).toEqual(geometry);
+  await page.locator('#map-options summary').click();await page.locator('#reset-north').click();await settled(page);
+  expect((await state(page)).camera.bearing).toBeCloseTo(0);
+  await page.locator('#map-options summary').click();
+  await page.locator('#perspective-flat').click();await settled(page);
+  expect((await state(page)).camera.pitch).toBeCloseTo(0);await zoneFits(page);
+});
+
+test('narrow flat and angled overviews fit the zone around open study panels without automatic camera movement',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await page.reload();
+  await page.waitForFunction(()=>Boolean((window as any).__FREMONT_MAP_STUDY__));await settled(page);await zoneFits(page);
+  const initial=(await state(page)).camera;
+  await select(page,'ew13',false);expect((await state(page)).camera).toEqual(initial);
+  await page.locator('#map-home').click();await settled(page);await zoneFits(page);
+  await page.locator('#perspective-angled').click();await settled(page);await zoneFits(page);
+  expect((await state(page)).camera.pitch).toBeCloseTo(30);
+  await expect.poll(async()=>(await symbols(page)).rendered.length).toBeGreaterThan(0);
+  const angled=(await state(page)).camera;
+  await page.locator('#compare-road').selectOption('ns03');await settled(page);
+  expect((await state(page)).camera).toEqual(angled);
+  await openLibrary(page);await settled(page);expect((await state(page)).camera).toEqual(angled);
+  await page.locator('#map-home').click();await settled(page);await zoneFits(page);
+  await expect.poll(async()=>(await symbols(page)).rendered.length).toBeGreaterThan(0);
+  await closeLibrary(page);await page.locator('#perspective-flat').click();await settled(page);await zoneFits(page);
+  expect((await state(page)).camera.pitch).toBeCloseTo(0);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
 test('Stevenson selection uses orange sourced Zone 1 geometry and supports its full imported extent',async({page})=>{
   await select(page,'ew13');
   expect((await state(page)).selectionColor).toBe('#FF8C00');
@@ -141,11 +236,12 @@ test('arrow shortcuts highlight sourced streets in curriculum order and wrap in 
     expect(geometry.features.length).toBeGreaterThan(0);
     const allowed=new Set(data().entries.find(entry=>entry.id===id)!.sourceWayIds);
     expect(geometry.features.every((feature:any)=>feature.properties.entryId===id&&feature.properties.sourceWayIds.every((way:string)=>allowed.has(way)))).toBe(true);
-    await expect.poll(async()=>(await state(page)).renderedSelectedCount).toBeGreaterThan(0);
+    // Off-screen roads remain selected without changing a learner's camera.
     expect((await state(page)).selectionColor).toBe('#FF8C00');
     await expect(page.locator('#selection-panel h2')).toHaveText(data().entries.find(entry=>entry.id===id)!.label);
   }
   await closeLibrary(page);await canvas.focus();
+  const overview=(await state(page)).camera;
   await page.keyboard.down('ArrowDown');await highlighted(zone1Ids[0]);
   // Repeated keydown events represent holding one physical press, including
   // after selection moves focus from the map to the details panel.
@@ -156,6 +252,7 @@ test('arrow shortcuts highlight sourced streets in curriculum order and wrap in 
   await page.keyboard.press('ArrowUp');await highlighted(zone1Ids[0]);
   await page.keyboard.press('ArrowUp');await highlighted(zone1Ids.at(-1)!);
   await page.keyboard.press('ArrowDown');await highlighted(zone1Ids[0]);
+  expect((await state(page)).camera).toEqual(overview);
   await page.locator('#clear-selection').click();await canvas.focus();
   await page.keyboard.press('ArrowUp');await highlighted(zone1Ids.at(-1)!);
   await page.locator('#study-mode').selectOption('all');
@@ -233,46 +330,86 @@ test('overlapping road hits offer an explicit identity choice instead of silentl
   await expect.poll(async()=>(await state(page)).selectedId).toBe('ns03');
 });
 
-test('source junction inspection and ordered walkthrough preserve actual component identities',async({page})=>{
-  await select(page,'ew13');
-  const model=data(),byId=new Map(model.junctions.map(junction=>[junction.id,junction]));
-  const zone=model.zones.zones.find(zone=>zone.id==='zone1')!.geometry!;
-  const scopedRows=(section:MapRoadSection)=>section.junctionOrder.filter(row=>byId.get(row.junctionId)?.components.some(component=>section.sourceNodeIds.includes(component.nodeId)&&pointInZone(component.position,zone)));
-  const section=model.sections.find(section=>section.entryId==='ew13'&&section.inside.coordinates.length&&scopedRows(section).length>2)!;
-  const expectedOrder=scopedRows(section).map(row=>row.junctionId);
-  await page.locator('#section-select').selectOption(section.id);await settled(page);
-  const junctions=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.displayedJunctions);
-  const real=junctions.filter((j:any)=>j.kind==='junction');expect(real.length).toBeGreaterThan(1);
-  expect(real.slice(0,2).map((j:any)=>j.id)).toEqual(expectedOrder.slice(0,2));
-  await page.locator(`[data-junction-id="${real[0].id}"]`).first().click();await settled(page);
-  expect((await state(page)).selectedIntersectionId).toBe(real[0].id);
-  await expect(page.locator('#selection-panel')).toContainText(real[0].roadNames[0]);
-  await expect(page.locator('#selection-panel')).toContainText(/unresolved|unverified|not verified/i);
-  const sourceNodeIds=new Set(data().junctions.find(j=>j.id===real[0].id)!.nodeIds);
-  expect(real[0].components.every((c:any)=>sourceNodeIds.has(c.nodeId))).toBe(true);
+test('assigned intersection walkthrough preserves real source components and leaves the overview until explicitly focused',async({page})=>{
+  await select(page,'ew13',false);await page.locator('#map-home').click();await settled(page);
+  const model=data(),zone=model.zones.zones.find(zone=>zone.id==='zone1')!.geometry!;
+  const real=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.displayedJunctions);
+  expect(real.length).toBeGreaterThan(1);expect(new Set(real.map((j:any)=>j.id)).size).toBe(real.length);
+  for(const shown of real){
+    expect(shown.kind).toBe('junction');
+    const original=model.junctions.find(j=>j.id===(shown.sourceJunctionId??shown.id))!;
+    const component=original.components.find(c=>c.nodeId===shown.displayNodeId)!;
+    expect(component).toBeTruthy();expect(shown.position).toEqual(component.position);
+    expect(pointInZone(component.position,zone)).toBe(true);
+    const section=model.sections.find(section=>section.id===shown.displaySectionId)!;
+    expect(section.entryId).toBe('ew13');expect(section.sourceNodeIds).toContain(component.nodeId);
+    const eligible=original.mappedPairs.filter(pair=>pair.nodeIds.includes(component.nodeId)&&pair.roadIds.every(id=>component.roadIds.includes(id)));
+    expect(eligible.some(pair=>{
+      const sides=pair.roadIds.map(id=>original.roads.find(road=>road.id===id)!);
+      return sides.some(road=>road.entryIds.includes('ew13'))&&sides.some(road=>road.entryIds.some(id=>id!=='ew13'&&zone1Ids.includes(id)
+        &&model.sections.some(section=>section.entryId===id&&section.sourceNodeIds.includes(component.nodeId)&&section.sourceWayIds.some(way=>component.sourceWayIds.includes(way)))));
+    })).toBe(true);
+    expect(shown.roads.every((road:any)=>road.entryIds.some((id:string)=>zone1Ids.includes(id)))).toBe(true);
+  }
+  await expect(page.locator('[data-junction-id]')).toHaveCount(real.length);
+  await expect(page.locator('.intersection-list')).not.toContainText(/Civic Center Drive|Liberty Street|Leslie Street/);
+  const wide=(await state(page)).camera;
   await page.locator('#junction-next').click();await settled(page);
-  const next=(await state(page)).selectedIntersectionId;expect(next).toBe(expectedOrder[1]);
+  expect((await state(page)).selectedIntersectionId).toBe(real[0].id);expect((await state(page)).camera).toEqual(wide);
+  await page.locator('#junction-next').click();await settled(page);
+  expect((await state(page)).selectedIntersectionId).toBe(real[1].id);expect((await state(page)).camera).toEqual(wide);
   await page.locator('#junction-previous').click();await settled(page);
-  expect((await state(page)).selectedIntersectionId).toBe(real[0].id);
-  // Click the actual projected native marker after navigating to its position.
+  expect((await state(page)).selectedIntersectionId).toBe(real[0].id);expect((await state(page)).camera).toEqual(wide);
+  await page.locator('#view-intersection').click();await settled(page);
+  expect((await state(page)).camera).not.toEqual(wide);expect((await state(page)).selectedId).toBe('ew13');
+  await expect(page.locator('#selection-panel')).toContainText(/unresolved|unverified|not verified/i);
   await page.locator('#close-intersection').click();
   const point=await page.evaluate(position=>(window as any).__FREMONT_MAP_STUDY__.project(position),real[0].position);
   const box=(await page.locator('.maplibregl-canvas').boundingBox())!;
   await page.mouse.click(box.x+point.x,box.y+point.y);
   await expect.poll(async()=>(await state(page)).selectedIntersectionId).toBe(real[0].id);
-  // A logical junction can span the boundary and contain different named pairs.
-  // The selected Driscoll marker must use its own in-zone source node, without
-  // inheriting independent evidence for the separate Osgood/Washington pair.
-  await select(page,'ew14');
+  // Driscoll/Washington genuinely connect at this source node. Osgood's
+  // different component cannot lend its identity or independent evidence.
+  await select(page,'ew14',false);
   const driscoll=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.displayedJunctions.find((j:any)=>j.id==='map-junction-1676005285'));
   expect(driscoll).toBeTruthy();expect(driscoll.displayNodeId).toBe('1676005285');
-  const original=model.junctions.find(j=>j.id===driscoll.id)!;
-  expect(driscoll.position).toEqual(original.components.find(component=>component.nodeId===driscoll.displayNodeId)!.position);
-  expect(pointInZone(driscoll.position,model.zones.zones.find(zone=>zone.id==='zone1')!.geometry!)).toBe(true);
-  expect(driscoll.evidence.topology.status).toBe('Unresolved');
-  expect(driscoll.displayQuizPairs).toEqual([]);
-  await page.locator(`[data-junction-id="${driscoll.id}"]`).click();await settled(page);
-  await expect(page.locator('.intersection-detail')).not.toContainText(/Independent physical evidence applies to:.*(?:Osgood|Washington)/);
+  expect(driscoll.roadNames.slice().sort()).toEqual(['Driscoll Road','Washington Boulevard']);
+  expect(driscoll.evidence.topology.status).toBe('Unresolved');expect(driscoll.displayQuizPairs).toEqual([]);
+});
+
+test('intersection filtering uses the active curriculum and excludes crossings, connectors and out-of-zone pairs',async({page})=>{
+  const model=data(),zone=model.zones.zones.find(zone=>zone.id==='zone1')!.geometry!;
+  const check=async(active:string[],within:boolean)=>{
+    const selected=(await state(page)).selectedId;
+    const shown=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.displayedJunctions);
+    for(const junction of shown){
+      expect(junction.kind).toBe('junction');expect(['shared-node','name-change']).toContain(junction.connectionType);
+      expect(junction.entryIds).toContain(selected);
+      expect(junction.entryIds.filter((id:string)=>id!==selected&&active.includes(id)).length).toBeGreaterThan(0);
+      expect(junction.roads.every((road:any)=>road.entryIds.some((id:string)=>active.includes(id)))).toBe(true);
+      const original=model.junctions.find(value=>value.id===(junction.sourceJunctionId??junction.id))!;
+      expect(original.components.some(component=>component.nodeId===junction.displayNodeId&&component.position[0]===junction.position[0]&&component.position[1]===junction.position[1])).toBe(true);
+      if(within)expect(pointInZone(junction.position,zone)).toBe(true);
+    }
+    return shown;
+  };
+  await select(page,'ew13',false);const zoneRows=await check(zone1Ids,true);
+  expect(zoneRows).toHaveLength(6);
+  expect([...new Set(zoneRows.flatMap((junction:any)=>junction.roadNames).filter((name:string)=>name!=='Stevenson Boulevard'))].sort()).toEqual(['Blacow Road','Farwell Drive','Fremont Boulevard','Mission Boulevard','Paseo Padre Parkway','Sundale Drive']);
+  await page.locator('#show-full-road').check();await settled(page);
+  expect((await check(zone1Ids,true)).map((j:any)=>j.id)).toEqual(zoneRows.map((j:any)=>j.id));
+  await select(page,'ns02',false);
+  await expect(page.locator('[data-junction-id]')).toHaveCount(0);
+  await expect(page.locator('.intersection-list')).toContainText('No direct assigned-road connection is mapped in this study section.');
+  expect(await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.displayedJunctions.length)).toBe(0);
+  await select(page,'ns05',false);
+  const transitions=(await check(zone1Ids,true)).filter((junction:any)=>junction.connectionType==='name-change');
+  expect(transitions.some((junction:any)=>junction.displayNodeId==='443527086'&&junction.roadNames.includes('Mowry Avenue'))).toBe(true);
+  await expect(page.locator('.intersection-list')).toContainText('Road-name transition');
+  await page.locator('#study-mode').selectOption('all');await select(page,'ns09',false);
+  const allRows=await check(model.entries.map(entry=>entry.id),false);
+  expect(allRows.length).toBeGreaterThan(0);
+  expect((await state(page)).visibleEntryIds).toHaveLength(38);
 });
 
 test('comparison distinguishes direct source junctions from grade-separated visual crossings',async({page})=>{
@@ -282,6 +419,7 @@ test('comparison distinguishes direct source junctions from grade-separated visu
   await page.locator('#close-intersection').click();
   await expect(page.locator('#map-status')).toContainText('Stevenson Boulevard');
   await expect(page.locator('#map-status')).not.toContainText('Mission Boulevard');
+  await page.locator('#map-home').click();await settled(page);
   await page.locator('#compare-road').selectOption('ns03');await settled(page);
   expect((await state(page)).comparisonId).toBe('ns03');
   expect((await state(page)).comparisonColor).toBe('#4DA6FF');
@@ -385,7 +523,11 @@ test('find-the-road scores actual source-identity clicks and intersection practi
   await expect.poll(async()=>(await symbols(page)).rendered.length).toBe(0);
   await expect(page.locator('#quiz-panel')).not.toContainText(/all turns.*legal|legal turn.*verified/i);
   const contextIds=new Set(junction.roads.filter(road=>road.entryIds.includes(quiz.entryId)).map(road=>road.id));
-  const pair=junction.quizPairs.find(pair=>pair.nodeIds.includes(quiz.nodeId)&&pair.roadIds.some(id=>contextIds.has(id)))!;
+  const pair=junction.quizPairs.find(pair=>pair.nodeIds.includes(quiz.nodeId)&&pair.roadIds.some(id=>contextIds.has(id))
+    &&pair.roadIds.every(id=>junction.roads.find(road=>road.id===id)?.entryIds.some(entryId=>zone1Ids.includes(entryId))))!;
+  const choices=await page.locator('[data-quiz-answer]').evaluateAll(elements=>elements.map(element=>(element as HTMLButtonElement).dataset.quizAnswer!));
+  const assignedRoads=new Set(data().junctions.flatMap(j=>j.roads).filter(road=>road.entryIds.some(id=>zone1Ids.includes(id))).map(road=>road.id));
+  expect(choices.every(id=>assignedRoads.has(id))).toBe(true);
   const answerId=pair.roadIds.find(id=>!contextIds.has(id))!;
   await page.locator(`[data-quiz-answer="${answerId}"]`).click();
   await expect(page.locator('#quiz-panel .quiz-feedback')).toHaveText(/^Correct —/);
