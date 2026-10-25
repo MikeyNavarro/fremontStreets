@@ -67,7 +67,8 @@ export class StudyMapView {
     },layers}});
     this.map.addControl(new maplibregl.NavigationControl(),'bottom-right');
     this.map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
-    this.map.getCanvas().setAttribute('aria-label','Interactive Fremont street study map. Arrow keys pan; plus and minus zoom.');
+    this.map.getCanvas().setAttribute('aria-label','Interactive Fremont street study map. Down arrow selects the next study street; up arrow selects the previous street. During practice, arrows pan. Drag to pan; plus and minus zoom.');
+    this.map.getCanvas().setAttribute('aria-keyshortcuts','ArrowDown ArrowUp');
     const landmark=document.createElement('button');landmark.type='button';landmark.className='headquarters-marker';landmark.textContent='HQ';landmark.title='Fremont Police Headquarters · building reference';landmark.setAttribute('aria-label','Find Fremont Police Headquarters');
     landmark.addEventListener('click',event=>{event.stopPropagation();this.findHeadquarters();});
     this.hq=new maplibregl.Marker({element:landmark}).setLngLat(data.headquarters.position).addTo(this.map);

@@ -37,7 +37,7 @@ export function mountStudyShell(container: HTMLElement): void {
           <div><span class="eyebrow">YOUR STUDY AREA</span><h1 id="library-heading">One street at a time.</h1></div>
           <button id="close-library" class="icon-button" type="button" aria-label="Close street list">${icon('close')}</button>
         </div>
-        <div class="drawer-intro"><p>Select a street to follow its shape and explore the roads it meets.</p><div id="study-count" data-testid="study-count" class="study-count">18 assigned streets · Zone 1</div></div>
+        <div class="drawer-intro"><p>Select a street to follow its shape and explore the roads it meets.</p><p>↓ Next street · ↑ Previous street</p><div id="study-count" data-testid="study-count" class="study-count">18 assigned streets · Zone 1</div></div>
         <div id="road-list" data-testid="road-list" class="road-list" role="group" aria-label="Assigned study streets" tabindex="-1"></div>
         <div id="road-details" data-testid="road-details" class="road-details"></div>
         <div class="drawer-footer"><span class="legend-line orange" aria-hidden="true"></span><span>Orange marks your selected street.</span></div>

@@ -73,6 +73,7 @@ async function boot(){
     const relationship=entry.zone1Relationship==='within'?'Available geometry within Zone 1':entry.zone1Relationship==='nearly-within'?'Nearly all available geometry within Zone 1':entry.zone1Relationship==='partial'?'Partly within Zone 1':'Outside Zone 1';
     const comparisonDetails=comparison?compareEntries(data,entry.id,comparison.id,{...options(),sectionId:sectionId||undefined}):null;
     panel.innerHTML=`<div class="panel-header"><div class="selected-title"><span class="eyebrow">YOUR SELECTED ROAD</span><h2>${esc(entry.label)}</h2>${entry.originalLabel!==entry.label?`<p class="actual-road-name">Study entry: ${esc(entry.originalLabel)}</p>`:''}</div><button id="clear-selection" class="icon-button" aria-label="Clear road selection" type="button">×</button></div>
+      <p class="source-note">↓ Next street · ↑ Previous street</p>
       <p>${esc(relationship)} · approximate historical study boundary.</p><dl class="detail-grid"><div><dt>${sectionId?'Selected section':'Mapped road'} ${effectiveFull()?'full':'Zone 1'} centerlines</dt><dd>${distance(effectiveFull()?shownLengths.full:shownLengths.zone1)}</dd></div><div><dt>Mapped junctions in view</dt><dd>${activeJunctions.length}</dd></div></dl>
       <p class="source-note">Separate carriageways are included in the length. The available imported extent may not cover the complete corridor.</p><div>${pill('Name',entry.evidence.identity.status)}${pill('Geometry',entry.evidence.geometry.status)}</div>
       <div class="selection-toggles"><label class="toggle-row"><input id="show-full-road" type="checkbox" ${effectiveFull()?'checked':''} ${scope==='all'?'disabled':''}/><span>Show Full Road${scope==='all'?' · All Assigned Streets':''}</span></label><label class="toggle-row"><input id="show-intersections" type="checkbox" ${showIntersections?'checked':''}/><span>Show intersections and crossing notices</span></label></div>
@@ -131,6 +132,21 @@ async function boot(){
     if(['show-full-road','show-intersections','section-select','compare-road'].includes(target.id))document.getElementById(target.id)?.focus({preventScroll:true});
     if(target.id==='import-history'){const file=(target as HTMLInputElement).files?.[0];if(file){if(file.size>MAP_STUDY_MAX_BACKUP_BYTES){status('Backup is too large; existing history was preserved.');return;}void file.text().then(text=>{status(history.importJSON(text).message);renderLibrary();}).catch(()=>status('Backup could not be read; existing history was preserved.'));}}
   });
+  // Capture claimed shortcuts before MapLibre's canvas handler can also pan.
+  // Form controls and practice retain their own keys and answer protection.
+  document.addEventListener('keydown',event=>{
+    if(!['ArrowDown','ArrowUp'].includes(event.key)||event.defaultPrevented||event.isComposing||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;
+    if(practiceOpen||question||!$('disambiguation').hidden)return;
+    const target=event.target;
+    if(target instanceof HTMLElement&&(target.isContentEditable||target.closest('input,textarea,select,[role="textbox"],[role="combobox"],[role="listbox"],#search-results')))return;
+    const list=studyEntries(data,scope);
+    if(!list.length)return;
+    event.preventDefault();event.stopPropagation();
+    if(event.repeat)return;
+    const current=list.findIndex(entry=>entry.id===selectedId),step=event.key==='ArrowDown'?1:-1;
+    const next=current<0?(step===1?0:list.length-1):(current+step+list.length)%list.length;
+    selectEntry(list[next].id);
+  },{capture:true});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(!$('disambiguation').hidden){$('disambiguation').hidden=true;view.map.getCanvas().focus();}else if(practiceOpen)endQuiz();else if(!$('search-results').hidden)$('search-results').hidden=true;else drawer(false);}});
   renderLibrary();updateMap();
   Object.defineProperty(window,'__FREMONT_MAP_STUDY__',{configurable:true,value:{

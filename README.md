@@ -10,6 +10,7 @@ The redesign is published only after the main-branch GitHub Actions build, tests
 
 - Start with the **18 assigned Zone 1 entries**. Switch to **All Assigned Streets — 38 Entries** for the complete original curriculum.
 - Choose a road from **Street list**, search, or click its actual mapped geometry. Your selection is **orange**. Overlapping road hits offer an explicit identity choice.
+- Press **↓ Down Arrow** to highlight and frame the next street in the current list; **↑ Up Arrow** goes back. The list wraps at either end. Shortcuts pause while using search or form fields, choosing an ambiguous road, or practicing a quiz; holding a key does not skip through streets.
 - Zone 1 mode highlights actual line/polygon-clipped sections. **Show Full Road** displays the complete *available imported* extent; pale dashes identify out-of-zone sections. Separate carriageways contribute separately to reported centerline length.
 - Drag and zoom freely. There is no vehicle, automatic follow mode, physics loop, speedometer, driving HUD or driver's-seat renderer in the active application.
 - Inspect junction markers, their source evidence and connecting streets. **Previous / Next** follows source geometry within explicit mapped sections; it is not a guaranteed complete real-world itinerary.
@@ -17,7 +18,7 @@ The redesign is published only after the main-branch GitHub Actions build, tests
 - Use **Map layers → Find Police Headquarters** for the retained building reference at 2000 Stevenson Boulevard. This is a landmark, not the former approximate vehicle departure or a verified driveway.
 - **Practice** offers highlighted-road identification, finding a road by clicking it, and eligible physical-intersection recognition. Hidden-name questions suppress the map labels and answer-revealing interface together. Explicit hints count as assisted.
 
-The list collapses to leave almost the entire screen available for the map. Narrow screens use a drawer. Native MapLibre keyboard, mouse and touch navigation remain available, with visible keyboard focus and reduced-motion support.
+The list collapses to leave almost the entire screen available for the map. Narrow screens use a drawer. Mouse and touch panning, native keyboard zoom and horizontal panning remain available, with visible keyboard focus and reduced-motion support. Up/down arrows select study streets outside practice.
 
 ## Accuracy and scope
 

@@ -133,6 +133,73 @@ test('Stevenson selection uses orange sourced Zone 1 geometry and supports its f
   expect(await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.renderedRoadCount)).toBeGreaterThan(0);
 });
 
+test('arrow shortcuts highlight sourced streets in curriculum order and wrap in both study areas',async({page})=>{
+  const canvas=page.locator('.maplibregl-canvas');
+  async function highlighted(id:string){
+    await expect.poll(async()=>(await state(page)).selectedId).toBe(id);await settled(page);
+    const geometry=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.selectedGeometry);
+    expect(geometry.features.length).toBeGreaterThan(0);
+    const allowed=new Set(data().entries.find(entry=>entry.id===id)!.sourceWayIds);
+    expect(geometry.features.every((feature:any)=>feature.properties.entryId===id&&feature.properties.sourceWayIds.every((way:string)=>allowed.has(way)))).toBe(true);
+    await expect.poll(async()=>(await state(page)).renderedSelectedCount).toBeGreaterThan(0);
+    expect((await state(page)).selectionColor).toBe('#FF8C00');
+    await expect(page.locator('#selection-panel h2')).toHaveText(data().entries.find(entry=>entry.id===id)!.label);
+  }
+  await closeLibrary(page);await canvas.focus();
+  await page.keyboard.down('ArrowDown');await highlighted(zone1Ids[0]);
+  // Repeated keydown events represent holding one physical press, including
+  // after selection moves focus from the map to the details panel.
+  const camera=(await state(page)).camera;
+  await page.keyboard.down('ArrowDown');await page.keyboard.down('ArrowDown');await page.keyboard.up('ArrowDown');
+  expect((await state(page)).selectedId).toBe(zone1Ids[0]);expect((await state(page)).camera).toEqual(camera);
+  await canvas.focus();await page.keyboard.press('ArrowDown');await highlighted(zone1Ids[1]);
+  await page.keyboard.press('ArrowUp');await highlighted(zone1Ids[0]);
+  await page.keyboard.press('ArrowUp');await highlighted(zone1Ids.at(-1)!);
+  await page.keyboard.press('ArrowDown');await highlighted(zone1Ids[0]);
+  await page.locator('#clear-selection').click();await canvas.focus();
+  await page.keyboard.press('ArrowUp');await highlighted(zone1Ids.at(-1)!);
+  await page.locator('#study-mode').selectOption('all');
+  const allIds=data().entries.map(entry=>entry.id);
+  await select(page,allIds.at(-1)!);await canvas.focus();
+  await page.keyboard.press('ArrowDown');await highlighted(allIds[0]);
+  await page.keyboard.press('ArrowUp');await highlighted(allIds.at(-1)!);
+  expect((await state(page)).mode).toBe('all');
+});
+
+test('arrow shortcuts preserve form controls, search choices and protected practice answers',async({page})=>{
+  await select(page,'ew13');
+  const search=page.locator('#map-search');
+  await search.fill('Fremont');await search.press('ArrowDown');
+  const searchChoice=page.locator('#search-results button').first();
+  await expect(searchChoice).toBeFocused();expect((await state(page)).selectedId).toBe('ew13');
+  await page.keyboard.press('ArrowDown');await page.keyboard.press('ArrowUp');
+  expect((await state(page)).selectedId).toBe('ew13');await expect(page.locator('#search-results')).toBeVisible();
+  await page.keyboard.press('Escape');await search.fill('');
+  // Native select arrows must retain their browser behavior, instead of
+  // replacing the selected road or swallowing the control's change event.
+  await page.locator('#study-mode').focus();await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#study-mode')).toHaveValue('all');expect((await state(page)).selectedId).toBe('ew13');
+  await page.keyboard.press('ArrowUp');await expect(page.locator('#study-mode')).toHaveValue('zone1');
+  expect((await state(page)).selectedId).toBe('ew13');
+  await page.locator('#compare-road').focus();await page.keyboard.press('ArrowDown');
+  await expect.poll(async()=>(await state(page)).comparisonId).toBe(zone1Ids[0]);
+  expect((await state(page)).selectedId).toBe('ew13');await settled(page);
+  await page.locator('.maplibregl-canvas').focus();await page.keyboard.press('Shift+ArrowDown');
+  expect((await state(page)).selectedId).toBe('ew13');
+  await page.locator('#open-practice').click();await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#quiz-identify')).toBeVisible();expect((await state(page)).selectedId).toBe('ew13');
+  await page.locator('#quiz-identify').click();await settled(page);
+  const before=(await state(page)).quiz,attempts=await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.history.attempts);
+  await page.locator('.maplibregl-canvas').focus();await page.keyboard.press('ArrowDown');await page.keyboard.press('ArrowUp');await settled(page);
+  expect((await state(page)).quiz).toEqual(before);expect(before.finished).toBe(false);expect(before.assisted).toBe(false);
+  expect((await state(page)).selectedId).toBe('ew13');
+  expect(await page.evaluate(()=>(window as any).__FREMONT_MAP_STUDY__.history.attempts)).toBe(attempts);
+  await expect(page.locator('#selection-panel')).not.toBeVisible();await expect(search).not.toBeVisible();
+  await expect(page.locator('#road-drawer')).not.toBeVisible();await expect(page.locator('#map-status')).toHaveText('');
+  expect((await symbols(page)).layers.every((layer:any)=>layer.visibility==='none')).toBe(true);
+  await expect(page.locator('#quiz-hint')).toBeEnabled();
+});
+
 test('real map clicks select source-backed road identities and manual exploration is persistent',async({page})=>{
   await select(page,'ew13');
   await page.locator('#clear-selection').click();
